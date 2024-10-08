@@ -1,0 +1,51 @@
+---
+FormatStyle: file
+
+# Configure clang-tidy for this project.
+
+InheritParentConfig: true
+UseColor: false
+
+Checks: >
+  -*,
+  bugprone-*,
+  google-*,
+  misc-*,
+  modernize-*,
+  performance-*,
+  portability-*,
+  readability-*,
+  -bugprone-narrowing-conversions,
+  -google-build-using-namespace,
+  -google-global-names-in-headers,
+  -google-readability-braces-around-statements,
+  -google-readability-namespace-comments,
+  -google-readability-todo,
+  -google-runtime-references,
+  -misc-non-private-member-variables-in-classes,
+  -modernize-return-braced-init-list,
+  -modernize-use-trailing-return-type,
+  -modernize-avoid-c-arrays,
+  -performance-move-const-arg,
+  -readability-braces-around-statements,
+  -readability-convert-member-functions-to-static,
+  -readability-implicit-bool-conversion,
+  -readability-magic-numbers,
+  -readability-named-parameter,
+  -readability-redundant-declaration,
+  -readability-function-cognitive-complexity,
+  -readability-else-after-return,
+  -readability-uppercase-literal-suffix,
+  -misc-unused-parameters,
+  -google-explicit-constructor,
+  -modernise-use-using,
+  -modernize-use-nodiscard,
+  -modernize-avoid-bind,
+  -modernize-concat-nested-namespaces,
+  -modernize-use-using,
+HeaderFilterRegex: "(?!3rd_party).*"
+
+CheckOptions:
+  - { key: cppcoreguidelines-special-member-functions.AllowSoleDefaultDtor, value: 1 }
+  - { key: readability-implicit-bool-conversion.AllowIntegerConditions, value: 1 }
+  - { key: readability-implicit-bool-conversion.AllowPointerConditions, value: 1 }

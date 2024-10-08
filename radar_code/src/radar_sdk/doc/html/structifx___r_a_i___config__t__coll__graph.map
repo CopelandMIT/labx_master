@@ -1,0 +1,7 @@
+<map id="ifx_RAI_Config_t" name="ifx_RAI_Config_t">
+<area shape="rect" id="node1" title="Defines the structure for Range Angle Image module related settings." alt="" coords="59,288,187,315"/>
+<area shape="rect" id="node2" href="$structifx___d_b_f___config__t.html" title="Defines the structure for DBF module related settings." alt="" coords="5,199,139,225"/>
+<area shape="rect" id="node3" href="$structifx___r_d_m___config__t.html" title="Defines the structure for Range Doppler module related settings." alt="" coords="163,199,301,225"/>
+<area shape="rect" id="node4" href="$structifx___p_p_f_f_t___config__t.html" title="Defines the structure for pre&#45;processed FFT related settings." alt="" coords="159,95,305,121"/>
+<area shape="rect" id="node5" href="$structifx___window___config__t.html" title="Defines the structure for Window module related settings." alt="" coords="153,5,311,32"/>
+</map>

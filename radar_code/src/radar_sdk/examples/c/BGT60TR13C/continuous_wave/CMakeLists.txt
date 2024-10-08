@@ -1,0 +1,2 @@
+add_executable(BGT60TR13C_continuous_wave continuous_wave.c continuous_wave_defaults.h)
+target_link_libraries(BGT60TR13C_continuous_wave BGT60TR13C_common sdk_cw)

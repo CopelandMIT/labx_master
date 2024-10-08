@@ -1,0 +1,6 @@
+<map id="ifx_Fmcw_Sequence_Loop" name="ifx_Fmcw_Sequence_Loop">
+<area shape="rect" id="node1" title="A loop in an acquisition sequence." alt="" coords="5,5,199,32"/>
+<area shape="rect" id="node2" href="$structifx___fmcw___sequence___element.html" title="An element of an acquisition sequence." alt="" coords="145,95,361,121"/>
+<area shape="rect" id="node3" href="$structifx___fmcw___sequence___chirp.html" title="A chirp in an acquisition sequence." alt="" coords="223,5,419,32"/>
+<area shape="rect" id="node4" href="$structifx___fmcw___sequence___delay.html" title="A delay in an acquisition sequence." alt="" coords="443,5,643,32"/>
+</map>

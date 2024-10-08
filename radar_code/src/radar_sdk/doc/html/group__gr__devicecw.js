@@ -1,0 +1,28 @@
+var group__gr__devicecw =
+[
+    [ "ifx_cw_capture_frame", "group__gr__devicecw.html#ga1920cc5de038318ee93d311277f501aa", null ],
+    [ "ifx_cw_create", "group__gr__devicecw.html#ga2ee51e79df876b4c4d0892d77418420f", null ],
+    [ "ifx_cw_create_by_uuid", "group__gr__devicecw.html#ga3b9f873d673a28210e771267de13b93d", null ],
+    [ "ifx_cw_create_by_uuid_with_reference_freq", "group__gr__devicecw.html#ga968e64cd4a69bc94ede340d4fdc7fd65", null ],
+    [ "ifx_cw_create_dummy", "group__gr__devicecw.html#ga84f1a2c16873bda39210bdbe1d414d93", null ],
+    [ "ifx_cw_create_dummy_from_device", "group__gr__devicecw.html#ga700b6e1b4b905519c20da521c52d8d33", null ],
+    [ "ifx_cw_create_dummy_with_reference_freq", "group__gr__devicecw.html#gafbb284aa9f9ae4b9e4b8e76b9f54bc30", null ],
+    [ "ifx_cw_destroy", "group__gr__devicecw.html#ga1cf4056984223c7fbf3cb6b100aeff8b", null ],
+    [ "ifx_cw_get_adc_config", "group__gr__devicecw.html#ga8cf285d01af2ed34d42282a7b358e68b", null ],
+    [ "ifx_cw_get_baseband_config", "group__gr__devicecw.html#ga510f257a796744c83486634abc9f8bb2", null ],
+    [ "ifx_cw_get_firmware_information", "group__gr__devicecw.html#gaa120a85f780c77c03ae05db41ffb4c6d", null ],
+    [ "ifx_cw_get_list", "group__gr__devicecw.html#gabb071c6506610ed9873176a6eaabc343", null ],
+    [ "ifx_cw_get_sensor_information", "group__gr__devicecw.html#gacf75e22f44e82920d9797c5e6426e2eb", null ],
+    [ "ifx_cw_get_sensor_type", "group__gr__devicecw.html#ga6aa3371c1bf2575be0f5b0c5c0f89571", null ],
+    [ "ifx_cw_get_test_signal_generator_config", "group__gr__devicecw.html#gabdbe9242200d74fca4e272118319fcce", null ],
+    [ "ifx_cw_is_signal_active", "group__gr__devicecw.html#ga847b98bf1df4e3b5e11ab3b8c2b806fd", null ],
+    [ "ifx_cw_load_register_file", "group__gr__devicecw.html#gabf1511c75564bc5eba3da73421cc9385", null ],
+    [ "ifx_cw_measure_temperature", "group__gr__devicecw.html#gaaa260b5911b0a11019729b59bd039c44", null ],
+    [ "ifx_cw_measure_tx_power", "group__gr__devicecw.html#ga2c48d119823413b85c9f7168a854d125", null ],
+    [ "ifx_cw_save_register_file", "group__gr__devicecw.html#ga6e94ecb6a2d378f5e65f8200beee4061", null ],
+    [ "ifx_cw_set_adc_config", "group__gr__devicecw.html#ga16614ddac1af20ff232e8c571d7cd4b3", null ],
+    [ "ifx_cw_set_baseband_config", "group__gr__devicecw.html#ga147848f038379eda57731866d6b3e2bd", null ],
+    [ "ifx_cw_set_test_signal_generator_config", "group__gr__devicecw.html#ga96e125fe0afac8dc6866d775e74c02c9", null ],
+    [ "ifx_cw_start_signal", "group__gr__devicecw.html#gab622821ab53394d8d9f17eeccbf91cf8", null ],
+    [ "ifx_cw_stop_signal", "group__gr__devicecw.html#ga1e4825200cde5c9276483524ce37992c", null ]
+];

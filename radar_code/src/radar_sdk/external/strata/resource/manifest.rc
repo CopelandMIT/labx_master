@@ -1,0 +1,8 @@
+// Resource file to explicitly build manifest
+// (When using MSVC, this is not needed since it is built automatically)
+//
+
+
+#include <winuser.h>
+
+CREATEPROCESS_MANIFEST_RESOURCE_ID RT_MANIFEST "mainfest.xml"

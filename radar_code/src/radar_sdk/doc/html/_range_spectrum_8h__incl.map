@@ -1,0 +1,15 @@
+<map id="/home/jenkins/agent/workspace/ild&#45;documentation_release_v3.5.0/sdk/c/ifxRadar/RangeSpectrum.h" name="/home/jenkins/agent/workspace/ild&#45;documentation_release_v3.5.0/sdk/c/ifxRadar/RangeSpectrum.h">
+<area shape="rect" id="node1" title="API for Range Spectrum." alt="" coords="325,5,547,76"/>
+<area shape="rect" id="node2" href="$_preprocessed_f_f_t_8h.html" title="API for Pre&#45;processed FFT." alt="" coords="187,124,381,151"/>
+<area shape="rect" id="node4" href="$_types_8h.html" title="Definitions of data types used within the SDK." alt="" coords="247,423,371,449"/>
+<area shape="rect" id="node8" href="$_vector_8h.html" title="API for operations on Vector data structures." alt="" coords="373,273,499,300"/>
+<area shape="rect" id="node11" href="$_window_8h.html" title="API for Window function processing." alt="" coords="369,199,503,225"/>
+<area shape="rect" id="node13" href="$_matrix_8h.html" title="API for operations on Matrix data structures." alt="" coords="579,199,709,225"/>
+<area shape="rect" id="node3" href="$_f_f_t_8h.html" title="API for Fast Fourier Transform (FFT)" alt="" coords="93,199,200,225"/>
+<area shape="rect" id="node12" href="$_math_8h.html" title="API for Mathematical operations." alt="" coords="224,199,344,225"/>
+<area shape="rect" id="node5" title=" " alt="" coords="165,497,248,524"/>
+<area shape="rect" id="node6" title=" " alt="" coords="272,497,347,524"/>
+<area shape="rect" id="node7" title=" " alt="" coords="371,497,442,524"/>
+<area shape="rect" id="node9" href="$_mda_8h.html" title="API for multi&#45;dimensional arrays." alt="" coords="575,348,638,375"/>
+<area shape="rect" id="node10" title=" " alt="" coords="569,423,644,449"/>
+</map>

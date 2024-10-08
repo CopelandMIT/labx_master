@@ -1,0 +1,97 @@
+*******************
+* libAvian 0.1.11 *
+*******************
+- Added support for BGT60ATR24E
+- Added support for BGT24LTR13E
+- Timing Model knows different power consumption for Deep Sleep and Deep Sleep & Continue
+- Fixed bad maximum anti alias filter for BGT120UTR24
+- Fixed changing of reference clock frequency for BGT24LTR24
+- Fixed bad default RF range for BGT24LTR24
+- Extended valid RF start range to 57.8GHzfor BGT60UTR13DAiP devices
+- Fixed RF end range for BGT60ATR24C to 63.5GHz
+- Fixed clock option settings for BGT60ATR24E and BGT120UTR24
+- Fixed clock startup when reading device ID
+
+*******************
+* libAvian 0.1.10 *
+*******************
+- Fixed data loss with StrataPort and small burst sizes
+- Fixed bad temperature measurement during extremely short chirps (~8 samples)
+
+******************
+* libAvian 0.1.9 *
+******************
+- Adjusted allowed RF limits
+- Fixed register import for BGT60UTR11AIP
+- Removed test_antennas from Driver (Constant_Wave_Controller shall be used instead)
+- Removed baseband test and TX toggling from Driver (These are still features of Constant_Wave_Controller)
+
+******************
+* libAvian 0.1.8 *
+******************
+- Added support for BGT120UTR24
+- Removed enumeration type Hp_Cutoff, cutoffs are now specified in kHz
+- Adjusted high pass cutoff values for non Avian C devices according to data sheet
+- Constant_Wave_Controller may be instantiated with just in IControlPort
+- Fixed register modifications in driver, when the modified register is not programmed by default
+- Fixed wake up for temperature measurement through IPorts without High Speed compensation
+- Fixed reading of device id through IPorts without High Speed compensation
+
+******************
+* libAvian 0.1.7 *
+******************
+- Added Strata based IPort implementation
+
+******************
+* libAvian 0.1.6 *
+******************
+- Added class that extracts parameters from register dump
+- Adjusted RF limits for BGT24LTR24 to 24GHz - 24.25GHz
+- Added function to get Device Type from CHIP_VERSION register
+- Function get_device_id returns error code on failure
+- Added utility class for PLL frequency register calculation
+- Added utility class and functions for clock cycle calculation
+- Fixed frequency ramp setup for down chirps
+- Fixed UTR11 CW mode acquisition broken by temperature or TX power measurement
+
+******************
+* libAvian 0.1.5 *
+******************
+- Renamed values of enumeration types and Adc_Tracking and Test_Signal_Generator_Mode
+
+******************
+* libAvian 0.1.4 *
+******************
+- Fixed broken TX power measurement for BGT60ATR24C
+- Fixed crash when Constant_Wave_Controller is destroyed and IAvianPort throws an exception
+
+******************
+* libAvian 0.1.3 *
+******************
+- Adjusted RF limits for BGT24LTR24 (formerly called as BGT24ATR24C)
+- Introduced dedicated classes for continuous wave mode and sensor measurement
+- Enumeration types are now strict C++ class enumerations
+- DeviceTraits are publicly accessible now (for expert use case!)
+
+******************
+* libAvian 0.1.2 *
+******************
+- Replaced Driver::open_device() by Driver::create_driver()
+- Adjusted allowed RF range for BGT120UTR13E
+- Fixed a potential dead lock in SPI connection test
+- Fixed SPI connection test with BGT60UTR11AIP
+- Fixed first temperature and power measurement in CW mode with BGT60UTR11AIP
+
+******************
+* libAvian 0.1.1 *
+******************
+- Both TX of BGT60ATR24C can be enabled at the same time
+- Fixed TX power measurement for BGT60UTR11D
+- Added support for shrinked BGT60UTR11D
+- Fixed device detection for BGT120UTR13E
+- Added support for shrinked BGT24ATR24C
+
+******************
+* libAvian 0.1.0 *
+******************
+- Initial version based on BGT60TRxx C Driver 0.8.16

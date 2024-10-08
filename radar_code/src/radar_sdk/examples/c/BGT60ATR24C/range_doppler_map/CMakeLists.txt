@@ -1,0 +1,2 @@
+add_executable(BGT60ATR24C_range_doppler_map range_doppler_map.c range_doppler_map_defaults.h)
+target_link_libraries(BGT60ATR24C_range_doppler_map sdk_avian BGT60ATR24C_common)

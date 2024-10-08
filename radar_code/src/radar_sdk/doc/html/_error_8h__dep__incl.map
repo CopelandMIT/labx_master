@@ -1,0 +1,15 @@
+<map id="/home/jenkins/agent/workspace/ild&#45;documentation_release_v3.5.0/sdk/c/ifxBase/Error.h" name="/home/jenkins/agent/workspace/ild&#45;documentation_release_v3.5.0/sdk/c/ifxBase/Error.h">
+<area shape="rect" id="node1" title="API for error handling." alt="" coords="345,5,563,76"/>
+<area shape="rect" id="node2" href="$_base_8h.html" title="Header for ifxBase." alt="" coords="5,131,268,187"/>
+<area shape="rect" id="node3" href="$_device_fmcw_8h.html" title="For details refer to FMCW Device Control." alt="" coords="147,243,369,313"/>
+<area shape="rect" id="node9" href="$_device_fmcw_types_8h.html" title=" " alt="" coords="343,124,565,195"/>
+<area shape="rect" id="node12" href="$_device_ltr11_8h.html" title="Main header file for DeviceLtr11." alt="" coords="590,124,809,195"/>
+<area shape="rect" id="node13" href="$_util_8h.html" title="This file defines some utility functions like printing to, reading from files or printing to console." alt="" coords="833,131,1078,187"/>
+<area shape="rect" id="node4" href="$_device_control_8h.html" title="Header for ifxAvian." alt="" coords="149,361,367,432"/>
+<area shape="rect" id="node5" href="$_avian_8h.html" title="Header for ifxAvian." alt="" coords="254,599,473,669"/>
+<area shape="rect" id="node6" href="$_metrics_8h.html" title="API for Metrics." alt="" coords="601,480,819,551"/>
+<area shape="rect" id="node7" href="$_device_cw_8h.html" title="Header for Continuous Wave Control." alt="" coords="358,480,577,551"/>
+<area shape="rect" id="node8" href="$_presence_sensing_8h.html" title=" " alt="" coords="54,480,334,551"/>
+<area shape="rect" id="node10" href="$_device_cw_types_8h.html" title=" " alt="" coords="394,243,613,313"/>
+<area shape="rect" id="node11" href="$_metrics_fmcw_8h.html" title="API for MetricsFmcw." alt="" coords="575,361,797,432"/>
+</map>

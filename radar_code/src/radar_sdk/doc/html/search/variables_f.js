@@ -1,0 +1,25 @@
+var searchData=
+[
+  ['sample_2183',['sample',['../structifx___o_s_c_f_a_r___config__t.html#ab5035e101e6956d15d8cae9030735e5a',1,'ifx_OSCFAR_Config_t']]],
+  ['sample_5fand_5fhold_5ftime_5fns_2184',['sample_and_hold_time_ns',['../structifx___cw___adc___config__t.html#ae466cf43ed1becf7173c1d614ab143c9',1,'ifx_Cw_Adc_Config_t']]],
+  ['sample_5frate_5fhz_2185',['sample_rate_Hz',['../structifx___avian___config__t.html#a572bb1e1816656cca9acc378ea59f2a6',1,'ifx_Avian_Config_t::sample_rate_Hz()'],['../structifx___fmcw___sequence___chirp.html#a447b7223b65ed66e8263a60cef8d5e36',1,'ifx_Fmcw_Sequence_Chirp::sample_rate_Hz()']]],
+  ['samples_2186',['samples',['../structifx___fmcw___raw___frame__s.html#a780ef6e0bae6ddcec88a8879819e594f',1,'ifx_Fmcw_Raw_Frame_s']]],
+  ['samples_5fper_5fchirp_2187',['samples_per_chirp',['../structifx___r_a_i___opt___config__s.html#a734085fed2df9e5129fb1f5a34caf08c',1,'ifx_RAI_Opt_Config_s']]],
+  ['scale_2188',['scale',['../structifx___window___config__t.html#a5b61c1f5ad9e22b746a4e5fcc756fef5',1,'ifx_Window_Config_t']]],
+  ['search_5fzone_5fend_2189',['search_zone_end',['../structifx___peak___search___config__t.html#ab031779afe0bb8dc14a2af6354e24aa7',1,'ifx_Peak_Search_Config_t']]],
+  ['search_5fzone_5fstart_2190',['search_zone_start',['../structifx___peak___search___config__t.html#a086a604d01bf621e310a0f62a784fe76',1,'ifx_Peak_Search_Config_t']]],
+  ['selected_5frx_2191',['selected_rx',['../structifx___angle_capon___config__t.html#a7b32cc4e42b5d316f9b2db19e3113992',1,'ifx_AngleCapon_Config_t']]],
+  ['sensitivity_5fthreshold_2192',['sensitivity_threshold',['../structifx___presence___sensing___config__t.html#ace66b68ce9859c7ac4bae13abcf98722',1,'ifx_Presence_Sensing_Config_t']]],
+  ['sensor_5ftype_2193',['sensor_type',['../structifx___radar___sensor___list___entry__t.html#a6c58e71c4ea76f49ed941b3de1698f8e',1,'ifx_Radar_Sensor_List_Entry_t']]],
+  ['shape_2194',['shape',['../structifx___mda___r__t.html#ae34886c3872e8d7957e0068e58d2e4bf',1,'ifx_Mda_R_t::shape()'],['../structifx___mda___c__t.html#ae34886c3872e8d7957e0068e58d2e4bf',1,'ifx_Mda_C_t::shape()']]],
+  ['size_2195',['size',['../structifx___window___config__t.html#ab2c6b258f02add8fdf4cfc7c371dd772',1,'ifx_Window_Config_t']]],
+  ['spect_5fthreshold_2196',['spect_threshold',['../structifx___doppler_spectrogram___config__t.html#adb93ab255f33613617cad8875e760bc4',1,'ifx_DopplerSpectrogram_Config_t::spect_threshold()'],['../structifx___r_s___config__t.html#adb93ab255f33613617cad8875e760bc4',1,'ifx_RS_Config_t::spect_threshold()'],['../structifx___r_d_m___config__t.html#adb93ab255f33613617cad8875e760bc4',1,'ifx_RDM_Config_t::spect_threshold()']]],
+  ['speed_2197',['speed',['../structifx___motion_angle___result__t.html#a1442a84d924d66b803b9c09ed197fc5b',1,'ifx_MotionAngle_Result_t::speed()'],['../structifx___target__t.html#a1442a84d924d66b803b9c09ed197fc5b',1,'ifx_Target_t::speed()']]],
+  ['speed_5fresolution_5fm_5fs_2198',['speed_resolution_m_s',['../structifx___fmcw___metrics__t.html#aaa05fccc08f293debd40a276a241a789',1,'ifx_Fmcw_Metrics_t']]],
+  ['start_2199',['start',['../structifx__mda__slice__t.html#a61eb63d26b2fa6c2971603ceccffb14b',1,'ifx_mda_slice_t']]],
+  ['start_5ffrequency_5fhz_2200',['start_frequency_Hz',['../structifx___avian___config__t.html#a6262f5ec49f88bd54c5f3404f65f0dc9',1,'ifx_Avian_Config_t::start_frequency_Hz()'],['../structifx___fmcw___sequence___chirp.html#aaaba76d3af972a9074d1d9eec847110f',1,'ifx_Fmcw_Sequence_Chirp::start_frequency_Hz()']]],
+  ['step_2201',['step',['../structifx__mda__slice__t.html#a739c65d9c925e3793560160ef5a96d6f',1,'ifx_mda_slice_t::step()'],['../structifx___ltr11___config___limits__t.html#a2cd6cee747e102d6259b37eb31894f43',1,'ifx_Ltr11_Config_Limits_t::step()']]],
+  ['stop_2202',['stop',['../structifx__mda__slice__t.html#ab62795d0dce17019b8037b19185c21b1',1,'ifx_mda_slice_t']]],
+  ['stride_2203',['stride',['../structifx___mda___r__t.html#a629f6c2aa224cf8c3c121aedba87031b',1,'ifx_Mda_R_t::stride()'],['../structifx___mda___c__t.html#a629f6c2aa224cf8c3c121aedba87031b',1,'ifx_Mda_C_t::stride()']]],
+  ['sub_5fsequence_2204',['sub_sequence',['../structifx___fmcw___sequence___loop.html#a65ed2f3efc852dbc483c7553d89862c0',1,'ifx_Fmcw_Sequence_Loop']]]
+];

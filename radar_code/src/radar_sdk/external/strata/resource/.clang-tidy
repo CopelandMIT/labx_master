@@ -1,0 +1,4 @@
+---
+FormatStyle: none
+Checks: -*,misc-definitions-in-headers # we need to have at least one check enabled, otherwise we get a configuration error
+...

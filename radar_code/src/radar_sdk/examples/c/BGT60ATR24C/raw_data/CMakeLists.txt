@@ -1,0 +1,2 @@
+add_executable(BGT60ATR24C_raw_data raw_data.c)
+target_link_libraries(BGT60ATR24C_raw_data sdk_avian)

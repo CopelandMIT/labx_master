@@ -1,0 +1,13 @@
+.git
+
+bin
+*/build*/*
+CMakeLists.txt.user
+__pycache__
+.idea
+*.autosave
+*.mexw32
+*.mexw64
+*.mexa64*
+*.pyd
+*.so

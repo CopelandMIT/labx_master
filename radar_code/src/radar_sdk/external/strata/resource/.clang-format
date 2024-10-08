@@ -1,0 +1,5 @@
+---
+Language: Cpp
+DisableFormat: true
+SortIncludes: false # this is needed due to a bug in DisableFormat for versions < 13
+...

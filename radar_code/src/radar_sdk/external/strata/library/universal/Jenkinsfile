@@ -1,0 +1,155 @@
+@Library('fwswt@v3.1.0') _
+
+def windowsAgentLabel = 'linkedclone && os.win10 && tool.python37'
+
+pipeline {
+    agent none
+
+    parameters {
+        choice(name: 'releaseType', choices: ['', 'Standalone', 'Upstream Release Candidate', 'Upstream Release'],
+            description: """Decide if and which kind of release procedure is performed when building from a release branch.
+                default: Build RC Conan package only.
+                'Standalone': Build RC Conan package, wait for manual approval, then create Git tag and promote the built Conan package.
+                'Upstream Release Candidate': Build RC Conan package, create RC Git tag '<TAG_PREFIX><releaseVersion>-rc<releaseCandidateNumber>'
+                'Upstream Release': Promote the previously built RC Conan package with <releaseCandidateNumber>, create Git tag '<TAG_PREFIX><releaseVersion>' on same commit.""")
+
+        string(name: 'releaseVersionPrefix', defaultValue: '', description: 'Prefix for the release version.')
+
+        string(name: 'releaseCandidateNumber', defaultValue: '',
+                     description: 'Number of the rc-package e.g. universal/mlabif_1.1.0@ci/rc0, otherwise the current BUILD_NUMBER is used')
+    }
+
+    stages {
+        stage('Initialize') {
+            agent { label windowsAgentLabel }
+            steps {
+                script {
+                    plUtils.initialize(ARTIFACTORYSERVER: 'ifx_artifactory',
+                                       CONAN: [VERSION: '==1.9.2', REMOTE: 'artifactory', USERHOME: env.CONAN19_USER_HOME, PACKAGEUSER: 'ci'],
+                                       PYTHONHOME: env.PYTHON37_HOME, PIP: [REQUIREMENTS_FILE: 'requirements.txt'],
+                                       PROJECTCONFIG: [URL: 'https://bitbucket.vih.infineon.com/scm/sc-fwsw-graz-conan/conan-configuration.git', BRANCH: 'v1.2.0', CONANCONFIGDIR: 'conan'],
+                                       RELEASE: [TAG_PREFIX: '', VERSION_PREFIX: params.releaseVersionPrefix, CONANUSER: 'ifx', CONANCHANNEL: 'release', CHANGELOG: 'NONE', RC_NUMBER: params.releaseCandidateNumber])
+
+                    if (BRANCH_NAME.startsWith('releases/') && params.releaseType) {
+                        plUtils.initReleaseConfig()
+                    }
+                }
+            }
+        }
+
+        stage('Package') {
+            when { expression { params.releaseType !=  'Upstream Release'}  } // do not again build an RC, take the one built before for the release
+            agent { label windowsAgentLabel }
+            steps {
+                script {
+                    plUtils.createConanPackage()
+                    plUtils.uploadConanPackage()
+                    if (!plUtils.config.releaseVersion) {
+                        plUtils.createAndUploadConanAliasPackage()
+                    }
+                }
+            }
+        }
+
+        stage('Verify Irma Zynq') {
+            when { branch 'develop' }
+            agent { label windowsAgentLabel }
+            steps {
+                script {
+                    String repo = 'sw-irma-zynq'
+                    plUtils.logger.info("Triggering build of '${repo}' for branch '${env.BRANCH_NAME}'")
+                    build job: "${repo}/" + URLEncoder.encode(env.BRANCH_NAME, 'UTF-8'), wait: false, propagate: false
+                }
+            }
+        }
+
+        stage('Release') {
+            when { expression { plUtils.config.releaseVersion }  }
+            stages {
+                stage('Standalone Release') {
+                    when { expression { params.releaseType == 'Standalone' } }
+                    stages {
+                        stage('Manual Approval') {
+                            agent none 
+                            steps {
+                                timeout(time: 1, unit: 'HOURS' ) {
+                                    input "Do you want to release this build (rev ${plUtils.config.releaseCommitHash}) as Version ${plUtils.config.releaseVersion}?".toString()
+                                }
+                            }
+                        }
+
+                        stage('Create Git tag') {
+                            agent { label windowsAgentLabel }
+                            steps {
+                                script {
+                                    plUtils.createReleaseTag()
+                                }
+                            }
+                        }
+
+                        stage('Promote Conan Package') {
+                            agent { label windowsAgentLabel }
+                            steps {
+                                script {
+                                    plUtils.promoteConanPackage()
+                                }
+                            }
+                        }
+                    }
+                }
+
+                stage('Upstream Release Candidate') {
+                    when {
+                        allOf {
+                            triggeredBy 'BuildUpstreamCause'
+                            expression { params.releaseType == 'Upstream Release Candidate' }
+                        }
+                    }
+                    agent { label windowsAgentLabel }
+                    steps {
+                        script {
+                            plUtils.createReleaseCandidateTag()
+                        }
+                    }
+                }
+
+                stage('Upstream Release') {
+                    when { 
+                        allOf {
+                            triggeredBy 'BuildUpstreamCause'
+                            expression { params.releaseType == 'Upstream Release' }
+                        }
+                    }
+                    stages {
+                        stage('Create Git tag') {
+                            agent { label windowsAgentLabel }
+                            steps {
+                                script {
+                                    plUtils.createReleaseTag(sourceTag: plUtils.config.releaseCandidateTag)
+                                }
+                            }
+                        }
+
+                        stage('Promote Conan Package') {
+                            agent { label windowsAgentLabel }
+                            steps {
+                                script {
+                                    plUtils.promoteConanPackage()
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        stage('Finalize') {
+            agent { label windowsAgentLabel }
+            steps {
+                script {
+                    plUtils.publishBuildInfo()
+                }
+            }
+        }
+    }
+}

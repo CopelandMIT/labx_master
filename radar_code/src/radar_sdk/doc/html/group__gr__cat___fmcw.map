@@ -1,0 +1,5 @@
+<map id="FMCW Device Control (ifxFmcw)" name="FMCW Device Control (ifxFmcw)">
+<area shape="rect" id="node1" href="$group__gr__devicefmcw.html" title="API for FMCW Radar device control operations." alt="" coords="217,5,381,31"/>
+<area shape="rect" id="node2" title="API for FMCW Radar device control operations." alt="" coords="5,23,169,63"/>
+<area shape="rect" id="node3" href="$group__gr__metrics__fmcw.html" title="API for MetricsFmcw." alt="" coords="245,55,354,80"/>
+</map>

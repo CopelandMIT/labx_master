@@ -1,0 +1,23 @@
+<map id="/home/jenkins/agent/workspace/ild&#45;documentation_release_v3.5.0/sdk/c/ifxAvian/DeviceControl.h" name="/home/jenkins/agent/workspace/ild&#45;documentation_release_v3.5.0/sdk/c/ifxAvian/DeviceControl.h">
+<area shape="rect" id="node1" title="Header for ifxAvian." alt="" coords="275,5,493,76"/>
+<area shape="rect" id="node2" href="$_device_config_8h.html" title="API for Radar device configuration." alt="" coords="404,273,524,300"/>
+<area shape="rect" id="node9" href="$_cube_8h.html" title="API for operations on Cube data structures." alt="" coords="131,124,251,151"/>
+<area shape="rect" id="node11" href="$_math_8h.html" title="API for Mathematical operations." alt="" coords="191,273,259,300"/>
+<area shape="rect" id="node16" href="$_device_fmcw_8h.html" title="For details refer to FMCW Device Control." alt="" coords="746,199,923,225"/>
+<area shape="rect" id="node3" href="$_types_8h.html" title="Definitions of data types used within the SDK." alt="" coords="473,512,597,539"/>
+<area shape="rect" id="node7" href="$_device_fmcw_avian_config_8h.html" title="API for Radar device configuration." alt="" coords="290,348,497,389"/>
+<area shape="rect" id="node8" href="$_radar_device_common_8h.html" title="Header for ifxRadarDeviceCommon." alt="" coords="623,348,804,389"/>
+<area shape="rect" id="node4" title=" " alt="" coords="391,587,473,613"/>
+<area shape="rect" id="node5" title=" " alt="" coords="497,587,572,613"/>
+<area shape="rect" id="node6" title=" " alt="" coords="597,587,667,613"/>
+<area shape="rect" id="node10" href="$_defines_8h.html" title="Internal definitions used by standard math.h functions as Macros, to use float or double precision." alt="" coords="173,199,256,225"/>
+<area shape="rect" id="node13" href="$_mda_8h.html" title="API for multi&#45;dimensional arrays." alt="" coords="11,437,74,464"/>
+<area shape="rect" id="node15" href="$_matrix_8h.html" title="API for operations on Matrix data structures." alt="" coords="78,273,154,300"/>
+<area shape="rect" id="node12" href="$_vector_8h.html" title="API for operations on Vector data structures." alt="" coords="140,355,215,382"/>
+<area shape="rect" id="node14" title=" " alt="" coords="5,512,80,539"/>
+<area shape="rect" id="node17" href="$_error_8h.html" title="API for error handling." alt="" coords="929,355,1047,382"/>
+<area shape="rect" id="node20" href="$_list_8h.html" title=" " alt="" coords="837,437,947,464"/>
+<area shape="rect" id="node21" href="$_device_fmcw_types_8h.html" title=" " alt="" coords="700,273,855,300"/>
+<area shape="rect" id="node18" href="$_log_8h.html" title="API for logging." alt="" coords="971,437,1029,464"/>
+<area shape="rect" id="node19" title=" " alt="" coords="967,512,1033,539"/>
+</map>

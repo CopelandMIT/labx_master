@@ -1,0 +1,13 @@
+<map id="Radar (ifxRadar)" name="Radar (ifxRadar)">
+<area shape="rect" id="node1" href="$group__gr__doppler__spect.html" title="API for Doppler Spectrogram." alt="" coords="183,5,333,31"/>
+<area shape="rect" id="node2" href="$group__gr__dbf.html" title="API for Digital Beamforming (DBF) algorithm." alt="" coords="233,55,283,80"/>
+<area shape="rect" id="node3" title=" " alt="" coords="5,228,135,253"/>
+<area shape="rect" id="node4" href="$group__gr__peaksearch.html" title="API for Peak Search preprocessing." alt="" coords="207,104,309,129"/>
+<area shape="rect" id="node5" href="$group__gr__anglemonopulse.html" title="API for Phase Monopulse algorithm." alt="" coords="191,153,325,179"/>
+<area shape="rect" id="node6" href="$group__gr__rai.html" title="API for Range Angle Image algorithm." alt="" coords="183,203,333,228"/>
+<area shape="rect" id="node7" href="$group__gr__rdm.html" title="API for Range Doppler Map." alt="" coords="183,252,333,277"/>
+<area shape="rect" id="node8" href="$group__gr__sa.html" title="API for Spectrum Axis used by Range spectrum, Range Doppler and Range Angle Map modules." alt="" coords="200,301,316,327"/>
+<area shape="rect" id="node9" href="$group__gr__rs.html" title="API for Range Spectrum." alt="" coords="193,351,323,376"/>
+<area shape="rect" id="node10" href="$group__gr__anglecapon.html" title="API for the 1&#45;D Angle Capon algorithm." alt="" coords="206,400,310,425"/>
+<area shape="rect" id="node11" href="$group__gr__target.html" title="Definitions used by Tracker algorithm." alt="" coords="227,449,289,475"/>
+</map>

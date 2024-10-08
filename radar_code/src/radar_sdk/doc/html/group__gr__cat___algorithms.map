@@ -1,0 +1,11 @@
+<map id="Algorithms (ifxAlgo)" name="Algorithms (ifxAlgo)">
+<area shape="rect" id="node1" href="$group__gr__window.html" title="API for Window function processing." alt="" coords="257,5,331,31"/>
+<area shape="rect" id="node2" href="$group__gr__signal.html" title="API for digital filtering operations." alt="" coords="226,55,362,80"/>
+<area shape="rect" id="node3" href="$group__gr__ppfft.html" title="API for Pre&#45;processed FFT." alt="" coords="223,104,365,129"/>
+<area shape="rect" id="node4" href="$group__gr__dbscan.html" title="API for Density&#45;based spatial clustering of applications with noise (DBSCAN) algorithm." alt="" coords="255,153,333,179"/>
+<area shape="rect" id="node5" href="$group__gr__mti.html" title="API for Moving Target Indicator (MTI) filter." alt="" coords="207,203,381,243"/>
+<area shape="rect" id="node6" href="$group__gr__fft.html" title="API for Fast Fourier Transform (FFT)" alt="" coords="271,268,317,293"/>
+<area shape="rect" id="node7" href="$group__gr__oscfar.html" title="API for 2D ordered statistic constant false alarm rate (OS&#45;CFAR) algorithm." alt="" coords="255,317,333,343"/>
+<area shape="rect" id="node8" href="$group__gr__mti2d.html" title="API for 2D Moving Target Indicator filter (2DMTI)" alt="" coords="207,367,381,407"/>
+<area shape="rect" id="node9" title=" " alt="" coords="5,183,159,208"/>
+</map>

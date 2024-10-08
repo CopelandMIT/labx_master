@@ -1,0 +1,4 @@
+<map id="ifx_Fmcw_Simple_Sequence_Config" name="ifx_Fmcw_Simple_Sequence_Config">
+<area shape="rect" id="node1" title="An acquisition sequence with either a single chirp or a sequence of similar chirps with TDM MIMO conf..." alt="" coords="5,95,212,136"/>
+<area shape="rect" id="node2" href="$structifx___fmcw___sequence___chirp.html" title="A chirp in an acquisition sequence." alt="" coords="11,5,207,32"/>
+</map>

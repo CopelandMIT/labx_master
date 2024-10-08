@@ -1,0 +1,16 @@
+<map id="Base (ifxBase)" name="Base (ifxBase)">
+<area shape="rect" id="node1" href="$group__gr__cube.html" title="API for operations on Cube data structures." alt="" coords="236,5,291,31"/>
+<area shape="rect" id="node2" href="$group__gr__sdk__version.html" title="SDK version query." alt="" coords="228,55,299,80"/>
+<area shape="rect" id="node3" href="$group__gr__complex.html" title="API for operations on complex numbers." alt="" coords="223,104,303,129"/>
+<area shape="rect" id="node4" href="$group__gr__types.html" title="Definitions of data types used within the SDK." alt="" coords="234,153,293,179"/>
+<area shape="rect" id="node5" href="$group__gr__log.html" title="API for logging." alt="" coords="241,203,286,228"/>
+<area shape="rect" id="node6" href="$group__gr__matrix.html" title="API for operations on Matrix data structures." alt="" coords="231,252,295,277"/>
+<area shape="rect" id="node7" href="$group__gr__mda.html" title="API for multi&#45;dimensional arrays." alt="" coords="171,301,356,327"/>
+<area shape="rect" id="node8" href="$group__gr__mem.html" title="API for memory management." alt="" coords="225,351,301,376"/>
+<area shape="rect" id="node9" href="$group__gr__error.html" title="API for error handling." alt="" coords="237,400,290,425"/>
+<area shape="rect" id="node10" title=" " alt="" coords="5,301,123,327"/>
+<area shape="rect" id="node11" href="$group__gr__la.html" title="API for Linear Algebra (LA)" alt="" coords="205,449,321,475"/>
+<area shape="rect" id="node12" href="$group__gr__vector.html" title="API for operations on Vector data structures." alt="" coords="232,499,295,524"/>
+<area shape="rect" id="node13" href="$group__gr__list.html" title="API for list handling." alt="" coords="241,548,286,573"/>
+<area shape="rect" id="node14" href="$group__gr__math.html" title="API for Mathematical operations." alt="" coords="236,597,291,623"/>
+</map>

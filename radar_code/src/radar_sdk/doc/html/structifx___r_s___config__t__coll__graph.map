@@ -1,0 +1,5 @@
+<map id="ifx_RS_Config_t" name="ifx_RS_Config_t">
+<area shape="rect" id="node1" title="Defines the structure for range spectrum related settings." alt="" coords="23,184,146,211"/>
+<area shape="rect" id="node2" href="$structifx___p_p_f_f_t___config__t.html" title="Defines the structure for pre&#45;processed FFT related settings." alt="" coords="12,95,157,121"/>
+<area shape="rect" id="node3" href="$structifx___window___config__t.html" title="Defines the structure for Window module related settings." alt="" coords="5,5,164,32"/>
+</map>

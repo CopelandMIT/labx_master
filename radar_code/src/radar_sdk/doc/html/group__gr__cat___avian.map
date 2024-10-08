@@ -1,0 +1,6 @@
+<map id="Avian Radar Sensor (ifxAvian)" name="Avian Radar Sensor (ifxAvian)">
+<area shape="rect" id="node1" href="$group__gr__devicecontrol.html" title="API for Radar device control operations." alt="" coords="221,5,340,31"/>
+<area shape="rect" id="node2" title=" " alt="" coords="5,47,153,87"/>
+<area shape="rect" id="node3" href="$group__gr__avian__metrics.html" title="API for Metrics." alt="" coords="245,55,316,80"/>
+<area shape="rect" id="node4" href="$group__gr__deviceconfig.html" title="API for Radar device configuration." alt="" coords="201,104,360,129"/>
+</map>

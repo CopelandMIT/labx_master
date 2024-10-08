@@ -1,0 +1,86 @@
+/**
+ * \file    Introduction.dox
+ */
+/* ===========================================================================
+** Copyright (C) 2020-2023 Infineon Technologies AG
+**
+** Redistribution and use in source and binary forms, with or without
+** modification, are permitted provided that the following conditions are met:
+**
+** 1. Redistributions of source code must retain the above copyright notice,
+**    this list of conditions and the following disclaimer.
+** 2. Redistributions in binary form must reproduce the above copyright
+**    notice, this list of conditions and the following disclaimer in the
+**    documentation and/or other materials provided with the distribution.
+** 3. Neither the name of the copyright holder nor the names of its
+**    contributors may be used to endorse or promote products derived from
+**    this software without specific prior written permission.
+**
+** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+** AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+** IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+** ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+** LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+** CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+** SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+** INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+** CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+** ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+** POSSIBILITY OF SUCH DAMAGE.
+** ===========================================================================
+*/
+
+/**
+\page pg_introduction Introduction
+
+\section sct_intro_overview Overview
+
+\image html "Overview.svg" "libAvian Overview"
+
+As shown in the picture, libAvian consists of several parts an application can
+interact with. Those parts also interact with each other
+
+- <b>The interface \ref Infineon::Avian::HW::IPort "HW::IPort" (consisting of
+  \ref Infineon::Avian::HW::IControlPort "HW::IControlPort" and
+  \ref Infineon::Avian::HW::IReadPort "HW::IReadPort")</b>
+
+  These classes act as a hardware abstraction layer and define the interface to
+  interact with an Avian device. The interface IControlPort allows to access
+  the registers and IO lines of the AvianDevice, while the interface IReadPort
+  provides access to the acquired radar data. The data format provided by
+  IReadPort is set through a template parameter.
+
+  libAvian does not include any implementation of this interface, because
+  libAvian is supposed to be platform independent and the implementation
+  depends significantly on the target platform.
+
+- <b>The class \ref Infineon::Avian::HW::RegisterSet "HW::RegisterSet"</b>
+
+  This class represents a collection of register values that must be programmed
+  into an Avian device to operate the device for a certain use case. Typically
+  there is no need for an application to setup a register set value by value,
+  because it can be generated way more easily through an instance of the driver
+  class.
+
+- <b>The class \ref Infineon::Avian::Driver "Driver"</b>
+
+  The driver class can be considered as a parameter translator. It provides a
+  programming interface that allows to set all parameters of an Avian device
+  and generates a register set that configures an Avian device for data
+  acquisition according to these parameters.
+
+- <b>The class \ref Infineon::Avian::DataConverter "DataConverter"</b>
+
+  Typically hardware specific implementations of the IPort interface provide
+  acquired data in a packed format, which is very generic, but not convenient
+  for processing of that data. A data converter can be used to unpack acquired
+  data as a preparation for data processing. The data converter receives packed
+  data from an IReadPort instance and itself is an IReadPort that provides data
+  in a different format.
+
+- <b>The namespace \ref Infineon::Avian::HwTest "HwTest"</b>
+
+  This namespace contains some functions that are usefull to test the hardware
+  of an Avian device and the connection to it. This functionality is usually
+  not required for application use cases.
+*/

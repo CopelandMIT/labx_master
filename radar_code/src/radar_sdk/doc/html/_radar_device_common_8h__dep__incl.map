@@ -1,0 +1,17 @@
+<map id="/home/jenkins/agent/workspace/ild&#45;documentation_release_v3.5.0/sdk/c/ifxRadarDeviceCommon/RadarDeviceCommon.h" name="/home/jenkins/agent/workspace/ild&#45;documentation_release_v3.5.0/sdk/c/ifxRadarDeviceCommon/RadarDeviceCommon.h">
+<area shape="rect" id="node1" title="Header for ifxRadarDeviceCommon." alt="" coords="736,5,1002,76"/>
+<area shape="rect" id="node2" href="$_device_config_8h.html" title="API for Radar device configuration." alt="" coords="345,243,564,313"/>
+<area shape="rect" id="node11" href="$_device_fmcw_types_8h.html" title=" " alt="" coords="758,124,980,195"/>
+<area shape="rect" id="node15" href="$_device_ltr11_8h.html" title="Main header file for DeviceLtr11." alt="" coords="1005,124,1224,195"/>
+<area shape="rect" id="node3" href="$_avian_8h.html" title="Header for ifxAvian." alt="" coords="630,599,849,669"/>
+<area shape="rect" id="node4" href="$_device_control_8h.html" title="Header for ifxAvian." alt="" coords="736,361,954,432"/>
+<area shape="rect" id="node7" href="$_presence_sensing_8h.html" title=" " alt="" coords="413,480,693,551"/>
+<area shape="rect" id="node8" href="$_motion_angle_8h.html" title=" " alt="" coords="446,361,711,432"/>
+<area shape="rect" id="node9" href="$_segmentation_8h.html" title="API for Segmentation and Seamless Tracking algorithm." alt="" coords="58,361,370,432"/>
+<area shape="rect" id="node5" href="$_metrics_8h.html" title="API for Metrics." alt="" coords="1020,480,1238,551"/>
+<area shape="rect" id="node6" href="$_device_cw_8h.html" title="Header for Continuous Wave Control." alt="" coords="777,480,996,551"/>
+<area shape="rect" id="node10" href="$_radar_segmentation_8h.html" title="Header for ifxRadarSegmentation." alt="" coords="58,480,370,551"/>
+<area shape="rect" id="node12" href="$_device_cw_types_8h.html" title=" " alt="" coords="882,243,1101,313"/>
+<area shape="rect" id="node13" href="$_device_fmcw_8h.html" title="For details refer to FMCW Device Control." alt="" coords="635,243,858,313"/>
+<area shape="rect" id="node14" href="$_metrics_fmcw_8h.html" title="API for MetricsFmcw." alt="" coords="1028,361,1251,432"/>
+</map>

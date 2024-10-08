@@ -1,0 +1,9 @@
+*.user
+/Debug
+/Release
+/libDriverD.a
+/libDriver.a
+build/
+lib/
+libAvian.xcodeproj/project.xcworkspace
+libAvian.xcodeproj/xcuserdata

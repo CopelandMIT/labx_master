@@ -1,0 +1,11 @@
+<map id="/home/jenkins/agent/workspace/ild&#45;documentation_release_v3.5.0/sdk/c/ifxAvian/DeviceConfig.h" name="/home/jenkins/agent/workspace/ild&#45;documentation_release_v3.5.0/sdk/c/ifxAvian/DeviceConfig.h">
+<area shape="rect" id="node1" title="API for Radar device configuration." alt="" coords="523,5,741,76"/>
+<area shape="rect" id="node2" href="$_avian_8h.html" title="Header for ifxAvian." alt="" coords="5,361,224,432"/>
+<area shape="rect" id="node3" href="$_device_control_8h.html" title="Header for ifxAvian." alt="" coords="376,124,595,195"/>
+<area shape="rect" id="node6" href="$_presence_sensing_8h.html" title=" " alt="" coords="637,243,917,313"/>
+<area shape="rect" id="node7" href="$_motion_angle_8h.html" title=" " alt="" coords="670,124,935,195"/>
+<area shape="rect" id="node8" href="$_segmentation_8h.html" title="API for Segmentation and Seamless Tracking algorithm." alt="" coords="960,124,1272,195"/>
+<area shape="rect" id="node4" href="$_metrics_8h.html" title="API for Metrics." alt="" coords="152,243,371,313"/>
+<area shape="rect" id="node5" href="$_device_cw_8h.html" title="Header for Continuous Wave Control." alt="" coords="395,243,613,313"/>
+<area shape="rect" id="node9" href="$_radar_segmentation_8h.html" title="Header for ifxRadarSegmentation." alt="" coords="960,243,1272,313"/>
+</map>
