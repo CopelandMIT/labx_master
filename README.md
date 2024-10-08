@@ -13,9 +13,8 @@
    git clone https://github.com/yourusername/labx_master.git
 
 2. Install dependencies:
-''' bash
-
-pip install -r requirements.txt
+   ```bash
+   pip install -r requirements.txt
 
 ## Usage
 Central Server: Run central_server.py to manage sensor data.
