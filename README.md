@@ -11,3 +11,15 @@
 1. Clone the repository:
    ```bash
    git clone https://github.com/yourusername/labx_master.git
+
+2. Install dependencies:
+''' bash
+
+pip install -r requirements.txt
+
+## Usage
+Central Server: Run central_server.py to manage sensor data.
+Sensor Nodes: Follow sensor-specific instructions in the respective folders.
+
+## License
+This project is licensed under the MIT License - see the LICENSE file for details.
