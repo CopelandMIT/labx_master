@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -160,3 +161,26 @@ cython_debug/
 #  and can be added to the global gitignore or merged into this file.  For a more nuclear
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 #.idea/
+
+# Ignore data directories
+radar_code/data/
+camera_code/data/
+
+# Ignore logs directories
+radar_code/logs/
+camera_code/logs/
+
+# Ignore Python virtual environments
+venv/
+env/
+
+# Ignore Python bytecode files
+__pycache__/
+*.py[cod]
+
+# Ignore backup files
+*~
+
+# Mac-specific files
+.DS_Store
+>>>>>>> 30515d9 (Initial Commit of labx_master)
