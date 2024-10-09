@@ -12,45 +12,46 @@ This guide outlines the steps to set up the PPS GPS Raspberry Pi, including the 
 
 ---
 
-## Step 1: Soldering the GPS Antenna to the GPS Module
+## Step 1: Soldering the Pins to the GPS Module
 
-The GPS module needs to be soldered to ensure a proper connection with the active antenna.
+The GPS module needs to be soldered to pins to enable the connection with the Raspberry Pi.
 
 ### Soldering Steps:
 
 1. **Prepare the soldering iron** and make sure the GPS module pins are clean.
-2. **Connect the antenna** leads to the appropriate solder points on the GPS module.
-3. Ensure there are no loose connections, and double-check the solder joints.
+2. **Solder the pins** to the appropriate solder points on the GPS module.
+3. Ensure there are no loose connections, and double-check the solder joints. Ensure no bridges between pin connections. 
 
-![Soldering the GPS Module](./images/soldering_gps_module.jpg)
+![Soldering the GPS Module](./images/soldered_gps_module.jpeg)
 
 ---
 
 ## Step 2: Connect the GPS Module to the Raspberry Pi
 
-After soldering the antenna to the GPS module, the next step is to connect the GPS module to the Raspberry Pi's GPIO pins.
+After soldering the antenna to the GPS module, the next step is to connect the GPS module to the Raspberry Pi's GPIO pins using female to female jumper cables.
 
 ### Pin Connections:
 
-- **3.3V/5V**: Connect the GPS module to the GPIO pin 4 on the Raspberry Pi (depending on your GPS module's power requirements).
-- **GND (Ground)**: Connect the GND pin from the GPS module to a GND pin on the Raspberry Pi (GPIO pin 6).
-- **TX Pin**: Connect the TX pin from the GPS module to the Raspberry Pi GPIO 14 (UART, pin 8).
-- **PPS Pin**: Connect the PPS pin from the GPS module to the Raspberry Pi GPIO 18 (pin 10).
+- **VCC**: Connect the VCC Pin from the GPS module to 5V Power Pin on the Raspberry Pi (pin 4).
+- **GND**: Connect the GND pin from the GPS module to a GND pin on the Raspberry Pi (pin 6).
+- **RXD**: Connect the RXD pin from the GPS module to the Raspberry Pi GPIO 14  (pin 8).
+- **TXD**: Connect the TXD pin from the GPS module to the Raspberry Pi GPIO 15 (pin 10).
+- **PPS**: Connect the PPS pin from the GPS module to the Raspberry Pi GPIO 18 (pin 12).
 
-![Raspberry Pi Pin Connections](./images/rpi_pin_connections.jpg)
+![Raspberry Pi - GPS Pin Connections](./images/gps_to_rpi_pin_connection_diagram.png)
 
 ---
 
 ## Step 3: Install and Set Up the GPS Antenna
 
-Place the GPS antenna in a location with a clear view of the sky to ensure good satellite reception. Use the provided cable to connect the antenna to the GPS module's antenna port.
+Place the GPS antenna in a location with a clear view of the sky to ensure good satellite reception. Use the provided cables to connect the antenna to the GPS module's antenna port (Snap fit to GPS module, coaxial style cable to antenna).
 
 ### Antenna Placement Tips:
 
 - Make sure the antenna is placed **outdoors** or near a **window** for optimal satellite reception.
 - The antenna should be **fixed** securely to avoid any movement that could interrupt the signal.
 
-![GPS Antenna Setup](./images/gps_antenna_setup.jpg)
+![GPS Antenna Setup](./images/antenna_setup.png)
 
 ---
 
@@ -62,7 +63,7 @@ Place the GPS antenna in a location with a clear view of the sky to ensure good 
    sudo raspi-config
    ```
 
-2. Navigate to **Interfacing Options > Serial**, disable the console, but enable the serial hardware.
+2. Navigate to **Interfacing Options > Serial**, disable the console, AND enable the serial hardware.
 
 3. Install necessary software:
 
@@ -71,7 +72,7 @@ Place the GPS antenna in a location with a clear view of the sky to ensure good 
    sudo apt install gpsd gpsd-clients chrony pps-tools
    ```
 
-4. Add the following lines to `/boot/config.txt`:
+4. Add the following lines to `/boot/firmware/config.txt`:
 
    ```conf
    dtoverlay=pps-gpio,gpiopin=18
@@ -171,5 +172,7 @@ sudo systemctl restart chrony
 ## Conclusion
 
 By following this guide, you have successfully set up the PPS GPS Raspberry Pi to act as a Stratum 1 NTP server, and configured the other Raspberry Pis to synchronize their time using this GPS source with Google NTP servers as a backup.
+
+Option to build another for redundancy, and include it in the chrony.conf file.
 
 
