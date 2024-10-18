@@ -13,7 +13,7 @@ offset_data = {}  # {sbc_id: (timestamp, data)}
 data_lock = threading.Lock()
 
 # CSV file for storing metrics
-CSV_FILE = f'data/synchronization_metrics_2_rpi_1_radar_{time.time()}.csv'
+CSV_FILE = f'data/synchronization_metrics_1_camera_1_radar_{time.time()}.csv'
 
 # Ensure the CSV file exists and has a header
 if not os.path.isfile(CSV_FILE):
@@ -27,6 +27,8 @@ def receive_data():
     data = request.get_json()
     sbc_id = data.get('sbc_id')
     entries = data.get('data')
+
+    print(f"from {sbc_id}: {data}")
 
     if sbc_id is None or entries is None:
         return jsonify({'status': 'error', 'message': 'Invalid data'}), 400
