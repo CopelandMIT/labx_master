@@ -2,7 +2,6 @@ import threading
 import time
 import os
 import cv2
-import json
 import requests
 import subprocess
 import argparse
@@ -18,7 +17,7 @@ VIDEO_CAPTURE_LENGTH = 3600
 class CameraDataCollector:
     def __init__(self, stop_event, sbc_id="SBC001", central_server_url='http://192.168.68.130:5000/receive_data',
                  data_collection_interval=10, data_directory='data', video_filename='video.avi',
-                 delayed_start_timestamp=None, duration=None, camera_index=0):
+                 delayed_start_timestamp=None, duration=None, camera_index=None):
         # Configuration
         self.sbc_id = sbc_id
         print(f"CameraDataCollector initialized with SBC ID: {self.sbc_id}")
@@ -31,12 +30,35 @@ class CameraDataCollector:
         self.camera_index = camera_index
         self.stop_event = stop_event  # Store the stop_event for graceful shutdown
 
+        # Find a working camera index if none is provided
+        if self.camera_index is None:
+            self.camera_index = self.find_working_camera()
+            if self.camera_index is None:
+                print("No camera found. Exiting initialization.")
+                return
+        
         # Threads
         self.camera_thread = threading.Thread(target=self.collect_camera_data, daemon=True)
         self.chrony_collection_thread = threading.Thread(target=self.collect_chrony_data, daemon=True)
 
+    def find_working_camera(self):
+        """Tries different camera indices until it finds one that works, or returns None if none found."""
+        for idx in range(0, 38):  # Adjust the range based on your devices
+            cap = cv2.VideoCapture(idx)
+            if cap.isOpened():
+                print(f"Camera found at index {idx}.")
+                cap.release()
+                return idx
+            cap.release()
+        print("No camera found.")
+        return None
+
     def start(self):
         """Start the camera data collection and chrony data collection threads."""
+        if self.camera_index is None:
+            print("No camera available to start.")
+            return
+        
         self.camera_thread.start()
         self.chrony_collection_thread.start()
         print("Camera Data Collector started.")
@@ -126,7 +148,7 @@ def main():
     parser.add_argument('--video_filename', type=str, default=None, help="Filename for the video data")
     parser.add_argument('--delayed_start_timestamp', type=float, default=None, help="Timestamp to delay start until")
     parser.add_argument('--chrony_interval', type=int, default=10, help="Interval to send Chrony data (seconds)")
-    parser.add_argument('--camera_index', type=int, default=25, help="Camera index to use")
+    parser.add_argument('--camera_index', type=int, default=None, help="Camera index to use")
     args = parser.parse_args()
 
     # If video_filename is not provided, create one based on current time
