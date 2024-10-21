@@ -16,15 +16,17 @@ from ifxradarsdk.fmcw import DeviceFmcw
 from ifxradarsdk.fmcw.types import FmcwSimpleSequenceConfig, FmcwSequenceChirp
 
 # -------------------------------------------------
-# Chrony Data Collector Class
+# Radar Data Collector Class with Chrony
 # -------------------------------------------------
 
-class ChronyDataCollector:
+RADAR_CAPTURE_LENGTH = 300
+
+class RadarDataCollector:
     def __init__(self, stop_event, sbc_id="SBC002", central_server_url='http://192.168.68.130:5000/receive_data',
-                 data_collection_interval=10, data_send_interval=30, data_file='chrony_data.json'):
+                 data_collection_interval=10, data_send_interval=10.2, data_file='chrony_data.json'):
         # Configuration
         self.sbc_id = sbc_id
-        print(f"ChronyDataCollector initialized with SBC ID: {self.sbc_id}")
+        print(f"RadarDataCollector initialized with SBC ID: {self.sbc_id}")
         self.central_server_url = central_server_url
         self.data_collection_interval = data_collection_interval
         self.data_send_interval = data_send_interval
@@ -35,60 +37,46 @@ class ChronyDataCollector:
         self.data_lock = threading.Lock()
         # Threads
         self.collection_thread = threading.Thread(target=self.collect_chrony_data, daemon=True)
-        self.send_thread = threading.Thread(target=self.send_data_to_server, daemon=True)
 
     def start(self):
         """Start the data collection and sending threads."""
         self.collection_thread.start()
-        self.send_thread.start()
         print("Chrony Data Collector started.")
 
+
     def collect_chrony_data(self):
-        """Collects chrony data at specified intervals."""
+        """Collects Chrony data at specified intervals and sends each entry to the server."""
         while not self.stop_event.is_set():
             try:
-                # Execute 'chronyc tracking' and capture the output
-                result = subprocess.run(['chronyc', 'tracking'], stdout=subprocess.PIPE, text=True)
-                chronyc_output = result.stdout
+                # Fetch tracking information
+                tracking_result = subprocess.run(['chronyc', 'tracking'], stdout=subprocess.PIPE, text=True)
+                tracking_output = tracking_result.stdout
+
                 # Get current time
                 current_time = time.time()
-                # Store the output with timestamp
-                with self.data_lock:
-                    self.collected_data.append({
+
+                # Prepare payload
+                payload = {
+                    'sbc_id': self.sbc_id,
+                    'data': {
                         'timestamp': current_time,
-                        'chronyc_output': chronyc_output
-                    })
+                        'chronyc_output': tracking_output
+                    }
+                }
+
+                # Send data to server
+                response = requests.post(self.central_server_url, json=payload)
+                if response.status_code != 200:
+                    print(f"Failed to send data: {response.text}")
+                else:
+                    print(f"Successfully sent Chrony data to server at {datetime.fromtimestamp(current_time)}")
             except Exception as e:
-                print(f"Error collecting chrony data: {e}")
+                print(f"Error collecting or sending Chrony data: {e}")
+
             # Wait for the specified interval or until stop_event is set
             if self.stop_event.wait(self.data_collection_interval):
                 break  # Exit if stop_event is set
 
-    def send_data_to_server(self):
-        """Sends collected data to the central server at specified intervals."""
-        while not self.stop_event.is_set():
-            # Wait for the specified interval or until stop_event is set
-            if self.stop_event.wait(self.data_send_interval):
-                break  # Exit if stop_event is set
-            with self.data_lock:
-                # Copy and clear the collected data
-                data_to_send = self.collected_data.copy()
-                self.collected_data.clear()
-            if data_to_send:
-                payload = {
-                    'sbc_id': self.sbc_id,
-                    'data': data_to_send
-                }
-                try:
-                    response = requests.post(self.central_server_url, json=payload)
-                    if response.status_code != 200:
-                        print(f"Failed to send data: {response.text}")
-                    else:
-                        print(f"Successfully sent data to server. Data count: {len(data_to_send)}")
-                except Exception as e:
-                    print(f"Error sending data to server: {e}")
-            else:
-                print("No Chrony data to send.")
 
     def save_data_to_file(self):
         """Saves collected data to a file (optional, if needed)."""
@@ -191,7 +179,7 @@ def main():
     buffer = []
     timestamps = []
 
-    RECORDING_DURATION = 3600  # Record for 3600 seconds
+    RECORDING_DURATION = RADAR_CAPTURE_LENGTH  # Record for X seconds
     start_time = time.time()
 
     data_queue = queue.Queue()
@@ -199,12 +187,12 @@ def main():
     saving_thread.start()
 
     # Initialize Chrony Data Collector with stop_event
-    chrony_collector = ChronyDataCollector(
+    chrony_collector = RadarDataCollector(
         stop_event=stop_event,
         sbc_id=args.sbc_id,
         central_server_url='http://192.168.68.130:5000/receive_data',
         data_collection_interval=10,
-        data_send_interval=30
+        data_send_interval=10.2
     )
 
     chrony_collector.start()
@@ -215,7 +203,6 @@ def main():
         stop_event.set()
         saving_thread.join()
         chrony_collector.collection_thread.join()
-        chrony_collector.send_thread.join()
 
     signal.signal(signal.SIGTERM, handle_termination)
     signal.signal(signal.SIGINT, handle_termination)
@@ -278,7 +265,6 @@ def main():
     data_queue.join()
     saving_thread.join()
     chrony_collector.collection_thread.join()
-    chrony_collector.send_thread.join()
     print("Data capture and saving complete.")
     print(f"Total gap time where data was not captured: {total_gap_time:.6f} seconds")
 
