@@ -165,10 +165,14 @@ cython_debug/
 # Ignore data directories
 radar_code/data/
 camera_code/data/
+data/
 
 # Ignore logs directories
 radar_code/logs/
 camera_code/logs/
+
+# Ignore Archives
+central_server_code/archives
 
 # Ignore Python virtual environments
 venv/

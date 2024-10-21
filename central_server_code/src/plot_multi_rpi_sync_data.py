@@ -2,11 +2,13 @@ import matplotlib.pyplot as plt
 import pandas as pd
 
 # Load your data
-data_file = '/home/daniel/labx_master/data/synchronization_metrics_1_camera_1_radar_1728594906.9089365.csv'
-appendix = "_radar_300_v2"
+data_file = '/home/daniel/labx_master/data/synchronization_metrics_1_camera_1_radar_1729539624.2568672.csv'
+appendix = "_radar_short_v3"
+plot_save_dir = "/home/daniel/labx_master/central_server_code/data/plots"
 
 # Assuming you have a CSV file with columns 'timestamp', 'max_offset_ms', 'mean_offset_ms', 'jitter_ms', 'mean_root_dispersion_ms'
 data = pd.read_csv(data_file)
+print(data)
 start_time = data['timestamp'][0]
 time = data['timestamp'] - start_time
 
@@ -17,9 +19,10 @@ plt.xlabel('Time (seconds)')
 plt.ylabel('Max Offset (ms)')
 plt.title('Maximum Offset Between SBCs Over Time')
 plt.legend()
+plt.show()
 
 # Save the max offset plot
-plt.savefig(f'msi_code/data/plots/max_offset_plot{appendix}.png')
+plt.savefig(f'{plot_save_dir}/max_offset_plot{appendix}.png')
 
 # Plot the mean offset
 plt.figure()
@@ -30,7 +33,7 @@ plt.title('Mean Offset Between SBCs Over Time')
 plt.legend()
 
 # Save the mean offset plot
-plt.savefig(f'msi_code/data/plots/mean_offset_plot{appendix}.png')
+plt.savefig(f'{plot_save_dir}/mean_offset_plot{appendix}.png')
 
 # Plot the jitter (standard deviation of offsets)
 plt.figure()
@@ -41,7 +44,7 @@ plt.title('Jitter (Std Dev of Offsets) Over Time')
 plt.legend()
 
 # Save the jitter plot
-plt.savefig(f'msi_code/data/plots/jitter_plot{appendix}.png')
+plt.savefig(f'{plot_save_dir}/jitter_plot{appendix}.png')
 
 # Plot the mean root dispersion
 plt.figure()
@@ -52,4 +55,4 @@ plt.title('Mean Root Dispersion Over Time')
 plt.legend()
 
 # Save the mean root dispersion plot
-plt.savefig(f'msi_code/data/plots/mean_root_dispersion_plot{appendix}.png')
+plt.savefig(f'{plot_save_dir}/mean_root_dispersion_plot{appendix}.png')
