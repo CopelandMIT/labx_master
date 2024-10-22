@@ -8,6 +8,7 @@ import argparse
 from datetime import datetime
 import signal
 
+from shared_sensor_code.TimeSync import TimeSync
 # -------------------------------------------------
 # Camera Data Collector Class
 # -------------------------------------------------
