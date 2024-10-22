@@ -1,6 +1,6 @@
 # **Infineon Radar SDK Setup on Raspberry Pi (32-bit) with Debian Bookworm**
 
-This guide walks you through the process of setting up a 32-bit Raspberry Pi OS (Debian Bookworm) for development with the Infineon Radar SDK. It includes installing the SDK, setting up a Python virtual environment with the required dependencies, and configuring time synchronization using GPS PPS with Chrony.
+This guide walks you through setting up a 32-bit Raspberry Pi OS (Debian Bookworm) for development with the Infineon Radar SDK. It includes installing the SDK, setting up a Python virtual environment with the required dependencies, and configuring time synchronization using a GPS PPS SBC over LAN with Chrony.
 
 ## **Table of Contents**
 
@@ -10,9 +10,9 @@ This guide walks you through the process of setting up a 32-bit Raspberry Pi OS 
     1. [Cloning the Repository](#1-cloning-the-repository)
     2. [Setting Up Python Virtual Environment](#2-setting-up-python-virtual-environment)
     3. [Installing the Python SDK](#3-installing-the-python-sdk)
-4. [Configuring Time Synchronization with GPS PPS using Chrony](#configuring-time-synchronization-with-gps-pps-using-chrony)
+4. [Configuring Time Synchronization with Chrony](#configuring-time-synchronization-with-chrony)
     1. [Installing Chrony](#1-installing-chrony)
-    2. [Configuring Chrony to Use GPS PPS](#2-configuring-chrony-to-use-gps-pps)
+    2. [Configuring Chrony to Use GPS PPS SBC over LAN](#2-configuring-chrony-to-use-gps-pps-sbc-over-lan)
     3. [Testing the Configuration](#3-testing-the-configuration)
 5. [Troubleshooting](#troubleshooting)
 
@@ -248,13 +248,13 @@ With the virtual environment set up and dependencies installed, you can now inst
 
 ---
 
-## **Configuring Time Synchronization with GPS PPS using Chrony**
+## **Configuring Time Synchronization with Chrony**
 
-Accurate time synchronization is crucial for applications that rely on precise timing. This section guides you through installing Chrony and configuring it to use a GPS PPS (Pulse Per Second) source as the preferred time source, along with 4 Google NTP servers.
+Accurate time synchronization is crucial for applications that rely on precise timing. This section guides you through installing Chrony and configuring it to use a GPS PPS SBC over LAN as the preferred time source. If you don't have a GPS time server on your LAN, instructions are provided to use Google's NTP servers instead.
 
 ### **1. Installing Chrony**
 
-Chrony is a versatile implementation of NTP (Network Time Protocol) that can synchronize the system clock with NTP servers, reference clocks (e.g., GPS receivers), and manual input.
+Chrony is a versatile implementation of NTP (Network Time Protocol) that can synchronize the system clock with NTP servers, reference clocks, and manual input.
 
 **Install Chrony:**
 
@@ -263,111 +263,62 @@ sudo apt update
 sudo apt install -y chrony
 ```
 
-### **2. Configuring Chrony to Use GPS PPS**
+### **2. Configuring Chrony to Use GPS PPS SBC over LAN**
 
-We need to configure Chrony to use the GPS PPS source as the preferred time source and add Google NTP servers for redundancy.
+We need to configure Chrony to use the GPS PPS SBC over LAN as the preferred time source. You'll need to determine the IP address of your GPS time server.
 
 **Steps:**
 
-1. **Identify GPS Device:**
+1. **Determine the IP Address of Your GPS PPS SBC:**
 
-   - Determine the device names for your GPS receiver's NMEA data and PPS signal. Commonly, these are `/dev/ttyS0` for serial NMEA data and `/dev/pps0` for PPS.
+   - The GPS PPS SBC should be connected to your LAN.
+   - Find its IP address by checking your router's connected devices or using network scanning tools.
+   - For example, let's assume the IP address is `192.168.1.100`.
 
-2. **Ensure GPSD is Installed and Configured:**
+   **Note:** Replace `192.168.1.100` with the actual IP address of your GPS time server.
 
-   - Install GPSD and related packages:
+2. **Configure Chrony:**
 
-     ```bash
-     sudo apt install -y gpsd gpsd-clients python3-gps
-     ```
-
-   - Configure GPSD to use your GPS device (e.g., `/dev/ttyS0`):
-
-     Edit `/etc/default/gpsd`:
-
-     ```bash
-     sudo nano /etc/default/gpsd
-     ```
-
-     Update the file to include:
-
-     ```
-     START_DAEMON="true"
-     GPSD_OPTIONS="-n"
-     DEVICES="/dev/ttyS0"
-     USBAUTO="false"
-     GPSD_SOCKET="/var/run/gpsd.sock"
-     ```
-
-   - Restart GPSD:
-
-     ```bash
-     sudo systemctl restart gpsd
-     ```
-
-3. **Verify GPS is Working:**
-
-   - Use `cgps` or `gpsmon` to check GPS data:
-
-     ```bash
-     cgps
-     ```
-
-4. **Configure Chrony:**
-
-   - Edit Chrony configuration file:
+   - Edit Chrony's configuration file:
 
      ```bash
      sudo nano /etc/chrony/chrony.conf
      ```
 
-   - Add the following lines to configure GPS PPS as the preferred time source and add Google NTP servers:
+   - **Remove** or comment out existing `server` or `pool` lines to prevent conflicts.
 
+     ```bash
+     # Comment out default servers
+     #pool 2.debian.pool.ntp.org iburst
      ```
-     # GPS PPS reference (NMEA serial data)
-     refclock SHM 0 offset 0.0 delay 0.2 refid NMEA noselect
 
-     # GPS PPS reference (PPS signal)
-     refclock PPS /dev/pps0 refid PPS prefer
+   - **Add** the GPS PPS SBC as the preferred time source:
 
-     # Google NTP servers
+     ```bash
+     # GPS PPS SBC over LAN
+     server 192.168.1.100 iburst prefer
+     ```
+
+     - **Explanation:**
+       - `server 192.168.1.100`: Specifies the IP address of your GPS time server.
+       - `iburst`: Allows faster initial synchronization.
+       - `prefer`: Marks this server as the preferred time source.
+
+   - **Optional:** Add Google's NTP servers as fallback options in case the GPS PPS SBC is unavailable.
+
+     ```bash
+     # Google NTP servers as fallback
      server time.google.com iburst
      server time2.google.com iburst
      server time3.google.com iburst
      server time4.google.com iburst
      ```
 
-     - **Explanation:**
-       - `refclock SHM 0`: Uses shared memory segment 0, which GPSD writes NMEA data to.
-       - `noselect`: This source is monitored but not used for synchronization (since NMEA data may not be as precise).
-       - `refclock PPS /dev/pps0`: Uses the PPS signal from the GPS device.
-       - `prefer`: Marks this source as preferred.
-       - `refid`: An identifier for the source.
-       - `server ... iburst`: Adds Google NTP servers with the `iburst` option for faster initial synchronization.
+3. **Save and Close the File:**
 
-5. **Enable PPS Support:**
+   - Press `Ctrl+O` to save and `Ctrl+X` to exit the editor.
 
-   - Ensure the `pps-gpio` module is loaded at boot:
-
-     ```bash
-     sudo nano /boot/config.txt
-     ```
-
-     Add the following lines:
-
-     ```
-     dtoverlay=pps-gpio,gpiopin=18
-     ```
-
-     - **Note:** Adjust `gpiopin` to match the GPIO pin connected to the PPS signal from the GPS module.
-
-   - Load the module without rebooting:
-
-     ```bash
-     sudo dtoverlay pps-gpio gpiopin=18
-     ```
-
-6. **Restart Chrony:**
+4. **Restart Chrony:**
 
    ```bash
    sudo systemctl restart chrony
@@ -375,29 +326,7 @@ We need to configure Chrony to use the GPS PPS source as the preferred time sour
 
 ### **3. Testing the Configuration**
 
-1. **Check PPS Device:**
-
-   - Verify that `/dev/pps0` exists:
-
-     ```bash
-     ls -l /dev/pps0
-     ```
-
-   - Install `ppstest` utility:
-
-     ```bash
-     sudo apt install -y pps-tools
-     ```
-
-   - Test the PPS signal:
-
-     ```bash
-     sudo ppstest /dev/pps0
-     ```
-
-     - You should see output indicating PPS signal events.
-
-2. **Monitor Chrony Sources:**
+1. **Verify Time Sources:**
 
    - Use `chronyc` to check the sources:
 
@@ -407,99 +336,104 @@ We need to configure Chrony to use the GPS PPS source as the preferred time sour
 
      - This will display a list of time sources and their status.
 
-   - Check tracking statistics:
+   - **Example Output:**
+
+     ```
+     MS Name/IP address         Stratum Poll Reach LastRx Last sample
+     =============================================================================
+     ^* 192.168.1.100                1   6   377    34   -0.000123 +0.000456 0.000
+     ^? time.google.com              1   6   377    34   -0.000789 +0.001234 0.000
+     ```
+
+     - `^* 192.168.1.100`: The `^*` indicates that the GPS PPS SBC is the currently selected and preferred time source.
+
+2. **Check Tracking Statistics:**
+
+   - To view detailed information about the system's clock performance:
 
      ```bash
      chronyc tracking
      ```
 
-     - This shows information about the system's clock performance.
+3. **Monitor Synchronization:**
 
-3. **Ensure GPS PPS is Being Used:**
+   - Ensure that the system time is synchronizing with the GPS PPS SBC.
+   - You can use the `watch` command to monitor the sources:
 
-   - In the output of `chronyc sources -v`, look for the PPS source. The `^*` symbol indicates the source currently being used for synchronization.
+     ```bash
+     watch -n 10 'chronyc sources -v'
+     ```
 
-     - Example:
-
-       ```
-       MS Name/IP address         Stratum Poll Reach LastRx Last sample
-       =============================================================================
-       #? NMEA                          0   4     0   0     0.000000 0.000000 0.000
-       ^* PPS                           0   4   377   5     -0.000001 +0.000001 0.000
-       ^? time.google.com               1   6   377  34     -0.000123 +0.000456 0.000
-       ```
-
-     - `^* PPS`: Indicates that PPS is the preferred source.
+     - This will update the output every 10 seconds.
 
 ---
 
 ## **Troubleshooting**
 
-- **ImportError Related to NumPy and OpenBLAS:**
+- **GPS Time Server Unavailable:**
 
-  If you encounter an error like:
-
-  ```
-  ImportError: libopenblas.so.0: cannot open shared object file: No such file or directory
-  ```
-
-  **Solution:**
-
-  - Install OpenBLAS libraries:
+  - Ensure that the GPS PPS SBC is powered on and connected to the LAN.
+  - Verify the IP address and network connectivity.
+  - Use `ping` to test connectivity:
 
     ```bash
-    sudo apt install -y libopenblas-base libopenblas-dev
+    ping 192.168.1.100
     ```
 
-  - Reinstall NumPy in your virtual environment:
+- **Chrony Not Using GPS Time Server:**
+
+  - Ensure the `prefer` option is set in `chrony.conf`.
+  - Verify that there are no typos in the server IP address.
+  - Check for firewall rules that may block NTP traffic.
+
+- **No Network Connectivity:**
+
+  - Ensure the Raspberry Pi is connected to the LAN.
+  - Check network settings and cables.
+
+- **Using Google's NTP Servers Instead:**
+
+  If you do not have a GPS PPS SBC set up on your LAN, you can configure Chrony to use Google's NTP servers or any other reliable public NTP servers.
+
+  - Edit `/etc/chrony/chrony.conf`:
 
     ```bash
-    pip uninstall -y numpy
-    pip install numpy
+    sudo nano /etc/chrony/chrony.conf
     ```
 
-  - Verify NumPy installation:
+  - **Replace** any existing `server` lines with the following:
 
     ```bash
-    python -c "import numpy; print('NumPy version:', numpy.__version__)"
+    # Google NTP servers
+    server time.google.com iburst
+    server time2.google.com iburst
+    server time3.google.com iburst
+    server time4.google.com iburst
     ```
 
-- **ModuleNotFoundError:**
+  - **Remove** the line pointing to the GPS PPS SBC if it's not available.
 
-  Ensure you've installed the correct `.whl` file for your Raspberry Pi's architecture.
+  - Save and close the file, then restart Chrony:
 
-- **Virtual Environment Activation Issues:**
+    ```bash
+    sudo systemctl restart chrony
+    ```
 
-  Ensure that the `labx_env` directory exists and that you're in the correct directory.
+- **Chrony Service Not Starting:**
+
+  - Check the status of the Chrony service:
+
+    ```bash
+    sudo systemctl status chrony
+    ```
+
+  - Look for error messages in the output and address any configuration issues.
 
 - **Permission Errors:**
 
-  Do not use `sudo` inside the virtual environment.
-
-- **Missing Dependencies:**
-
-  Install additional system packages:
-
-  ```bash
-  sudo apt update
-  sudo apt install -y libusb-1.0-0
-  ```
-
-- **PPS Device Not Found:**
-
-  - Ensure the GPIO pin is correctly connected and configured.
-  - Verify `/dev/pps0` exists. If not, check the `dtoverlay` settings in `/boot/config.txt`.
-
-- **GPS Data Not Received:**
-
-  - Check the GPS antenna and placement.
-  - Verify GPSD is configured with the correct device.
-
-- **Chrony Not Using GPS PPS:**
-
-  - Ensure `prefer` is set for the PPS refclock in `chrony.conf`.
-  - Verify that the PPS signal is being received using `ppstest`.
+  - Ensure you use `sudo` when editing system files or restarting services.
 
 ---
 
 **Note:** Always activate the virtual environment (`source labx_env/bin/activate`) before running your radar code or scripts that depend on the installed packages and SDK.
+
