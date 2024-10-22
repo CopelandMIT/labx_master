@@ -56,7 +56,8 @@ If you're setting up the Pi without a monitor:
 Start by cloning the SDK repository from GitHub or your source control:
 
 ```bash
-git clone https://github.com/yourusername/your-repo.git labx_master
+cd ~
+git clone https://github.com/CopelandMIT/labx_master.git
 ```
 
 Change into the directory:
