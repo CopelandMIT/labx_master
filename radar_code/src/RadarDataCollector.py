@@ -15,6 +15,14 @@ from ifxradarsdk import get_version_full
 from ifxradarsdk.fmcw import DeviceFmcw
 from ifxradarsdk.fmcw.types import FmcwSimpleSequenceConfig, FmcwSequenceChirp
 
+# Add the parent directory to sys.path to import shared modules
+current_dir = os.path.dirname(os.path.abspath(__file__))
+parent_dir = os.path.abspath(os.path.join(current_dir, '..', '..'))
+sys.path.append(parent_dir)
+
+from shared_sensor_code.TimeSync import TimeSync
+
+
 # -------------------------------------------------
 # Radar Data Collector Class with Chrony
 # -------------------------------------------------
@@ -23,60 +31,35 @@ RADAR_CAPTURE_LENGTH = 300
 
 class RadarDataCollector:
     def __init__(self, stop_event, sbc_id="SBC002", central_server_url='http://192.168.68.130:5000/receive_data',
-                 data_collection_interval=10, data_send_interval=10.2, data_file='chrony_data.json'):
+                 data_collection_interval=10, data_file='radar_data.json'):
         # Configuration
         self.sbc_id = sbc_id
         print(f"RadarDataCollector initialized with SBC ID: {self.sbc_id}")
         self.central_server_url = central_server_url
         self.data_collection_interval = data_collection_interval
-        self.data_send_interval = data_send_interval
         self.data_file = data_file
         self.stop_event = stop_event  # Store the stop_event for graceful shutdown
         # Data storage
         self.collected_data = []
         self.data_lock = threading.Lock()
-        # Threads
-        self.collection_thread = threading.Thread(target=self.collect_chrony_data, daemon=True)
 
-    def start(self):
-        """Start the data collection and sending threads."""
-        self.collection_thread.start()
-        print("Chrony Data Collector started.")
+        # TimeSync object
+        self.time_sync = TimeSync(
+            sbc_id=self.sbc_id,
+            central_server_url=self.central_server_url,
+            data_collection_interval=self.data_collection_interval
+        )
 
+    def start_time_sync(self):
+        """Start the radar data collection and time synchronization."""
+        self.time_sync.start()
+        print("Radar Data Collector started.")
 
-    def collect_chrony_data(self):
-        """Collects Chrony data at specified intervals and sends each entry to the server."""
-        while not self.stop_event.is_set():
-            try:
-                # Fetch tracking information
-                tracking_result = subprocess.run(['chronyc', 'tracking'], stdout=subprocess.PIPE, text=True)
-                tracking_output = tracking_result.stdout
-
-                # Get current time
-                current_time = time.time()
-
-                # Prepare payload
-                payload = {
-                    'sbc_id': self.sbc_id,
-                    'data': {
-                        'timestamp': current_time,
-                        'chronyc_output': tracking_output
-                    }
-                }
-
-                # Send data to server
-                response = requests.post(self.central_server_url, json=payload)
-                if response.status_code != 200:
-                    print(f"Failed to send data: {response.text}")
-                else:
-                    print(f"Successfully sent Chrony data to server at {datetime.fromtimestamp(current_time)}")
-            except Exception as e:
-                print(f"Error collecting or sending Chrony data: {e}")
-
-            # Wait for the specified interval or until stop_event is set
-            if self.stop_event.wait(self.data_collection_interval):
-                break  # Exit if stop_event is set
-
+    def stop(self):
+        """Stop the radar data collection and time synchronization."""
+        self.stop_event.set()
+        self.time_sync.stop()
+        print("Radar Data Collector stopped.")    
 
     def save_data_to_file(self):
         """Saves collected data to a file (optional, if needed)."""
@@ -145,7 +128,10 @@ def main():
 
     # Directory for saving radar data
     current_time = datetime.now().strftime('%Y%m%d_%H%M%S%f')[:-3]
-    SAVE_DIR = f'/home/dcope_rpi5_32bit/LabX/data/radar_{current_time}'
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    parent_dir = os.path.abspath(os.path.join(current_dir, '..', '..'))
+    SAVE_DIR = f'{parent_dir}/radar_code/data/radar_{current_time}'
+    print(f"save dir: {SAVE_DIR}")
     os.makedirs(SAVE_DIR, exist_ok=True)
 
     # Extract configuration parameters into a dictionary
@@ -187,22 +173,21 @@ def main():
     saving_thread.start()
 
     # Initialize Chrony Data Collector with stop_event
-    chrony_collector = RadarDataCollector(
+    radar_data_collector = RadarDataCollector(
         stop_event=stop_event,
         sbc_id=args.sbc_id,
         central_server_url='http://192.168.68.130:5000/receive_data',
-        data_collection_interval=10,
-        data_send_interval=10.2
+        data_collection_interval=10
     )
 
-    chrony_collector.start()
+    radar_data_collector.start_time_sync()
 
     # Register the signal handler for SIGTERM and SIGINT
     def handle_termination(signum, frame):
         print("Received termination signal. Cleaning up...")
         stop_event.set()
         saving_thread.join()
-        chrony_collector.collection_thread.join()
+        radar_data_collector.collection_thread.join()
 
     signal.signal(signal.SIGTERM, handle_termination)
     signal.signal(signal.SIGINT, handle_termination)
@@ -264,7 +249,7 @@ def main():
     # Wait for the data saving thread to finish
     data_queue.join()
     saving_thread.join()
-    chrony_collector.collection_thread.join()
+    radar_data_collector.stop()
     print("Data capture and saving complete.")
     print(f"Total gap time where data was not captured: {total_gap_time:.6f} seconds")
 
