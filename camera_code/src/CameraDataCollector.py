@@ -1,14 +1,21 @@
+import sys
+import os
 import threading
 import time
-import os
 import cv2
-import requests
 import subprocess
-import argparse
 from datetime import datetime
 import signal
+import argparse 
+
+# Add the parent directory to sys.path
+current_dir = os.path.dirname(os.path.abspath(__file__))
+parent_dir = os.path.abspath(os.path.join(current_dir, '..', '..'))
+sys.path.append(parent_dir)
 
 from shared_sensor_code.TimeSync import TimeSync
+
+
 # -------------------------------------------------
 # Camera Data Collector Class
 # -------------------------------------------------
@@ -37,10 +44,16 @@ class CameraDataCollector:
             if self.camera_index is None:
                 print("No camera found. Exiting initialization.")
                 return
-        
-        # Threads
+
+        # TimeSync object
+        self.time_sync = TimeSync(
+            sbc_id=self.sbc_id,
+            central_server_url=self.central_server_url,
+            data_collection_interval=self.data_collection_interval
+        )
+
+        # Camera thread
         self.camera_thread = threading.Thread(target=self.collect_camera_data, daemon=True)
-        self.chrony_collection_thread = threading.Thread(target=self.collect_chrony_data, daemon=True)
 
     def find_working_camera(self):
         """Tries different camera indices until it finds one that works, or returns None if none found."""
@@ -55,14 +68,15 @@ class CameraDataCollector:
         return None
 
     def start(self):
-        """Start the camera data collection and chrony data collection threads."""
+        """Start the camera data collection and time synchronization."""
         if self.camera_index is None:
             print("No camera available to start.")
             return
-        
+
         self.camera_thread.start()
-        self.chrony_collection_thread.start()
+        self.time_sync.start()
         print("Camera Data Collector started.")
+
 
     def collect_camera_data(self):
         """Collects camera video data and saves it."""
@@ -100,38 +114,11 @@ class CameraDataCollector:
         out.release()
         print(f"Camera data collection stopped. Video saved to {video_path}")
 
-    def collect_chrony_data(self):
-        """Collects Chrony data at specified intervals and sends each entry to the server."""
-        while not self.stop_event.is_set():
-            try:
-                # Fetch tracking information
-                tracking_result = subprocess.run(['chronyc', 'tracking'], stdout=subprocess.PIPE, text=True)
-                tracking_output = tracking_result.stdout
-
-                # Get current time
-                current_time = time.time()
-
-                # Prepare payload
-                payload = {
-                    'sbc_id': self.sbc_id,
-                    'data': {
-                        'timestamp': current_time,
-                        'chronyc_output': tracking_output
-                    }
-                }
-
-                # Send data to server
-                response = requests.post(self.central_server_url, json=payload)
-                if response.status_code != 200:
-                    print(f"Failed to send data: {response.text}")
-                else:
-                    print(f"Successfully sent Chrony data to server at {datetime.fromtimestamp(current_time)}")
-            except Exception as e:
-                print(f"Error collecting or sending Chrony data: {e}")
-
-            # Wait for the specified interval or until stop_event is set
-            if self.stop_event.wait(self.data_collection_interval):
-                break  # Exit if stop_event is set
+    def stop(self):
+        """Stop the camera data collection and time synchronization."""
+        self.stop_event.set()
+        self.camera_thread.join()
+        self.time_sync.stop()
 
 # -------------------------------------------------
 # Main Function
@@ -145,7 +132,7 @@ def main():
     parser = argparse.ArgumentParser(description='Camera data collection with NTP chrony metadata')
     parser.add_argument('--sbc_id', type=str, default='SBC001', help="Single Board Computer ID")
     parser.add_argument('--duration', type=int, default=VIDEO_CAPTURE_LENGTH, help="Recording duration in seconds")
-    parser.add_argument('--data_directory', type=str, default='data', help="Directory to save video data")
+    parser.add_argument('--data_directory', type=str, default='camera_code/data', help="Directory to save video data")
     parser.add_argument('--video_filename', type=str, default=None, help="Filename for the video data")
     parser.add_argument('--delayed_start_timestamp', type=float, default=None, help="Timestamp to delay start until")
     parser.add_argument('--chrony_interval', type=int, default=10, help="Interval to send Chrony data (seconds)")
@@ -179,7 +166,6 @@ def main():
         print("Received termination signal. Cleaning up...")
         stop_event.set()
         camera_collector.camera_thread.join()
-        camera_collector.chrony_collection_thread.join()
         print("All threads have been terminated.")
 
     signal.signal(signal.SIGTERM, handle_termination)
@@ -196,7 +182,6 @@ def main():
     stop_event.set()
 
     # Wait for threads to finish
-    camera_collector.chrony_collection_thread.join()
     print("Data collection and saving complete.")
 
 if __name__ == '__main__':
