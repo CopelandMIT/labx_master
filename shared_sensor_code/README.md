@@ -1,68 +1,79 @@
-Shared Sensor Code
+# Shared Sensor Code
 
-This repository contains code for synchronizing sensor data timestamps across multiple devices using a central server. The TimeSync class allows your application to send timestamps to the central server for synchronization analysis. By using threading, you can send timestamps in the background without blocking your main application logic.
+This repository contains code for synchronizing sensor data timestamps across multiple devices using a central server. The `TimeSync` class allows your application to send timestamps to the central server for synchronization analysis. By using threading, you can send timestamps in the background without blocking your main application logic.
 
-This README provides instructions on how to import and use the TimeSync class within your application, specifically in the context of a CameraDataCollector class.
+This README provides instructions on how to import and use the `TimeSync` class within your application, specifically in the context of a `CameraDataCollector` class.
 
-Table of Contents
+## Table of Contents
 
-	•	Prerequisites
-	•	Installation
-	•	Usage
-	•	Importing the TimeSync Class
-	•	Integrating TimeSync in Your Application
-	•	Starting the Time Synchronization Thread
-	•	Example Code
-	•	Additional Notes
-	•	License
+- [Prerequisites](#prerequisites)
+- [Installation](#installation)
+- [Usage](#usage)
+  - [Importing the `TimeSync` Class](#importing-the-timesync-class)
+  - [Integrating `TimeSync` in Your Application](#integrating-timesync-in-your-application)
+  - [Starting the Time Synchronization Thread](#starting-the-time-synchronization-thread)
+- [Example Code](#example-code)
+- [Additional Notes](#additional-notes)
+- [License](#license)
 
-Prerequisites
+---
 
-	•	Python 3.6 or higher
-	•	Network Connection to the central server
-	•	Required Python Packages (listed in requirements.txt):
-	•	requests
-	•	threading (part of the standard library)
-	•	Additional packages as needed (e.g., opencv-python for camera operations)
+## Prerequisites
 
-Installation
+- **Python 3.6** or higher
+- **Network Connection** to the central server
+- **Required Python Packages** (listed in `requirements.txt`):
+  - `requests`
+  - `threading` (part of the standard library)
+  - Additional packages as needed (e.g., `opencv-python` for camera operations)
 
-	1.	Clone the Repository
+---
 
-git clone https://github.com/YourUsername/shared_sensor_code.git
-cd shared_sensor_code
+## Installation
 
+1. **Clone the Repository**
 
-	2.	Create and Activate a Virtual Environment (Recommended)
+   ```bash
+   git clone https://github.com/YourUsername/shared_sensor_code.git
+   cd shared_sensor_code
+   ```
 
-python3 -m venv venv
-source venv/bin/activate
+2. **Create and Activate a Virtual Environment** (Recommended)
 
+   ```bash
+   python3 -m venv venv
+   source venv/bin/activate
+   ```
 
-	3.	Install Dependencies
+3. **Install Dependencies**
 
-pip install -r requirements.txt
+   ```bash
+   pip install -r requirements.txt
+   ```
 
+---
 
+## Usage
 
-Usage
+### Importing the `TimeSync` Class
 
-Importing the TimeSync Class
+The `TimeSync` class is located in the `timesync.py` module within the repository. You can import it into your application as follows:
 
-The TimeSync class is located in the timesync.py module within the repository. You can import it into your application as follows:
-
+```python
 from timesync import TimeSync
+```
 
-Integrating TimeSync in Your Application
+### Integrating `TimeSync` in Your Application
 
-To use the TimeSync class within your application (e.g., a CameraDataCollector class), you should:
+To use the `TimeSync` class within your application (e.g., a `CameraDataCollector` class), you should:
 
-	1.	Initialize the TimeSync Object during the initialization of your application class.
-	2.	Pass Necessary Parameters such as sbc_id, central_server_url, and data_collection_interval.
-	3.	Ensure Threading is properly handled to allow TimeSync to run concurrently.
+1. **Initialize the `TimeSync` Object** during the initialization of your application class.
+2. **Pass Necessary Parameters** such as `sbc_id`, `central_server_url`, and `data_collection_interval`.
+3. **Ensure Threading** is properly handled to allow `TimeSync` to run concurrently.
 
-Example Initialization
+#### Example Initialization
 
+```python
 class CameraDataCollector:
     def __init__(self, ...):
         # Your existing initialization code
@@ -73,13 +84,15 @@ class CameraDataCollector:
             central_server_url=self.central_server_url,
             data_collection_interval=self.data_collection_interval
         )
+```
 
-Starting the Time Synchronization Thread
+### Starting the Time Synchronization Thread
 
-Start the TimeSync thread within a method of your application class, such as a start() method. This allows the time synchronization to run in the background.
+Start the `TimeSync` thread within a method of your application class, such as a `start()` method. This allows the time synchronization to run in the background.
 
-Example Start Method
+#### Example Start Method
 
+```python
     def start(self):
         """Start the camera data collection and time synchronization."""
         if self.camera_index is None:
@@ -93,13 +106,17 @@ Example Start Method
         self.time_sync.start()
 
         print("Camera Data Collector started.")
+```
 
-	•	Note: Ensure that your main application continues running to keep the threads alive.
+- **Note**: Ensure that your main application continues running to keep the threads alive.
 
-Example Code
+---
 
-Below is a complete example demonstrating how to use the TimeSync class within a CameraDataCollector class, including threading to send timestamps to the central server for synchronization analysis.
+## Example Code
 
+Below is a complete example demonstrating how to use the `TimeSync` class within a `CameraDataCollector` class, including threading to send timestamps to the central server for synchronization analysis.
+
+```python
 import threading
 import cv2
 from timesync import TimeSync
@@ -196,46 +213,61 @@ if __name__ == "__main__":
     except KeyboardInterrupt:
         print("Stopping Camera Data Collector...")
         camera_collector.stop()
+```
 
-Explanation:
+**Explanation:**
 
-	•	Initialization (__init__):
-	•	The TimeSync object is initialized with the necessary parameters.
-	•	A camera data collection thread is prepared but not started yet.
-	•	start() Method:
-	•	Starts both the camera data collection thread and the time synchronization thread.
-	•	Ensures that both processes run concurrently without blocking each other.
-	•	stop() Method:
-	•	Gracefully stops the camera data collection and time synchronization by setting the stop_event and joining the threads.
-	•	Main Application Loop:
-	•	Keeps the application running until a KeyboardInterrupt (Ctrl+C) is received.
-	•	Upon interruption, it calls the stop() method to clean up.
+- **Initialization (`__init__`):**
+  - The `TimeSync` object is initialized with the necessary parameters.
+  - A camera data collection thread is prepared but not started yet.
 
-Notes:
+- **`start()` Method:**
+  - Starts both the camera data collection thread and the time synchronization thread.
+  - Ensures that both processes run concurrently without blocking each other.
 
-	•	Threading:
-	•	The camera data collection and time synchronization run in separate threads.
-	•	The daemon=True parameter ensures that threads exit when the main program exits.
-	•	Graceful Shutdown:
-	•	The stop_event is used to signal threads to stop, allowing for a clean shutdown.
-	•	Adjust Parameters:
-	•	Replace 'http://192.168.68.130:5000/receive_data' with the actual URL of your central server.
-	•	Modify data_collection_interval and other parameters as needed.
+- **`stop()` Method:**
+  - Gracefully stops the camera data collection and time synchronization by setting the `stop_event` and joining the threads.
 
-Additional Notes
+- **Main Application Loop:**
+  - Keeps the application running until a KeyboardInterrupt (Ctrl+C) is received.
+  - Upon interruption, it calls the `stop()` method to clean up.
 
-	•	Central Server Setup:
-	•	Ensure that the central server is running and configured to receive and process the timestamps and data sent by the TimeSync class and your application.
-	•	The server should have an endpoint matching the central_server_url provided.
-	•	Error Handling:
-	•	Implement additional error handling as needed, especially for network operations and camera interactions.
-	•	Testing:
-	•	Test the application in a controlled environment before deploying it in a production setting.
-	•	Dependencies:
-	•	Make sure all dependencies are installed, including opencv-python if you’re using camera functionalities.
+**Notes:**
 
-License
+- **Threading:**
+  - The camera data collection and time synchronization run in separate threads.
+  - The `daemon=True` parameter ensures that threads exit when the main program exits.
 
-This project is licensed under the MIT License.
+- **Graceful Shutdown:**
+  - The `stop_event` is used to signal threads to stop, allowing for a clean shutdown.
 
-Disclaimer: This example provides a basic structure for integrating time synchronization into your application using threading. You may need to adjust the code to fit your specific use case and handle any exceptions or edge cases relevant to your environment.
+- **Adjust Parameters:**
+  - Replace `'http://192.168.68.130:5000/receive_data'` with the actual URL of your central server.
+  - Modify `data_collection_interval` and other parameters as needed.
+
+---
+
+## Additional Notes
+
+- **Central Server Setup:**
+  - Ensure that the central server is running and configured to receive and process the timestamps and data sent by the `TimeSync` class and your application.
+  - The server should have an endpoint matching the `central_server_url` provided.
+
+- **Error Handling:**
+  - Implement additional error handling as needed, especially for network operations and camera interactions.
+
+- **Testing:**
+  - Test the application in a controlled environment before deploying it in a production setting.
+
+- **Dependencies:**
+  - Make sure all dependencies are installed, including `opencv-python` if you're using camera functionalities.
+
+---
+
+## License
+
+This project is licensed under the [MIT License](LICENSE).
+
+---
+
+**Disclaimer:** This example provides a basic structure for integrating time synchronization into your application using threading. You may need to adjust the code to fit your specific use case and handle any exceptions or edge cases relevant to your environment.
