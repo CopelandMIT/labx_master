@@ -262,6 +262,10 @@ sudo ppstest /dev/pps0
 
 Edit `/etc/chrony/chrony.conf` to add the following lines:
 
+```bash
+sudo nano /etc/chrony/chrony.conf 
+```
+
 ```conf
 refclock PPS /dev/pps0 poll 2 refid PPS
 refclock SHM 0 poll 3 refid GPS
