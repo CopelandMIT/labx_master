@@ -148,7 +148,32 @@ To ensure optimal performance and compatibility for a headless server setup, it'
     ```
 
 20. **Disconnect the screen and peripherals (if needed)**, and you should now be able to connect via SSH on the network.
+    
+1. **Find the Raspberry Pi's IP address on your network**:
+    - You can use tools like `nmap` or [Angry IP Scanner](https://angryip.org/download/) to scan your local network and identify the Raspberry Pi's IP address.
+      - Select the `/24` subnet (e.g., `192.168.68.0/24`) and click "Start" to scan your network.
 
+2. **Open a terminal on your computer** and connect via SSH:
+
+    ```bash
+    ssh pi@<Raspberry_Pi_IP_Address>
+    ```
+
+    Replace `<Raspberry_Pi_IP_Address>` with the actual IP address of your Raspberry Pi.
+
+3. **Log in with the default credentials**:
+    - **Username**: `pi`
+    - **Password**: `raspberry` (you should change this after the first login).
+
+4. **Update the system**:
+
+    ```bash
+    sudo apt update
+    sudo apt full-upgrade -y
+    sudo reboot
+    ```
+
+5. After the reboot, reconnect via SSH to continue the setup.
 
 ---
 
@@ -269,18 +294,6 @@ sudo systemctl restart chrony
 
 The PPS GPS Raspberry Pi is now configured to act as a Stratum 1 NTP server for your local network.
 
----
-
-## Step 9: Set Up the GPS Antenna
-
-Place the GPS antenna in a location with a clear view of the sky to ensure good satellite reception. Use the provided cables to connect the antenna to the GPS module's antenna port (Snap fit to GPS module, coaxial style cable to antenna).
-
-### Antenna Placement Tips:
-
-- Make sure the antenna is placed **outdoors** or near a **window** for optimal satellite reception.
-- The antenna should be **fixed** securely to avoid any movement that could interrupt the signal.
-
-![GPS Antenna Setup](./images/antenna_setup.png)
 ---
 
 ## Step 9: Configure Other Raspberry Pis to Use the GPS PPS Signal
