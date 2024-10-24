@@ -148,29 +148,49 @@ Place the GPS antenna in a location with a clear view of the sky to ensure good 
 
 ## Step 5: Enable UART and PPS on the Raspberry Pi
 
-1. Open the Raspberry Pi configuration tool:
+1. **Open the Raspberry Pi Configuration Tool**:
 
    ```bash
    sudo raspi-config
    ```
 
-2. Navigate to **Interfacing Options > Serial**, disable the console, AND enable the serial hardware.
+2. **Navigate to Interfacing Options**:
 
-3. Install necessary software:
+   - Select **"Interfacing Options"**.
+   - Then select **"Serial"**.
+
+3. **Configure Serial Interface**:
+
+   - **Disable** the serial console by selecting **"No"** when prompted **"Would you like a login shell to be accessible over serial?"**
+   - **Enable** the serial hardware by selecting **"Yes"** when prompted **"Would you like the serial port hardware to be enabled?"**
+
+4. **Install Necessary Software**:
 
    ```bash
    sudo apt update
-   sudo apt install gpsd gpsd-clients chrony pps-tools
+   sudo apt install gpsd gpsd-clients chrony pps-tools -y
    ```
 
-4. Add the following lines to `/boot/firmware/config.txt`:
+5. **Configure `/boot/config.txt`**:
+
+   Open the configuration file with a text editor:
+
+   ```bash
+   sudo nano /boot/config.txt
+   ```
+
+   Add the following lines at the end of the file:
 
    ```conf
    dtoverlay=pps-gpio,gpiopin=18
    enable_uart=1
    ```
 
-5. Reboot the Raspberry Pi:
+   > **Note**: If you're using Raspberry Pi OS Bullseye or later, and `/boot/firmware/config.txt` doesn't exist, use `/boot/config.txt`.
+
+   Save and exit the editor by pressing **Ctrl+X**, then **Y**, and **Enter**.
+
+6. **Reboot the Raspberry Pi**:
 
    ```bash
    sudo reboot
