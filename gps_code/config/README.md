@@ -260,11 +260,12 @@ sudo ppstest /dev/pps0
 
 ## Step 7: Configure Chrony to Use PPS GPS Signal
 
-Edit `/etc/chrony/chrony.conf` to add the following lines:
+Edit `/etc/chrony/chrony.conf` ...
 
 ```bash
 sudo nano /etc/chrony/chrony.conf 
 ```
+to add the following lines:
 
 ```conf
 refclock PPS /dev/pps0 poll 2 refid PPS
