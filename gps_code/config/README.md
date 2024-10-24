@@ -106,30 +106,84 @@ To ensure optimal performance and compatibility for a headless server setup, it'
     - Connect the Raspberry Pi to your network via Ethernet (recommended for initial setup).
     - Power on the Raspberry Pi and allow it to boot into Raspberry Pi OS Lite.
 
-11. **Initial Setup via SSH**:
+---
 
-    - Find the Raspberry Pi's IP address on your network (you can use tools like `nmap` or [Download Angry Scanner](https://angryip.org/download/), select /24 and and click "Start").
-    - Open a terminal on your computer and connect via SSH:
+### 11. **Initial Setup via SSH or LCD Screen**
 
-      ```bash
-      ssh pi@<Raspberry_Pi_IP_Address>
-      ```
+#### **Option 1: Initial Setup via SSH**
 
-      Replace `<Raspberry_Pi_IP_Address>` with the actual IP address.
+1. **Find the Raspberry Pi's IP address on your network**:
+    - You can use tools like `nmap` or [Angry IP Scanner](https://angryip.org/download/) to scan your local network and identify the Raspberry Pi's IP address.
+      - Select the `/24` subnet (e.g., `192.168.68.0/24`) and click "Start" to scan your network.
 
-    - **Default Credentials**:
-      - **Username**: `pi`
-      - **Password**: `raspberry` (change this immediately after first login for security).
+2. **Open a terminal on your computer** and connect via SSH:
 
-    - **Update the System**:
+    ```bash
+    ssh pi@<Raspberry_Pi_IP_Address>
+    ```
 
-      ```bash
-      sudo apt update
-      sudo apt full-upgrade -y
-      sudo reboot
-      ```
+    Replace `<Raspberry_Pi_IP_Address>` with the actual IP address of your Raspberry Pi.
 
-    - After rebooting, reconnect via SSH to continue with the setup.
+3. **Log in with the default credentials**:
+    - **Username**: `pi`
+    - **Password**: `raspberry` (you should change this after the first login).
+
+4. **Update the system**:
+
+    ```bash
+    sudo apt update
+    sudo apt full-upgrade -y
+    sudo reboot
+    ```
+
+5. After the reboot, reconnect via SSH to continue the setup.
+
+---
+
+#### **Option 2: Initial Setup via Direct Connection to an LCD Screen**
+
+If you don't have access to SSH or want to use a direct connection:
+
+1. **Connect an HDMI-compatible monitor or LCD screen** to the Raspberry Pi's HDMI port.
+
+2. **Attach a keyboard and mouse** to the Raspberry Pi using the USB ports.
+
+3. **Power on the Raspberry Pi**. You should see the boot sequence on the screen, and once complete, you will be presented with a login prompt.
+
+4. **Log in with the default credentials**:
+    - **Username**: `pi`
+    - **Password**: `raspberry`
+
+5. **Change the default password** after logging in for security:
+    
+    ```bash
+    passwd
+    ```
+
+6. **Update the system** by running the following commands:
+   
+    ```bash
+    sudo apt update
+    sudo apt full-upgrade -y
+    ```
+
+7. **Enable SSH** for future remote access:
+
+    ```bash
+    sudo raspi-config
+    ```
+
+8. **In the `raspi-config` menu**:
+   - Navigate to **"Interface Options"**.
+   - Select **"SSH"** and enable it.
+
+9. **Reboot the Raspberry Pi**:
+
+    ```bash
+    sudo reboot
+    ```
+
+10. **Disconnect the screen and peripherals (if needed)**, and you should now be able to connect via SSH on the network.
 
 ---
 
