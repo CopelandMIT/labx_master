@@ -1,6 +1,6 @@
 # PPS GPS Raspberry Pi Setup
 
-This guide outlines the steps to set up the PPS GPS Raspberry Pi, including the hardware connection of the GPS module/antenna to the Raspberry Pi and the system configuration to accept and publish the GPS signal to other devices.
+This guide outlines the steps to set up the PPS GPS Raspberry Pi, including the hardware connection of the GPS module/antenna to the Raspberry Pi and the system configuration to accept and publish the GPS signal to other devices over your Local Access Network (LAN).
 
 ## Components Used
 
