@@ -168,12 +168,13 @@ If you don't have access to SSH or want to use a direct connection:
 2. **Navigate to Interfacing Options**:
 
    - Select **"Interfacing Options"**.
-   - Then select **"Serial"**.
+   - Then select **"Serial Port"**.
 
 3. **Configure Serial Interface**:
 
    - **Disable** the serial console by selecting **"No"** when prompted **"Would you like a login shell to be accessible over serial?"**
    - **Enable** the serial hardware by selecting **"Yes"** when prompted **"Would you like the serial port hardware to be enabled?"**
+   - Reboot
 
 4. **Install Necessary Software**:
 
