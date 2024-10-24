@@ -7,6 +7,7 @@ This guide outlines the steps to set up the PPS GPS Raspberry Pi, including the 
 - **Raspberry Pi 4 or 5** 
 - **GPS Module**: [NEO-6M GPS Module](https://www.amazon.com/dp/B07P8YMVNT?ref=ppx_yo2ov_dt_b_fed_asin_title)
 - **GPS Antenna**: [GPS Active Antenna](https://www.amazon.com/gp/product/B083D59N55/ref=ppx_yo_dt_b_asin_title_o01_s00?ie=UTF8&psc=1)
+- **Soldering Kit** 
 
 > **Note**: Soldering is required to connect the antenna to the GPS module. Follow the steps below to properly set up the hardware and configure the Raspberry Pi.
 
