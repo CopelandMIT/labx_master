@@ -44,9 +44,10 @@ After soldering the antenna to the GPS module, the next step is to connect the G
 
 ---
 
-## Step 3: Flash a 64-bit Raspberry Pi OS to the Raspberry Pi
 
-To ensure optimal performance and compatibility, it's recommended to use the 64-bit version of the Raspberry Pi OS on your Raspberry Pi 4 or 5.
+## Step 3: Flash a 64-bit Raspberry Pi OS Lite to the Raspberry Pi
+
+To ensure optimal performance and compatibility for a headless server setup, it's recommended to use the **64-bit Raspberry Pi OS Lite** on your Raspberry Pi 4 or 5.
 
 ### Steps to Flash the OS:
 
@@ -60,7 +61,7 @@ To ensure optimal performance and compatibility, it's recommended to use the 64-
 
 3. **Prepare a microSD Card**:
 
-   - Use a microSD card with at least **8GB** of storage.
+   - Use a microSD card with at least **16GB** of storage for better performance and longevity.
    - Insert the microSD card into your computer's card reader.
 
 4. **Launch the Raspberry Pi Imager**:
@@ -70,20 +71,24 @@ To ensure optimal performance and compatibility, it's recommended to use the 64-
 5. **Choose the OS**:
 
    - Click on **"Choose OS"**.
-   - Select **"Raspberry Pi OS (other)"**.
-   - Choose **"Raspberry Pi OS (64-bit)"**.
+   - Navigate to **"Raspberry Pi OS (other)"**.
+   - Select **"Raspberry Pi OS Lite (64-bit)"**.
 
 6. **Select the microSD Card**:
 
    - Click on **"Choose Storage"**.
    - Select your microSD card from the list.
 
-7. **Optional - Configure Advanced Settings**:
+7. **Configure Advanced Settings (Optional)**:
 
-   - Before writing, you can set up advanced options:
-     - Click on the **gear icon** or press **Ctrl+Shift+X** to open the advanced settings.
-     - Configure settings such as enabling SSH, setting Wi-Fi credentials, and setting the hostname.
-     - Click **"Save"** to apply the settings.
+   - Click on the **gear icon** or press **Ctrl+Shift+X** to open the advanced settings.
+   - **Enable SSH**: Check the box to enable SSH for remote access.
+   - **Set Hostname**: Assign a unique hostname for your Raspberry Pi.
+   - **Configure Wi-Fi** (if applicable): Enter your Wi-Fi SSID and password.
+   - **Set Locale Settings**: Configure the locale, timezone, and keyboard layout.
+   - **Save** the settings by clicking **"Save"**.
+
+   > **Note**: Configuring SSH and network settings here allows for headless setup without needing a monitor or keyboard.
 
 8. **Write the OS to the microSD Card**:
 
@@ -98,12 +103,33 @@ To ensure optimal performance and compatibility, it's recommended to use the 64-
 10. **Boot the Raspberry Pi**:
 
     - Insert the microSD card into the Raspberry Pi.
-    - Connect a monitor, keyboard, and power supply to the Raspberry Pi.
-    - Power on the Raspberry Pi and allow it to boot into the Raspberry Pi OS.
+    - Connect the Raspberry Pi to your network via Ethernet (recommended for initial setup).
+    - Power on the Raspberry Pi and allow it to boot into Raspberry Pi OS Lite.
 
-11. **Initial Setup**:
+11. **Initial Setup via SSH**:
 
-    - Follow the on-screen prompts to complete the initial setup, such as configuring the locale, time zone, and updating the system.
+    - Find the Raspberry Pi's IP address on your network (you can use tools like `nmap` or check your router's connected devices list).
+    - Open a terminal on your computer and connect via SSH:
+
+      ```bash
+      ssh pi@<Raspberry_Pi_IP_Address>
+      ```
+
+      Replace `<Raspberry_Pi_IP_Address>` with the actual IP address.
+
+    - **Default Credentials**:
+      - **Username**: `pi`
+      - **Password**: `raspberry` (change this immediately after first login for security).
+
+    - **Update the System**:
+
+      ```bash
+      sudo apt update
+      sudo apt full-upgrade -y
+      sudo reboot
+      ```
+
+    - After rebooting, reconnect via SSH to continue with the setup.
 
 ---
 
