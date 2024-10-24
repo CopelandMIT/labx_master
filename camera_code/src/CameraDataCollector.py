@@ -20,17 +20,17 @@ from shared_sensor_code.TimeSync import TimeSync
 # Camera Data Collector Class
 # -------------------------------------------------
 
-VIDEO_CAPTURE_LENGTH = 3600
+VIDEO_CAPTURE_LENGTH = 600
 
 class CameraDataCollector:
     def __init__(self, stop_event, sbc_id="SBC001", central_server_url='http://192.168.68.130:5000/receive_data',
-                 data_collection_interval=10, data_directory='data', video_filename='video.avi',
+                 polling_interval=10, data_directory='data', video_filename='video.avi',
                  delayed_start_timestamp=None, duration=None, camera_index=None):
         # Configuration
         self.sbc_id = sbc_id
         print(f"CameraDataCollector initialized with SBC ID: {self.sbc_id}")
         self.central_server_url = central_server_url
-        self.data_collection_interval = data_collection_interval
+        self.polling_interval = polling_interval
         self.data_directory = data_directory
         self.video_filename = video_filename
         self.delayed_start_timestamp = delayed_start_timestamp
@@ -49,7 +49,7 @@ class CameraDataCollector:
         self.time_sync = TimeSync(
             sbc_id=self.sbc_id,
             central_server_url=self.central_server_url,
-            data_collection_interval=self.data_collection_interval
+            polling_interval=self.polling_interval
         )
 
         # Camera thread
@@ -151,7 +151,7 @@ def main():
         stop_event=stop_event,
         sbc_id=args.sbc_id,
         central_server_url='http://192.168.68.130:5000/receive_data',
-        data_collection_interval=args.chrony_interval,
+        polling_interval=args.chrony_interval,
         data_directory=args.data_directory,
         video_filename=video_filename,
         delayed_start_timestamp=args.delayed_start_timestamp,
