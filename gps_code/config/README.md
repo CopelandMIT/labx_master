@@ -109,8 +109,6 @@ To ensure optimal performance and compatibility for a headless server setup, it'
 
 11. **Initial Setup via Direct Connection to an LCD Screen**:
 
-If you don't have access to SSH or want to use a direct connection:
-
 1. **Connect an HDMI-compatible monitor or LCD screen** to the Raspberry Pi's HDMI port.
 
 2. **Attach a keyboard and mouse** to the Raspberry Pi using the USB ports.
