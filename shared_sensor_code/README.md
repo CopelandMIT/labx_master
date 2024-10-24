@@ -1,13 +1,15 @@
 # Shared Sensor Code
 
-This repository contains code for synchronizing sensor data timestamps across multiple devices using a central server. The `TimeSync` class allows your application to send timestamps to the central server for synchronization analysis. By using threading, you can send timestamps in the background without blocking your main application logic.
+This repository contains code for synchronizing sensor data timestamps across multiple devices using a central server. The `TimeSync` class allows your application to send timestamps and Chrony tracking data to the central server for synchronization analysis. By using threading, you can send timestamps in the background without blocking your main application logic.
 
-This README provides instructions on how to import and use the `TimeSync` class within your application, specifically in the context of a `CameraDataCollector` class.
+This README provides instructions on how to import and use the `TimeSync` class within your application, specifically in the context of a `CameraDataCollector` class. Additionally, it includes the necessary configuration changes to the `/etc/chrony/chrony.conf` file to optimize time synchronization using Chrony.
 
 ## Table of Contents
 
 - [Prerequisites](#prerequisites)
 - [Installation](#installation)
+- [Chrony Configuration](#chrony-configuration)
+  - [Updating `/etc/chrony/chrony.conf`](#updating-etcchronychronyconf)
 - [Usage](#usage)
   - [Importing the `TimeSync` Class](#importing-the-timesync-class)
   - [Integrating `TimeSync` in Your Application](#integrating-timesync-in-your-application)
@@ -22,9 +24,9 @@ This README provides instructions on how to import and use the `TimeSync` class 
 
 - **Python 3.6** or higher
 - **Network Connection** to the central server
+- **Chrony** installed and configured for time synchronization
 - **Required Python Packages** (listed in `requirements.txt`):
   - `requests`
-  - `threading` (part of the standard library)
   - Additional packages as needed (e.g., `opencv-python` for camera operations)
 
 ---
@@ -53,6 +55,113 @@ This README provides instructions on how to import and use the `TimeSync` class 
 
 ---
 
+## Chrony Configuration
+
+To ensure precise time synchronization across your devices, you need to configure Chrony to use a local GPS PPS server and reliable NTP servers. This section guides you through updating the `/etc/chrony/chrony.conf` file.
+
+### Updating `/etc/chrony/chrony.conf`
+
+1. **Open the Chrony Configuration File**
+
+   ```bash
+   sudo nano /etc/chrony/chrony.conf
+   ```
+
+2. **Update the Configuration**
+
+   Replace or update the server (XXX.XXX) entries to include your local GPS PPS server and Google NTP servers with specified polling intervals:
+
+   ```plaintext
+   # Welcome to the chrony configuration file. See chrony.conf(5) for more
+   # information about usable directives.
+
+   # Include configuration files found in /etc/chrony/conf.d.
+
+   confdir /etc/chrony/conf.d
+
+   # Use Local PPS GPS Server - REPLACE XXX.XXX BELOW
+   server 192.168.XXX.XXX iburst prefer minpoll 4 maxpoll 4
+
+   # Google NTP servers
+   server time.google.com iburst minpoll 4 maxpoll 6
+   server time2.google.com iburst minpoll 4 maxpoll 6
+   server time3.google.com iburst minpoll 4 maxpoll 6
+   server time4.google.com iburst minpoll 4 maxpoll 6
+
+   # Use time sources from DHCP.
+   sourcedir /run/chrony-dhcp
+
+   # Use NTP sources found in /etc/chrony/sources.d.
+   sourcedir /etc/chrony/sources.d
+
+   # This directive specify the location of the file containing ID/key pairs for
+   # NTP authentication.
+   keyfile /etc/chrony/chrony.keys
+
+   # This directive specify the file into which chronyd will store the rate
+   # information.
+   driftfile /var/lib/chrony/chrony.drift
+
+   # Save NTS keys and cookies.
+   ntsdumpdir /var/lib/chrony
+
+   # Uncomment the following line to turn logging on.
+   #log tracking measurements statistics
+
+   # Log files location.
+   logdir /var/log/chrony
+
+   # Stop bad estimates upsetting machine clock.
+   maxupdateskew 100.0
+
+   # This directive enables kernel synchronisation (every 11 minutes) of the
+   # real-time clock. Note that it can't be used along with the 'rtcfile' directive.
+   rtcsync
+
+   # Step the system clock instead of slewing it if the adjustment is larger than
+   # one second, but only in the first three clock updates.
+   makestep 1 3
+
+   # Get TAI-UTC offset and leap seconds from the system tz database.
+   # This directive must be commented out when using time sources serving
+   # leap-smeared time.
+   leapsectz right/UTC
+   ```
+
+   **Explanation of Changes:**
+
+   - **Local GPS PPS Server:**
+     - `server 192.168.68.126 iburst prefer minpoll 4 maxpoll 4`
+       - **`192.168.68.126`**: Replace with the IP address of your local GPS PPS server.
+       - **`iburst`**: Allows faster initial synchronization.
+       - **`prefer`**: Marks this server as the preferred time source.
+       - **`minpoll 4 maxpoll 4`**: Sets the polling interval to 16 seconds (2^4 seconds).
+
+   - **Google NTP Servers:**
+     - Added Google NTP servers as fallback options with polling intervals between 16 and 64 seconds.
+     - **`minpoll 4 maxpoll 6`**: Allows polling intervals between 16 seconds (2^4) and 64 seconds (2^6).
+
+3. **Save and Exit**
+
+   - Press `Ctrl+O` to save the file.
+   - Press `Ctrl+X` to exit the editor.
+
+4. **Restart Chrony Service**
+
+   ```bash
+   sudo systemctl restart chrony
+   ```
+
+5. **Verify Chrony Sources**
+
+   ```bash
+   chronyc sources -v
+   ```
+
+   - Ensure that the local GPS PPS server is listed and marked as the preferred source (`^*`).
+
+---
+
 ## Usage
 
 ### Importing the `TimeSync` Class
@@ -68,7 +177,7 @@ from timesync import TimeSync
 To use the `TimeSync` class within your application (e.g., a `CameraDataCollector` class), you should:
 
 1. **Initialize the `TimeSync` Object** during the initialization of your application class.
-2. **Pass Necessary Parameters** such as `sbc_id`, `central_server_url`, and `data_collection_interval`.
+2. **Pass Necessary Parameters** such as `sbc_id`, `central_server_url`, and `polling_interval`.
 3. **Ensure Threading** is properly handled to allow `TimeSync` to run concurrently.
 
 #### Example Initialization
@@ -82,7 +191,7 @@ class CameraDataCollector:
         self.time_sync = TimeSync(
             sbc_id=self.sbc_id,
             central_server_url=self.central_server_url,
-            data_collection_interval=self.data_collection_interval
+            polling_interval=15  # Set polling interval to 15 seconds
         )
 ```
 
@@ -114,7 +223,7 @@ Start the `TimeSync` thread within a method of your application class, such as a
 
 ## Example Code
 
-Below is a complete example demonstrating how to use the `TimeSync` class within a `CameraDataCollector` class, including threading to send timestamps to the central server for synchronization analysis.
+Below is a complete example demonstrating how to use the `TimeSync` class within a `CameraDataCollector` class, including threading to send timestamps and Chrony tracking data to the central server for synchronization analysis.
 
 ```python
 import threading
@@ -148,7 +257,7 @@ class CameraDataCollector:
         self.time_sync = TimeSync(
             sbc_id=self.sbc_id,
             central_server_url=self.central_server_url,
-            data_collection_interval=self.data_collection_interval
+            polling_interval=15  # Set polling interval to 15 seconds
         )
 
         # Camera data collection thread
@@ -218,7 +327,7 @@ if __name__ == "__main__":
 **Explanation:**
 
 - **Initialization (`__init__`):**
-  - The `TimeSync` object is initialized with the necessary parameters.
+  - The `TimeSync` object is initialized with the necessary parameters, including the `polling_interval` set to 15 seconds.
   - A camera data collection thread is prepared but not started yet.
 
 - **`start()` Method:**
@@ -262,6 +371,10 @@ if __name__ == "__main__":
 - **Dependencies:**
   - Make sure all dependencies are installed, including `opencv-python` if you're using camera functionalities.
 
+- **Chrony Monitoring:**
+  - Use `chronyc tracking` and `chronyc sources` to monitor Chrony's synchronization status.
+  - Ensure that your device's time is accurately synchronized with the GPS PPS server.
+
 ---
 
 ## License
@@ -271,3 +384,9 @@ This project is licensed under the [MIT License](LICENSE).
 ---
 
 **Disclaimer:** This example provides a basic structure for integrating time synchronization into your application using threading. You may need to adjust the code to fit your specific use case and handle any exceptions or edge cases relevant to your environment.
+
+---
+
+**Note:** The changes to the `/etc/chrony/chrony.conf` file are crucial for ensuring accurate time synchronization across your devices. By configuring Chrony to use a local GPS PPS server and reliable NTP servers, you enhance the precision of your time-sensitive applications.
+
+---
