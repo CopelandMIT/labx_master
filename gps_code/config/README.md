@@ -8,7 +8,8 @@ This guide outlines the steps to set up the PPS GPS Raspberry Pi, including the 
 - **GPS Module**: [NEO-6M GPS Module](https://www.amazon.com/dp/B07P8YMVNT?ref=ppx_yo2ov_dt_b_fed_asin_title)
 - **GPS Antenna**: [GPS Active Antenna](https://www.amazon.com/gp/product/B083D59N55/ref=ppx_yo_dt_b_asin_title_o01_s00?ie=UTF8&psc=1)
 - **Soldering Kit**
-- **5 Female-Female Jumper Cables** 
+- **5 Female-Female Jumper Cables**
+- **HDMI Screen**
 
 > **Note**: Soldering is required to connect the antenna to the GPS module. Follow the steps below to properly set up the hardware and configure the Raspberry Pi.
 
@@ -108,39 +109,7 @@ To ensure optimal performance and compatibility for a headless server setup, it'
 
 ---
 
-### 11. **Initial Setup via SSH or LCD Screen**
-
-#### **Option 1: Initial Setup via SSH**
-
-1. **Find the Raspberry Pi's IP address on your network**:
-    - You can use tools like `nmap` or [Angry IP Scanner](https://angryip.org/download/) to scan your local network and identify the Raspberry Pi's IP address.
-      - Select the `/24` subnet (e.g., `192.168.68.0/24`) and click "Start" to scan your network.
-
-2. **Open a terminal on your computer** and connect via SSH:
-
-    ```bash
-    ssh pi@<Raspberry_Pi_IP_Address>
-    ```
-
-    Replace `<Raspberry_Pi_IP_Address>` with the actual IP address of your Raspberry Pi.
-
-3. **Log in with the default credentials**:
-    - **Username**: `pi`
-    - **Password**: `raspberry` (you should change this after the first login).
-
-4. **Update the system**:
-
-    ```bash
-    sudo apt update
-    sudo apt full-upgrade -y
-    sudo reboot
-    ```
-
-5. After the reboot, reconnect via SSH to continue the setup.
-
----
-
-#### **Option 2: Initial Setup via Direct Connection to an LCD Screen**
+### 11. Initial Setup via Direct Connection to an LCD Screen**
 
 If you don't have access to SSH or want to use a direct connection:
 
