@@ -193,7 +193,7 @@ To ensure optimal performance and compatibility for a headless server setup, it'
    enable_uart=1
    ```
 
-   > **Note**: If you're using Raspberry Pi OS Bullseye or later, and `/boot/firmware/config.txt` doesn't exist, use `/boot/firmware/config.txt`.
+   > **Note**: If you're using Raspberry Pi OS earlier than Bullseye, and `/boot/firmware/config.txt` doesn't exist, use `/boot/config.txt`.
 
    Save and exit the editor by pressing **Ctrl+X**, then **Y**, and **Enter**.
 
