@@ -44,7 +44,74 @@ After soldering the antenna to the GPS module, the next step is to connect the G
 
 ---
 
-## Step 3: Install and Set Up the GPS Antenna
+## Step 3: Flash a 64-bit Raspberry Pi OS to the Raspberry Pi
+
+To ensure optimal performance and compatibility, it's recommended to use the 64-bit version of the Raspberry Pi OS on your Raspberry Pi 4 or 5.
+
+### Steps to Flash the OS:
+
+1. **Download the Raspberry Pi Imager**:
+
+   - Visit the [Raspberry Pi Downloads page](https://www.raspberrypi.com/software/) and download the Raspberry Pi Imager suitable for your operating system (Windows, macOS, or Linux).
+
+2. **Install the Raspberry Pi Imager**:
+
+   - Run the installer you just downloaded and follow the on-screen instructions to install the Raspberry Pi Imager.
+
+3. **Prepare a microSD Card**:
+
+   - Use a microSD card with at least **8GB** of storage.
+   - Insert the microSD card into your computer's card reader.
+
+4. **Launch the Raspberry Pi Imager**:
+
+   - Open the Raspberry Pi Imager application.
+
+5. **Choose the OS**:
+
+   - Click on **"Choose OS"**.
+   - Select **"Raspberry Pi OS (other)"**.
+   - Choose **"Raspberry Pi OS (64-bit)"**.
+
+6. **Select the microSD Card**:
+
+   - Click on **"Choose Storage"**.
+   - Select your microSD card from the list.
+
+7. **Optional - Configure Advanced Settings**:
+
+   - Before writing, you can set up advanced options:
+     - Click on the **gear icon** or press **Ctrl+Shift+X** to open the advanced settings.
+     - Configure settings such as enabling SSH, setting Wi-Fi credentials, and setting the hostname.
+     - Click **"Save"** to apply the settings.
+
+8. **Write the OS to the microSD Card**:
+
+   - Click on **"Write"**.
+   - Confirm any prompts to begin the flashing process.
+   - Wait for the process to complete; this may take several minutes.
+
+9. **Safely Remove the microSD Card**:
+
+   - Once the writing and verification are complete, safely eject the microSD card from your computer.
+
+10. **Boot the Raspberry Pi**:
+
+    - Insert the microSD card into the Raspberry Pi.
+    - Connect a monitor, keyboard, and power supply to the Raspberry Pi.
+    - Power on the Raspberry Pi and allow it to boot into the Raspberry Pi OS.
+
+11. **Initial Setup**:
+
+    - Follow the on-screen prompts to complete the initial setup, such as configuring the locale, time zone, and updating the system.
+
+---
+
+![image](https://github.com/user-attachments/assets/f252d75c-8c7b-4a7b-895a-b88147d6659b)
+
+---
+
+## Step 4: Install and Set Up the GPS Antenna
 
 Place the GPS antenna in a location with a clear view of the sky to ensure good satellite reception. Use the provided cables to connect the antenna to the GPS module's antenna port (Snap fit to GPS module, coaxial style cable to antenna).
 
@@ -57,7 +124,7 @@ Place the GPS antenna in a location with a clear view of the sky to ensure good 
 
 ---
 
-## Step 4: Enable UART and PPS on the Raspberry Pi
+## Step 5: Enable UART and PPS on the Raspberry Pi
 
 1. Open the Raspberry Pi configuration tool:
 
@@ -89,7 +156,7 @@ Place the GPS antenna in a location with a clear view of the sky to ensure good 
 
 ---
 
-## Step 5: Verify GPS and PPS Signals
+## Step 6: Verify GPS and PPS Signals
 
 Check that the GPS module is recognized:
 
@@ -105,7 +172,7 @@ sudo ppstest /dev/pps0
 
 ---
 
-## Step 6: Configure Chrony to Use PPS GPS Signal
+## Step 7: Configure Chrony to Use PPS GPS Signal
 
 Edit `/etc/chrony/chrony.conf` to add the following lines:
 
@@ -122,7 +189,7 @@ sudo systemctl restart chrony
 
 ---
 
-## Step 7: Publish the GPS Time to Other RPi Nodes
+## Step 8: Publish the GPS Time to Other RPi Nodes
 
 To publish the GPS time to other Raspberry Pis on the local network, set up the PPS GPS Pi as an NTP server.
 
@@ -143,7 +210,7 @@ The PPS GPS Raspberry Pi is now configured to act as a Stratum 1 NTP server for 
 
 ---
 
-## Step 8: Configure Other Raspberry Pis to Use the GPS PPS Signal
+## Step 9: Configure Other Raspberry Pis to Use the GPS PPS Signal
 
 On the other Raspberry Pis, you'll need to configure them to prefer the PPS GPS time signal from the central Raspberry Pi. In the `/etc/chrony/chrony.conf` file on each RPi, add the following lines:
 
