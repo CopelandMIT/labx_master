@@ -108,7 +108,7 @@ To ensure optimal performance and compatibility for a headless server setup, it'
 
 11. **Initial Setup via SSH**:
 
-    - Find the Raspberry Pi's IP address on your network (you can use tools like `nmap` or [Download Angry Scanner](https://angryip.org/download/)).
+    - Find the Raspberry Pi's IP address on your network (you can use tools like `nmap` or [Download Angry Scanner](https://angryip.org/download/), select /24 and and click "Start").
     - Open a terminal on your computer and connect via SSH:
 
       ```bash
