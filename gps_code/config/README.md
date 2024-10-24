@@ -107,9 +107,7 @@ To ensure optimal performance and compatibility for a headless server setup, it'
     - Connect the Raspberry Pi to your network via Ethernet (recommended for initial setup).
     - Power on the Raspberry Pi and allow it to boot into Raspberry Pi OS Lite.
 
----
-
-### 11. Initial Setup via Direct Connection to an LCD Screen**
+11. **Initial Setup via Direct Connection to an LCD Screen**:
 
 If you don't have access to SSH or want to use a direct connection:
 
