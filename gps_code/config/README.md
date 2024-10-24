@@ -178,12 +178,12 @@ To ensure optimal performance and compatibility for a headless server setup, it'
    sudo apt install gpsd gpsd-clients chrony pps-tools -y
    ```
 
-5. **Configure `/boot/config.txt`**:
+5. **Configure `/boot/firmware/config.txt`**:
 
    Open the configuration file with a text editor:
 
    ```bash
-   sudo nano /boot/config.txt
+   sudo nano /boot/firmware/config.txt
    ```
 
    Add the following lines at the end of the file:
@@ -193,7 +193,7 @@ To ensure optimal performance and compatibility for a headless server setup, it'
    enable_uart=1
    ```
 
-   > **Note**: If you're using Raspberry Pi OS Bullseye or later, and `/boot/firmware/config.txt` doesn't exist, use `/boot/config.txt`.
+   > **Note**: If you're using Raspberry Pi OS Bullseye or later, and `/boot/firmware/config.txt` doesn't exist, use `/boot/firmware/config.txt`.
 
    Save and exit the editor by pressing **Ctrl+X**, then **Y**, and **Enter**.
 
