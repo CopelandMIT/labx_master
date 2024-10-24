@@ -154,22 +154,10 @@ If you don't have access to SSH or want to use a direct connection:
 
 10. **Disconnect the screen and peripherals (if needed)**, and you should now be able to connect via SSH on the network.
 
----
-
-## Step 4: Install and Set Up the GPS Antenna
-
-Place the GPS antenna in a location with a clear view of the sky to ensure good satellite reception. Use the provided cables to connect the antenna to the GPS module's antenna port (Snap fit to GPS module, coaxial style cable to antenna).
-
-### Antenna Placement Tips:
-
-- Make sure the antenna is placed **outdoors** or near a **window** for optimal satellite reception.
-- The antenna should be **fixed** securely to avoid any movement that could interrupt the signal.
-
-![GPS Antenna Setup](./images/antenna_setup.png)
 
 ---
 
-## Step 5: Enable UART and PPS on the Raspberry Pi
+## Step 4: Enable UART and PPS on the Raspberry Pi
 
 1. **Open the Raspberry Pi Configuration Tool**:
 
@@ -221,7 +209,7 @@ Place the GPS antenna in a location with a clear view of the sky to ensure good 
 
 ---
 
-## Step 6: Verify GPS and PPS Signals
+## Step 5: Verify GPS and PPS Signals
 
 Check that the GPS module is recognized:
 
@@ -237,7 +225,7 @@ sudo ppstest /dev/pps0
 
 ---
 
-## Step 7: Configure Chrony to Use PPS GPS Signal
+## Step 6: Configure Chrony to Use PPS GPS Signal
 
 Edit `/etc/chrony/chrony.conf` to add the following lines:
 
@@ -254,7 +242,7 @@ sudo systemctl restart chrony
 
 ---
 
-## Step 8: Publish the GPS Time to Other RPi Nodes
+## Step 7: Publish the GPS Time to Other RPi Nodes
 
 To publish the GPS time to other Raspberry Pis on the local network, set up the PPS GPS Pi as an NTP server.
 
@@ -273,6 +261,18 @@ sudo systemctl restart chrony
 
 The PPS GPS Raspberry Pi is now configured to act as a Stratum 1 NTP server for your local network.
 
+---
+
+## Step 8: Install and Set Up the GPS Antenna
+
+Place the GPS antenna in a location with a clear view of the sky to ensure good satellite reception. Use the provided cables to connect the antenna to the GPS module's antenna port (Snap fit to GPS module, coaxial style cable to antenna).
+
+### Antenna Placement Tips:
+
+- Make sure the antenna is placed **outdoors** or near a **window** for optimal satellite reception.
+- The antenna should be **fixed** securely to avoid any movement that could interrupt the signal.
+
+![GPS Antenna Setup](./images/antenna_setup.png)
 ---
 
 ## Step 9: Configure Other Raspberry Pis to Use the GPS PPS Signal
@@ -301,7 +301,19 @@ Restart Chrony on each RPi:
 sudo systemctl restart chrony
 ```
 
+
 ---
+
+## Step 9: Install and Set Up the GPS Antenna
+
+Place the GPS antenna in a location with a clear view of the sky to ensure good satellite reception. Use the provided cables to connect the antenna to the GPS module's antenna port (Snap fit to GPS module, coaxial style cable to antenna).
+
+### Antenna Placement Tips:
+
+- Make sure the antenna is placed **outdoors** or near a **window** for optimal satellite reception.
+- The antenna should be **fixed** securely to avoid any movement that could interrupt the signal.
+
+![GPS Antenna Setup](./images/antenna_setup.png)---
 
 ## Conclusion
 
