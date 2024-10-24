@@ -9,7 +9,7 @@ This guide outlines the steps to set up the PPS GPS Raspberry Pi, including the 
 - **GPS Antenna**: [GPS Active Antenna](https://www.amazon.com/gp/product/B083D59N55/ref=ppx_yo_dt_b_asin_title_o01_s00?ie=UTF8&psc=1)
 - **Soldering Kit**
 - **5 Female-Female Jumper Cables**
-- **HDMI Screen**
+- **HDMI Screen and Keyboard**
 
 > **Note**: Soldering is required to connect the antenna to the GPS module. Follow the steps below to properly set up the hardware and configure the Raspberry Pi.
 
