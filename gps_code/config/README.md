@@ -107,10 +107,6 @@ To ensure optimal performance and compatibility, it's recommended to use the 64-
 
 ---
 
-![image](https://github.com/user-attachments/assets/f252d75c-8c7b-4a7b-895a-b88147d6659b)
-
----
-
 ## Step 4: Install and Set Up the GPS Antenna
 
 Place the GPS antenna in a location with a clear view of the sky to ensure good satellite reception. Use the provided cables to connect the antenna to the GPS module's antenna port (Snap fit to GPS module, coaxial style cable to antenna).
