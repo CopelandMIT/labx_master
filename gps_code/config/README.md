@@ -263,7 +263,7 @@ The PPS GPS Raspberry Pi is now configured to act as a Stratum 1 NTP server for 
 
 ---
 
-## Step 8: Install and Set Up the GPS Antenna
+## Step 8: Set Up the GPS Antenna
 
 Place the GPS antenna in a location with a clear view of the sky to ensure good satellite reception. Use the provided cables to connect the antenna to the GPS module's antenna port (Snap fit to GPS module, coaxial style cable to antenna).
 
