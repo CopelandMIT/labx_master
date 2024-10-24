@@ -149,17 +149,17 @@ On the other Raspberry Pis, you'll need to configure them to prefer the PPS GPS 
 Add the IP address of the PPS GPS RPi as the preferred time source:
 
 ```conf
-server 192.168.68.XXX iburst prefer
+server 192.168.XXX.XXX iburst prefer minpoll 4 maxpoll 4
 ```
 
-Replace `192.168.68.XXX` with the actual IP address of the PPS GPS Raspberry Pi.
+Replace `192.168.XXX.XXX` with the actual IP address of the PPS GPS Raspberry Pi.
 
 Add backup NTP servers (e.g., Google NTP servers):
 ```conf
-server time1.google.com iburst
-server time2.google.com iburst
-server time3.google.com iburst
-server time4.google.com iburst
+server time1.google.com iburst minpoll 4 maxpoll 6
+server time2.google.com iburst minpoll 4 maxpoll 6
+server time3.google.com iburst minpoll 4 maxpoll 6
+server time4.google.com iburst minpoll 4 maxpoll 6
 ```
 
 Restart Chrony on each RPi:
