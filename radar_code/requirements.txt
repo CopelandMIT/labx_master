@@ -1,0 +1,7 @@
+certifi==2024.8.30
+charset-normalizer==3.4.0
+idna==3.10
+ifxradarsdk @ file:///home/dcope/labx_master/radar_code/infineon_radar_sdk/python_wheels/ifxradarsdk-3.5.0%2B8c595dbb-py3-none-linux_armv7l.whl#sha256=163ed47c986e78f123ba4e36cb7824d2d881d6d457ed5e55160dc40caee9483e
+numpy==2.1.2
+requests==2.32.3
+urllib3==2.2.3
