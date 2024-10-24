@@ -107,25 +107,23 @@ To ensure optimal performance and compatibility for a headless server setup, it'
     - Connect the Raspberry Pi to your network via Ethernet (recommended for initial setup).
     - Power on the Raspberry Pi and allow it to boot into Raspberry Pi OS Lite.
 
-11. **Initial Setup via Direct Connection to an LCD Screen**:
+11. **Connect an HDMI-compatible monitor or LCD screen** to the Raspberry Pi's HDMI port.
 
-1. **Connect an HDMI-compatible monitor or LCD screen** to the Raspberry Pi's HDMI port.
+12. **Attach a keyboard** to the Raspberry Pi using the USB ports.
 
-2. **Attach a keyboard and mouse** to the Raspberry Pi using the USB ports.
+13. **Power on the Raspberry Pi**. You should see the boot sequence on the screen, and once complete, you will be presented with a login prompt.
 
-3. **Power on the Raspberry Pi**. You should see the boot sequence on the screen, and once complete, you will be presented with a login prompt.
-
-4. **Log in with the default credentials**:
+14. **Log in with the default credentials**:
     - **Username**: `pi`
     - **Password**: `raspberry`
 
-5. **Change the default password** after logging in for security:
+15. **Change the default password** after logging in for security:
     
     ```bash
     passwd
     ```
 
-6. **Update the system** by running the following commands:
+16. **Update the system** by running the following commands:
    
     ```bash
     sudo apt update
@@ -138,17 +136,17 @@ To ensure optimal performance and compatibility for a headless server setup, it'
     sudo raspi-config
     ```
 
-8. **In the `raspi-config` menu**:
+18. **In the `raspi-config` menu**:
    - Navigate to **"Interface Options"**.
    - Select **"SSH"** and enable it.
 
-9. **Reboot the Raspberry Pi**:
+19. **Reboot the Raspberry Pi**:
 
     ```bash
     sudo reboot
     ```
 
-10. **Disconnect the screen and peripherals (if needed)**, and you should now be able to connect via SSH on the network.
+20. **Disconnect the screen and peripherals (if needed)**, and you should now be able to connect via SSH on the network.
 
 
 ---
