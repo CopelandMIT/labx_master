@@ -31,12 +31,12 @@ RADAR_CAPTURE_LENGTH = 300
 
 class RadarDataCollector:
     def __init__(self, stop_event, sbc_id="SBC002", central_server_url='http://192.168.68.130:5000/receive_data',
-                 data_collection_interval=10, data_file='radar_data.json'):
+                 polling_interval=10, data_file='radar_data.json'):
         # Configuration
         self.sbc_id = sbc_id
         print(f"RadarDataCollector initialized with SBC ID: {self.sbc_id}")
         self.central_server_url = central_server_url
-        self.data_collection_interval = data_collection_interval
+        self.polling_interval = polling_interval
         self.data_file = data_file
         self.stop_event = stop_event  # Store the stop_event for graceful shutdown
         # Data storage
@@ -47,7 +47,7 @@ class RadarDataCollector:
         self.time_sync = TimeSync(
             sbc_id=self.sbc_id,
             central_server_url=self.central_server_url,
-            data_collection_interval=self.data_collection_interval
+            polling_interval=self.polling_interval
         )
 
     def start_time_sync(self):
@@ -177,7 +177,7 @@ def main():
         stop_event=stop_event,
         sbc_id=args.sbc_id,
         central_server_url='http://192.168.68.130:5000/receive_data',
-        data_collection_interval=10
+        polling_interval=10
     )
 
     radar_data_collector.start_time_sync()
