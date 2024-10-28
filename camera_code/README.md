@@ -15,11 +15,11 @@ This project is a Python-based camera data collection tool designed for a Raspbe
 1. Download the latest **64-bit Raspberry Pi OS** (desktop version) from the [official website](https://www.raspberrypi.com/software/operating-systems/).
 2. Use a tool like **Raspberry Pi Imager** to flash the OS onto a microSD card with at least 256 GB of storage.
 3. Boot up the Raspberry Pi with the newly flashed OS.
-4. If using VNC/SSH, Run
+4. If using VNC/SSH, run:
    ```bash
    sudo raspi-config
    ```
-   and navigate to "Interface" and enble SSH and VNC.
+   Navigate to "Interface" to enable SSH and VNC.
 
 ### Step 2: Set Up the Environment
 
@@ -27,17 +27,26 @@ This project is a Python-based camera data collection tool designed for a Raspbe
    ```bash
    git clone https://github.com/CopelandMIT/labx_master.git
    ```
-2. **Set up the environment using `requirements.txt`**:
+2. **Create and activate a virtual environment** called `labx_env`:
    ```bash
    cd labx_master/camera_code
+   python3 -m venv labx_env
+   source labx_env/bin/activate
+   ```
+3. **Install the dependencies** from `requirements.txt`:
+   ```bash
    pip install -r requirements.txt
    ```
 
-3. **Configure settings** in the `camera_code.py` file if needed (e.g., `central_server_url`, `batch_duration`).
+4. **Configure settings** in the `camera_code.py` file if needed (e.g., `central_server_url`, `batch_duration`).
 
 ### Step 3: Running the Data Collector
 
-1. Start the data collector with desired settings:
+1. Make sure you’re in the virtual environment:
+   ```bash
+   source labx_env/bin/activate
+   ```
+2. Start the data collector with desired settings:
    ```bash
    python3 camera_code.py --duration 300 --data_directory "data"
    ```
@@ -61,4 +70,3 @@ This project is a Python-based camera data collection tool designed for a Raspbe
 
 - **CameraDataCollector**: Core class to manage camera setup, recording, batching, and timestamp synchronization.
 - **TimeSync**: Handles optional NTP synchronization for accurate timestamps across devices.
-
