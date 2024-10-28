@@ -29,7 +29,7 @@ This project is a Python-based camera data collection tool designed for a Raspbe
    ```
 2. **Set up the environment using `requirements.txt`**:
    ```bash
-   cd labx_master
+   cd labx_master/camera_code
    pip install -r requirements.txt
    ```
 
