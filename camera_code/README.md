@@ -87,6 +87,7 @@ sudo apt install -y chrony
    ```bash
    sudo systemctl restart chrony
    ```
+wait a few minutes for the time sync to stabilize. 
 
 #### 3. Testing the Configuration
 
