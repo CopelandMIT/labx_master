@@ -193,7 +193,7 @@ def main():
     parser = argparse.ArgumentParser(description='Camera data collection with optional NTP chrony metadata')
     parser.add_argument('--sbc_id', type=str, default='SBC001', help="Single Board Computer ID")
     parser.add_argument('--duration', type=int, default=VIDEO_CAPTURE_LENGTH, help="Recording duration in seconds")
-    parser.add_argument('--data_directory', type=str, default='camera_code/data', help="Directory to save video data")
+    parser.add_argument('--data_directory_name', type=str, default='camera_code/data', help="Directory to save video data")
     parser.add_argument('--video_filename', type=str, default=None, help="Filename for the video data")
     parser.add_argument('--delayed_start_timestamp', type=float, default=None, help="Timestamp to delay start until")
     parser.add_argument('--chrony_interval', type=int, default=10, help="Interval to send Chrony data (seconds)")
