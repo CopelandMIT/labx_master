@@ -22,7 +22,7 @@ VIDEO_CAPTURE_LENGTH = 600  # Default capture length for the whole session
 
 class CameraDataCollector:
     def __init__(self, stop_event, sbc_id="SBC001", central_server_url='http://192.168.68.130:5000/receive_data',
-                 polling_interval=10, data_directory_name='data', video_filename='video.avi',
+                 polling_interval=10, video_filename='video.avi',
                  delayed_start_timestamp=None, duration=None, camera_index=None,
                  batch_duration=10, disable_data_sync=False):
         # Configuration
@@ -30,7 +30,6 @@ class CameraDataCollector:
         print(f"CameraDataCollector initialized with SBC ID: {self.sbc_id}")
         self.central_server_url = central_server_url
         self.polling_interval = polling_interval
-        self.data_directory_name = data_directory_name
         self.video_filename = video_filename
         self.delayed_start_timestamp = delayed_start_timestamp
         self.duration = duration  # Total duration of the entire capture
@@ -39,9 +38,10 @@ class CameraDataCollector:
         self.stop_event = stop_event  # Store the stop_event for graceful shutdown
         self.disable_data_sync = disable_data_sync  # Flag to control data sync
 
-        # Make Data dir inside camera_code if not existing already.
-        base_directory = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-        self.data_directory = os.path.join(base_directory, self.data_directory_name)
+        # Define the absolute path to the data directory
+        self.data_directory = os.path.expanduser('~/labx_master/camera_code/data')
+
+        # Create the data directory if it doesn't exist
         if not os.path.exists(self.data_directory):
             os.makedirs(self.data_directory)
 
@@ -193,7 +193,6 @@ def main():
     parser = argparse.ArgumentParser(description='Camera data collection with optional NTP chrony metadata')
     parser.add_argument('--sbc_id', type=str, default='SBC001', help="Single Board Computer ID")
     parser.add_argument('--duration', type=int, default=VIDEO_CAPTURE_LENGTH, help="Recording duration in seconds")
-    parser.add_argument('--data_directory_name', type=str, default='camera_code/data', help="Directory to save video data")
     parser.add_argument('--video_filename', type=str, default=None, help="Filename for the video data")
     parser.add_argument('--delayed_start_timestamp', type=float, default=None, help="Timestamp to delay start until")
     parser.add_argument('--chrony_interval', type=int, default=10, help="Interval to send Chrony data (seconds)")
@@ -215,7 +214,6 @@ def main():
         sbc_id=args.sbc_id,
         central_server_url='http://192.168.68.130:5000/receive_data',
         polling_interval=args.chrony_interval,
-        data_directory_name=args.data_directory_name,
         video_filename=video_filename,
         delayed_start_timestamp=args.delayed_start_timestamp,
         duration=args.duration,
