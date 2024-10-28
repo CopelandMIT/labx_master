@@ -215,7 +215,7 @@ def main():
         sbc_id=args.sbc_id,
         central_server_url='http://192.168.68.130:5000/receive_data',
         polling_interval=args.chrony_interval,
-        data_directory=args.data_directory,
+        data_directory_name=args.data_directory_name,
         video_filename=video_filename,
         delayed_start_timestamp=args.delayed_start_timestamp,
         duration=args.duration,
