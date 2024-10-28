@@ -18,7 +18,7 @@ from shared_sensor_code.TimeSync import TimeSync
 # Camera Data Collector Class
 # -------------------------------------------------
 
-VIDEO_CAPTURE_LENGTH = 300  # Default capture length for the whole session
+VIDEO_CAPTURE_LENGTH = 600  # Default capture length for the whole session
 
 class CameraDataCollector:
     def __init__(self, stop_event, sbc_id="SBC001", central_server_url='http://192.168.68.130:5000/receive_data',
@@ -38,6 +38,10 @@ class CameraDataCollector:
         self.batch_duration = batch_duration  # Duration of each batch (in seconds)
         self.stop_event = stop_event  # Store the stop_event for graceful shutdown
         self.disable_data_sync = disable_data_sync  # Flag to control data sync
+
+        # Add this line in the __init__ method or before saving data
+        if not os.path.exists(self.data_directory):
+            os.makedirs(self.data_directory)
 
         # Buffer for storing frames before saving
         self.frame_buffer = []
