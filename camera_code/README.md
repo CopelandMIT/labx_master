@@ -40,7 +40,68 @@ This project is a Python-based camera data collection tool designed for a Raspbe
 
 4. **Configure settings** in the `camera_code.py` file if needed (e.g., `central_server_url`, `batch_duration`).
 
-### Step 3: Running the Data Collector
+---
+
+### Step 3: Configuring Time Synchronization with Chrony
+
+Accurate time synchronization is crucial for applications that rely on precise timing. This section guides you through installing Chrony and configuring it to use a GPS PPS SBC over LAN as the preferred time source. If you don't have a GPS time server on your LAN, instructions are provided to use Google's NTP servers instead.
+
+#### 1. Installing Chrony
+
+Install Chrony to synchronize with NTP servers and GPS time sources.
+
+```bash
+sudo apt update
+sudo apt install -y chrony
+```
+
+#### 2. Configuring Chrony to Use GPS PPS SBC over LAN
+
+1. **Determine the IP Address of Your GPS PPS SBC**, for example, `192.168.68.126` and `192.168.68.158`.
+   
+2. **Edit Chrony Configuration**:
+
+   ```bash
+   sudo nano /etc/chrony/chrony.conf
+   ```
+   - Add the following configuration for precise time polling:
+     ```bash
+     confdir /etc/chrony/conf.d
+
+     # Use PPS GPS RPi and Google Servers
+     # Local PPS GPS RPi Servers
+     server 192.168.68.126 iburst prefer minpoll 4 maxpoll 4
+     server 192.168.68.158 iburst prefer minpoll 4 maxpoll 4
+
+     # Google NTP servers
+     server time.google.com iburst minpoll 4 maxpoll 6
+     server time2.google.com iburst minpoll 4 maxpoll 6
+     server time3.google.com iburst minpoll 4 maxpoll 6
+     server time4.google.com iburst minpoll 4 maxpoll 6
+     ```
+
+   - **Explanation**:
+     - `minpoll` and `maxpoll`: These settings define the interval (in seconds) for polling the time servers. Setting both to `4` ensures more frequent polling for the local GPS servers.
+
+3. **Save and restart Chrony**:
+   ```bash
+   sudo systemctl restart chrony
+   ```
+
+#### 3. Testing the Configuration
+
+- Check sources:
+  ```bash
+  chronyc sources -v
+  ```
+- Verify tracking status:
+  ```bash
+  chronyc tracking
+  ```
+
+--- 
+
+### Step 4: Running the Data Collector
 
 1. Make sure you’re in the virtual environment:
    ```bash
