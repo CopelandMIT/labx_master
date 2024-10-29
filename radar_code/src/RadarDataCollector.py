@@ -27,7 +27,7 @@ from shared_sensor_code.TimeSync import TimeSync
 # Radar Data Collector Class with Chrony
 # -------------------------------------------------
 
-RADAR_CAPTURE_LENGTH = 300
+RADAR_CAPTURE_LENGTH = 600
 
 class RadarDataCollector:
     def __init__(self, stop_event, sbc_id="SBC002", central_server_url='http://192.168.68.130:5000/receive_data',
