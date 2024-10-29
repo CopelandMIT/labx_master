@@ -231,7 +231,7 @@ To ensure optimal performance and compatibility for a headless server setup, it'
 
 ## Step 5: Connect GPS Cables and Set Up the GPS Antenna
 
-Place the GPS antenna in a location with a clear view of the sky to ensure good satellite reception. Use the provided cables to connect the antenna to the GPS module's antenna port (Snap fit to GPS module, coaxial style cable to antenna).
+Place the GPS antenna in a location with a clear view of the sky to ensure good satellite reception. Use the provided cables to connect the antenna to the GPS module's antenna port (Snap fit to GPS module, coaxial style cable to antenna). Plug RPi ethernet directly into a router for the best results!
 
 ### Antenna Placement Tips:
 
