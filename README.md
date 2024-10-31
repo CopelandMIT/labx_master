@@ -30,7 +30,7 @@ By utilizing Network Time Protocol (NTP) and Pulse Per Second (PPS) GPS signals,
 
 ### Single-Board Computers (SBCs)
 
-Each sensor is controlled by an SBC, responsible for data acquisition, initial processing, and communication with the MSI server.
+Each sensor is controlled by an SBC, responsible for data acquisition, time sync with the GPS, initial processing, and communication with the central server.
 
 ### Time Synchronization
 
