@@ -37,13 +37,15 @@ Each sensor is controlled by an SBC, responsible for data acquisition, initial p
 - **Network Time Protocol (NTP)**: Synchronizes device clocks over the network.
 - **Pulse Per Second (PPS) GPS**: Provides precise time signals for synchronization.
 
-### MSI Server
+### Central Server
 
-The MSI server is the core of the system:
+The Central server is the core of the system:
 
 - **Metadata Management**: Aggregates and organizes metadata from all sensors.
 - **Synchronization Monitoring**: Ensures all devices maintain precise time alignment.
 - **Data Analysis**: Offers tools and interfaces for research-oriented data analysis.
+
+- **GUI: Inprogress...**
 
 ## Possible Use Cases
 
