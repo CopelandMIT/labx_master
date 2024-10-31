@@ -65,7 +65,7 @@ To participate in the LabX Master project:
    ```bash
    git clone https://github.com/yourusername/LabX-Master.git
    ```
-2. **Review Documentation**: Explore the `/docs` directory for setup guides and API references.
+2. **Review Documentation**: Explore the component (camera, cetnral server, GPS, radar) directories for setup guides.
 3. **Set Up Hardware**: Prepare your SBCs and sensors following the hardware setup guide.
 4. **Configure Time Sync**: Set up NTP and PPS GPS synchronization as per instructions.
 5. **Run the MSI Server**: Start the server to begin managing your sensor network.
