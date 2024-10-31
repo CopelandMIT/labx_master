@@ -70,17 +70,14 @@ To participate in the LabX Master project:
 4. **Configure Time Sync**: Set up NTP and PPS GPS synchronization as per instructions.
 5. **Run the MSI Server**: Start the server to begin managing your sensor network.
 
-## Contributing
-
-We welcome contributions from the community. Please read our [Contributing Guidelines](CONTRIBUTING.md) and [Code of Conduct](CODE_OF_CONDUCT.md) before submitting any pull requests.
 
 ## License
 
 This project is licensed under the MIT License—see the [LICENSE](LICENSE) file for details.
 
-## Contact
+## Contributing and Contact
 
-For questions or support, please open an issue or contact us at [email@example.com](mailto:email@example.com).
+For contribution requests, questions, or support, please open an issue or contact us at dcope_at_mit_dot_edu.
 
 ---
 
