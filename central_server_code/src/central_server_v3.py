@@ -12,7 +12,7 @@ offset_data = {}  # {sbc_id: (timestamp, data)}
 data_lock = threading.Lock()
 
 # CSV file for storing metrics
-CSV_FILE = f'data/synchronization_metrics_1_camera_1_radar_{time.time()}.csv'
+CSV_FILE = f'/home/daniel/labx_master/central_server_code/data/sync_metrics/test_2_camera_1_radar_{time.time()}_GPS_eth.csv'
 
 # Ensure the CSV file exists and has a header
 if not os.path.isfile(CSV_FILE):
@@ -49,7 +49,7 @@ def receive_data():
             # Store the latest data
             offset_data[sbc_id] = (timestamp, chrony_data)
 
-    # After receiving new data, calculate synchronization metrics
+    # After receiving new data, calculate synchronization metrics and save them immediately
     calculate_synchronization_metrics()
 
     return jsonify({'status': 'success'}), 200
@@ -121,19 +121,21 @@ def calculate_synchronization_metrics():
             print(f"  Mean Root Dispersion: {mean_root_dispersion * 1000:.3f} ms")
             print(f"  Max Root Dispersion: {max_root_dispersion * 1000:.3f} ms")
 
-            # Store metrics in CSV file
-            with open(CSV_FILE, 'a', newline='') as csvfile:
-                fieldnames = ['timestamp', 'max_offset_ms', 'mean_offset_ms', 'jitter_ms', 'mean_root_dispersion_ms', 'max_root_dispersion_ms']
-                writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
-                writer.writerow({
-                    'timestamp': current_time,
-                    'max_offset_ms': max_offset_ms,
-                    'mean_offset_ms': mean_offset_ms,
-                    'jitter_ms': jitter_ms,
-                    'mean_root_dispersion_ms': mean_root_dispersion * 1000,
-                    'max_root_dispersion_ms': max_root_dispersion * 1000
-                })
-                print(f"At time: {current_time}, added max offset (ms) of {max_offset_ms}")
+            # Save metrics immediately to the CSV file to avoid data loss
+            try:
+                with open(CSV_FILE, 'a', newline='') as csvfile:
+                    fieldnames = ['timestamp', 'max_offset_ms', 'mean_offset_ms', 'jitter_ms', 'mean_root_dispersion_ms', 'max_root_dispersion_ms']
+                    writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+                    writer.writerow({
+                        'timestamp': current_time,
+                        'max_offset_ms': max_offset_ms,
+                        'mean_offset_ms': mean_offset_ms,
+                        'jitter_ms': jitter_ms,
+                        'mean_root_dispersion_ms': mean_root_dispersion * 1000,
+                        'max_root_dispersion_ms': max_root_dispersion * 1000
+                    })
+            except IOError as e:
+                print(f"Error saving data to CSV: {e}")
         else:
             print("No offsets to calculate metrics.")
 
