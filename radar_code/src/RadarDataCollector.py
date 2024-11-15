@@ -27,11 +27,11 @@ from shared_sensor_code.TimeSync import TimeSync
 # Radar Data Collector Class with Chrony
 # -------------------------------------------------
 
-RADAR_CAPTURE_LENGTH = 600
+
 
 class RadarDataCollector:
     def __init__(self, stop_event, sbc_id="SBC002", central_server_url='http://192.168.68.130:5000/receive_data',
-                 polling_interval=10, data_file='radar_data.json'):
+                 polling_interval=10, data_file='default_radar_data'):
         # Configuration
         self.sbc_id = sbc_id
         print(f"RadarDataCollector initialized with SBC ID: {self.sbc_id}")
@@ -81,13 +81,13 @@ class RadarDataCollector:
 # Radar Data Collection Code
 # -------------------------------------------------
 
-def data_saving_thread(data_queue, stop_event, SAVE_DIR):
+def data_saving_thread(base_filename, data_queue, stop_event, SAVE_DIR):
     """Thread that saves data from the queue to disk."""
     while not stop_event.is_set() or not data_queue.empty():
         try:
             buffer, timestamps = data_queue.get(timeout=1)
             if buffer:
-                filename = f"data_{datetime.now().strftime('%Y%m%d_%H%M%S%f')[:-3]}.npz"
+                filename = f"{base_filename}_{datetime.now().strftime('%Y%m%d_%H%M%S%f')[:-3]}.npz"
                 file_path = os.path.join(SAVE_DIR, filename)
                 np.savez(file_path, data=np.concatenate(buffer, axis=0), timestamps=np.array(timestamps))
                 print(f"Saved {len(buffer)} frames to {filename}")
@@ -167,11 +167,11 @@ def main():
     buffer = []
     timestamps = []
 
-    RECORDING_DURATION = RADAR_CAPTURE_LENGTH  # Record for X seconds
+    RECORDING_DURATION = args.duration  # Record for X seconds
     start_time = time.time()
 
     data_queue = queue.Queue()
-    saving_thread = threading.Thread(target=data_saving_thread, args=(data_queue, stop_event, SAVE_DIR))
+    saving_thread = threading.Thread(target=data_saving_thread, args=(args.data_file, data_queue, stop_event, SAVE_DIR))
     saving_thread.start()
 
     # Initialize Chrony Data Collector with stop_event
