@@ -5,6 +5,7 @@ import subprocess
 import paramiko
 import socket
 import signal
+import sys
 
 # Define constants
 DB_PATH = "path/to/central_server_code/data/lab_in_a_box.db"
@@ -108,6 +109,16 @@ def start_capture():
         messagebox.showerror("Ping Error", f"Sensor at {ip_address} is unreachable.")
         return
     start_remote_capture(ip_address, sensor_type, filename, int(duration))
+
+# Function to handle termination signals and close the GUI
+def handle_exit_signal(signum, frame):
+    print("Termination signal received. Closing GUI...")
+    root.quit()  # Stop the Tkinter main loop
+    root.destroy()  # Close the window
+
+# Set up the signal handlers
+signal.signal(signal.SIGINT, handle_exit_signal)
+signal.signal(signal.SIGTERM, handle_exit_signal)
 
 # Initialize Tkinter
 root = tk.Tk()
