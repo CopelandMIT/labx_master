@@ -104,6 +104,8 @@ def main():
     parser = argparse.ArgumentParser(description='Derives raw data and saves to .npz file')
     parser.add_argument('-f', '--frate', type=float, default=1/1.28, help="Frame rate in Hz, default 5")
     parser.add_argument('--sbc_id', type=str, default='SBC002', help="Single Board Computer ID")
+    parser.add_argument('--data_file', type=str, default='radar_data.json', help="File to save radar data")
+    parser.add_argument('--duration', type=int, default=600, help="Duration for data capture in seconds")
     args = parser.parse_args()
 
     # Radar configuration setup
