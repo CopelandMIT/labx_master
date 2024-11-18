@@ -46,7 +46,7 @@ class RadarDataCollector:
         self.time_sync = TimeSync(
             deployed_sensor_id=self.deployed_sensor_id,
             central_server_url=self.central_server_url,
-            polling_interval=self.sync_polling_interval
+            sync_polling_interval=self.sync_polling_interval
         )
 
     def start_time_sync(self):
@@ -102,7 +102,7 @@ def main():
     # Argument parser setup
     parser = argparse.ArgumentParser(description='Derives raw data and saves to .npz file')
     parser.add_argument('-f', '--frate', type=float, default=1/1.28, help="Frame rate in Hz, default 5")
-    parser.add_argument('--deployed_sensor_id', type=str, default='SBC002', help="Single Board Computer ID")
+    parser.add_argument('--deployed_sensor_id', type=str, default='RAD001', help="Single Board Computer ID")
     parser.add_argument('--base_filename', type=str, default='radar_data.json', help="File to save radar data")
     parser.add_argument('--capture_duration', type=int, default=600, help="Duration for data capture in seconds")
     args = parser.parse_args()
@@ -178,7 +178,7 @@ def main():
         stop_event=stop_event,
         deployed_sensor_id=args.deployed_sensor_id,
         central_server_url='http://192.168.68.130:5000/receive_data',
-        polling_interval=10
+        sync_polling_interval=10
     )
 
     radar_data_collector.start_time_sync()
