@@ -31,7 +31,7 @@ LOG_DIR = "/home/dcope/labx_master/radar_code/logs"
 os.makedirs(LOG_DIR, exist_ok=True)
 
 logging.basicConfig(
-    filename=os.path.join(LOG_DIR, "sensor_output.log"),
+    filename=os.path.join(LOG_DIR, f"sensor_output_{time.time()}.log"),
     level=logging.INFO,
     format="%(asctime)s - %(levelname)s - %(message)s"
 )
@@ -48,6 +48,7 @@ class RadarDataCollector:
                  sync_polling_interval=10, base_filename='default_radar_data'):
         # Configuration
         self.deployed_sensor_id = deployed_sensor_id
+        logging.info(f"Initializing RadarDataCollector with ID {self.deployed_sensor_id}")
         print(f"RadarDataCollector initialized with SBC ID: {self.deployed_sensor_id}")
         self.central_server_url = central_server_url
         self.sync_polling_interval = sync_polling_interval
@@ -68,12 +69,14 @@ class RadarDataCollector:
         """Start the radar data collection and time synchronization."""
         self.time_sync.start()
         print("Radar Data Collector started.")
+        logging.info("Radar data synchronization started.")
 
     def stop(self):
         """Stop the radar data collection and time synchronization."""
         self.stop_event.set()
         self.time_sync.stop()
-        print("Radar Data Collector stopped.")    
+        print("Radar Data Collector stopped.")   
+        logging.info("Radar data synchronization stopped.") 
 
     def save_data_to_file(self):
         """Saves collected data to a file (optional, if needed)."""
@@ -86,10 +89,13 @@ class RadarDataCollector:
                     for entry in data_to_save:
                         f.write(json.dumps(entry) + '\n')
                 print(f"Data saved to {self.base_filename}.")
+                logging.info(f"Data saved to {self.base_filename}.")
             except Exception as e:
                 print(f"Error saving data to file: {e}")
+                logging.info(f"Data saved to {self.base_filename}.")
         else:
             print("No Chrony data to save.")
+            logging.info(f"Data saved to {self.base_filename}.")
 
 # -------------------------------------------------
 # Radar Data Collection Code
@@ -105,6 +111,7 @@ def data_saving_thread(base_filename, data_queue, stop_event, data_output_direct
                 file_path = os.path.join(data_output_directory, filename)
                 np.savez(file_path, data=np.concatenate(buffer, axis=0), frame_timestamps_list=np.array(frame_timestamps_list))
                 print(f"Saved {len(buffer)} frames to {filename}")
+                logging.info(f"Saved {len(buffer)} frames to {filename}")
             data_queue.task_done()
         except queue.Empty:
             continue
@@ -121,6 +128,8 @@ def main():
     parser.add_argument('--base_filename', type=str, default='radar_data.json', help="File to save radar data")
     parser.add_argument('--capture_duration', type=int, default=600, help="Duration for data capture in seconds")
     args = parser.parse_args()
+
+    logging.info("Starting RadarDataCollector main function.")
 
     # Radar configuration setup
     config = FmcwSimpleSequenceConfig(
@@ -219,6 +228,7 @@ def main():
 
         try:
             while not stop_event.is_set():
+                logging.info("Collecting data...")
                 elapsed_time = time.time() - start_time
                 if elapsed_time >= capture_duration:
                     print(f"Reached recording duration of {capture_duration} seconds.")
@@ -238,6 +248,7 @@ def main():
                         gap_duration = time_gap_between_frames - expected_frame_interval
                         total_frame_gap_duration += gap_duration
                         print(f"Gap detected: {gap_duration:.6f} seconds (time_gap_between_frames = {time_gap_between_frames:.6f} seconds)")
+                        logging.info(f"Gap detected: {gap_duration:.6f} seconds (time_gap_between_frames = {time_gap_between_frames:.6f} seconds)")
                 last_frame_time = timestamp
 
                 if len(buffer) >= MAX_BUFFER_FRAMES:
@@ -250,17 +261,21 @@ def main():
             # Save any remaining data
             if buffer:
                 print(f"Saving remaining {len(buffer)} frames.")
+                logging.info(f"Saving remaining {len(buffer)} frames.")
                 data_queue.put((buffer, frame_timestamps_list))
 
         except KeyboardInterrupt:
             print("Interrupted. Cleaning up...")
+            logging.error("Interrupted. Cleaning up...")
             stop_event.set()
         except Exception as e:
             print(f"An error occurred: {e}")
+            logging.error(f"An error occurred: {e}")
             stop_event.set()
 
     #Signal threads to stop
     stop_event.set()
+    logging.info("RadarDataCollector main function completed.")
     
     # Wait for the data saving thread to finish
     data_queue.join()
