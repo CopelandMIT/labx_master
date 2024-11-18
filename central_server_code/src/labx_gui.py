@@ -48,7 +48,7 @@ def start_central_server():
         messagebox.showerror("Error", f"Failed to start central server: {e}")
 
 # Function to run the appropriate capture script remotely
-def start_remote_capture(ip_address, sensor_type, filename, duration):
+def start_remote_capture(ip_address, sensor_type, base_filename, capture_duration):
     ssh = paramiko.SSHClient()
     ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
     try:
@@ -59,13 +59,13 @@ def start_remote_capture(ip_address, sensor_type, filename, duration):
             command = (
                 f"/home/pi/labx_master/camera_code/labx_env/bin/python "
                 f"/home/pi/labx_master/camera_code/src/CameraDataCollector.py "
-                f"--video_filename {filename} --duration {duration}"
+                f"--base_filename {base_filename} --capture_duration {capture_duration}"
             )
         elif sensor_type == "radar":
             command = (
                 f"/home/dcope/labx_master/radar_code/labx_env/bin/python "
                 f"/home/dcope/labx_master/radar_code/src/RadarDataCollector.py "
-                f"--data_file {filename} --duration {duration}"
+                f"--base_filename {base_filename} --capture_duration {capture_duration}"
             )
         else:
             messagebox.showerror("Error", f"Unsupported sensor type: {sensor_type}")
@@ -82,7 +82,7 @@ def start_remote_capture(ip_address, sensor_type, filename, duration):
         if error:
             messagebox.showerror("Error", f"Failed to start capture: {error}")
         else:
-            messagebox.showinfo("Capture Started", f"Capture started on {ip_address} for {sensor_type} with filename '{filename}' and duration {duration} seconds.")
+            messagebox.showinfo("Capture Started", f"Capture started on {ip_address} for {sensor_type} with base_filename '{base_filename}' and capture_duration {capture_duration} seconds.")
     except Exception as e:
         messagebox.showerror("Connection Error", f"Could not connect to {ip_address}: {e}")
     finally:
@@ -96,11 +96,11 @@ def ping_sensor(ip_address):
 # Start Capture logic
 def start_capture():
     ip_address = ip_entry.get()
-    filename = filename_entry.get()
-    duration = duration_entry.get()
+    base_filename = base_filename_entry.get()
+    capture_duration = capture_duration_entry.get()
     sensor_type = sensor_type_var.get()
-    if not ip_address or not filename or not duration.isdigit():
-        messagebox.showerror("Input Error", "Please enter a valid IP address, filename, and duration.")
+    if not ip_address or not base_filename or not capture_duration.isdigit():
+        messagebox.showerror("Input Error", "Please enter a valid IP address, base_filename, and capture_duration.")
         return
     if not sensor_type:
         messagebox.showerror("Input Error", "Please select a sensor type.")
@@ -108,7 +108,7 @@ def start_capture():
     if not ping_sensor(ip_address):
         messagebox.showerror("Ping Error", f"Sensor at {ip_address} is unreachable.")
         return
-    start_remote_capture(ip_address, sensor_type, filename, int(duration))
+    start_remote_capture(ip_address, sensor_type, base_filename, int(capture_duration))
 
 # Function to handle termination signals and close the GUI
 def handle_exit_signal(signum, frame):
@@ -129,18 +129,23 @@ tk.Label(root, text="Central Server Controls:").grid(row=0, column=0, padx=10, p
 server_button = tk.Button(root, text="Start Central Server", command=start_central_server)
 server_button.grid(row=0, column=1, padx=10, pady=5)
 
+# Create StringVar instances to hold default values
+ip_default = tk.StringVar(value="192.168.68.1")
+base_filename_default = tk.StringVar(value="test_capture_V")
+capture_duration_default = tk.StringVar(value="10")
+
 # Sensor Controls
 tk.Label(root, text="Sensor IP Address:").grid(row=1, column=0, padx=10, pady=5)
-ip_entry = tk.Entry(root)
+ip_entry = tk.Entry(root, textvariable=ip_default)
 ip_entry.grid(row=1, column=1, padx=10, pady=5)
 
-tk.Label(root, text="Filename:").grid(row=2, column=0, padx=10, pady=5)
-filename_entry = tk.Entry(root)
-filename_entry.grid(row=2, column=1, padx=10, pady=5)
+tk.Label(root, text="Base Filename:").grid(row=2, column=0, padx=10, pady=5)
+base_filename_entry = tk.Entry(root, textvariable=base_filename_default)
+base_filename_entry.grid(row=2, column=1, padx=10, pady=5)
 
 tk.Label(root, text="Capture Duration (seconds):").grid(row=3, column=0, padx=10, pady=5)
-duration_entry = tk.Entry(root)
-duration_entry.grid(row=3, column=1, padx=10, pady=5)
+capture_duration_entry = tk.Entry(root, textvariable=capture_duration_default)
+capture_duration_entry.grid(row=3, column=1, padx=10, pady=5)
 
 # Sensor Type Selection
 tk.Label(root, text="Sensor Type:").grid(row=4, column=0, padx=10, pady=5)
