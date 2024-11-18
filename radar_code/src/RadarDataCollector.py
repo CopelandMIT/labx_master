@@ -8,8 +8,9 @@ import threading
 import queue
 import json
 from datetime import datetime
-import subprocess
-import requests
+# import subprocess
+# import requests
+import logging
 
 from ifxradarsdk import get_version_full
 from ifxradarsdk.fmcw import DeviceFmcw
@@ -22,6 +23,20 @@ sys.path.append(parent_dir)
 
 from shared_sensor_code.TimeSync import TimeSync
 
+# -------------------------------------------------
+# Logging Setup
+# -------------------------------------------------
+# Ensure the logs directory exists
+LOG_DIR = "/home/dcope/labx_master/radar_code/logs"
+os.makedirs(LOG_DIR, exist_ok=True)
+
+logging.basicConfig(
+    filename=os.path.join(LOG_DIR, "sensor_output.log"),
+    level=logging.INFO,
+    format="%(asctime)s - %(levelname)s - %(message)s"
+)
+
+logging.info("Starting Radar Data Collector script.")
 
 # -------------------------------------------------
 # Radar Data Collector Class with Chrony

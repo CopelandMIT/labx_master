@@ -5,7 +5,7 @@ from threading import Thread, Event
 from datetime import datetime
 
 class TimeSync:
-    def __init__(self, deployed_sensor_id, central_server_url, sync_polling_interval=15):
+    def __init__(self, deployed_sensor_id, central_server_url, sync_polling_interval=10):
         self.deployed_sensor_id = deployed_sensor_id
         self.central_server_url = central_server_url
         self.sync_polling_interval = sync_polling_interval
