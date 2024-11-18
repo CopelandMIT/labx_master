@@ -5,14 +5,14 @@ from threading import Thread, Event
 from datetime import datetime
 
 class TimeSync:
-    def __init__(self, sbc_id, central_server_url, polling_interval=15):
-        self.sbc_id = sbc_id
+    def __init__(self, deployed_sensor_id, central_server_url, sync_polling_interval=15):
+        self.deployed_sensor_id = deployed_sensor_id
         self.central_server_url = central_server_url
-        self.polling_interval = polling_interval
+        self.sync_polling_interval = sync_polling_interval
         self.stop_event = Event()
         self.last_tracking_output = None  # Store the last tracking output
 
-    def collect_and_send_chrony_data(self):
+    def collect_and_send_time_sync_data(self):
         """Collects Chrony data and sends it to the server when new data is available."""
         while not self.stop_event.is_set():
             try:
@@ -29,7 +29,7 @@ class TimeSync:
 
                     # Prepare payload
                     payload = {
-                        'sbc_id': self.sbc_id,
+                        'deployed_sensor_id': self.deployed_sensor_id,
                         'data': {
                             'timestamp': current_time,
                             'chronyc_output': tracking_output
@@ -49,15 +49,17 @@ class TimeSync:
                 print(f"Error collecting or sending Chrony data: {e}")
 
             # Wait for the specified interval or until stop_event is set
-            if self.stop_event.wait(self.polling_interval):
+            if self.stop_event.wait(self.sync_polling_interval):
                 break  # Exit if stop_event is set
 
     def start(self):
         """Start the time sync data collection."""
-        self.thread = Thread(target=self.collect_and_send_chrony_data)
+        self.thread = Thread(target=self.collect_and_send_time_sync_data)
         self.thread.start()
+        print("TimeSync thread started.")
 
     def stop(self):
         """Stop the time sync data collection."""
         self.stop_event.set()
         self.thread.join()
+        print("TimeSync thread stopped.")

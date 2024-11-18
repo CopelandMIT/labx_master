@@ -72,6 +72,7 @@ def start_remote_capture(ip_address, sensor_type, base_filename, capture_duratio
             return
 
         # Execute the command
+        print(f"Executing command: {command}")
         stdin, stdout, stderr = ssh.exec_command(command)
         output = stdout.read().decode()
         error = stderr.read().decode()

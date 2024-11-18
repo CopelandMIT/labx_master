@@ -21,29 +21,29 @@ from shared_sensor_code.TimeSync import TimeSync
 VIDEO_CAPTURE_LENGTH = 600  # Default capture length for the whole session
 
 class CameraDataCollector:
-    def __init__(self, stop_event, sbc_id="SBC001", central_server_url='http://192.168.68.130:5000/receive_data',
-                 polling_interval=10, video_filename='video.avi',
-                 delayed_start_timestamp=None, duration=None, camera_index=None,
+    def __init__(self, stop_event, deployed_sensor_id="CAM001", central_server_url='http://192.168.68.130:5000/receive_data',
+                 sync_polling_interval=10, base_filename='default_name_video',
+                 delayed_start_timestamp=None, capture_duration=None, camera_index=None,
                  batch_duration=10, disable_data_sync=False):
         # Configuration
-        self.sbc_id = sbc_id
-        print(f"CameraDataCollector initialized with SBC ID: {self.sbc_id}")
+        self.deployed_sensor_id = deployed_sensor_id
+        print(f"CameraDataCollector initialized with SBC ID: {self.deployed_sensor_id}")
         self.central_server_url = central_server_url
-        self.polling_interval = polling_interval
-        self.video_filename = video_filename
+        self.sync_polling_interval = sync_polling_interval
+        self.base_filename = base_filename
         self.delayed_start_timestamp = delayed_start_timestamp
-        self.duration = duration  # Total duration of the entire capture
+        self.capture_duration = capture_duration  # Total duration of the entire capture
         self.camera_index = camera_index
         self.batch_duration = batch_duration  # Duration of each batch (in seconds)
         self.stop_event = stop_event  # Store the stop_event for graceful shutdown
         self.disable_data_sync = disable_data_sync  # Flag to control data sync
 
         # Define the absolute path to the data directory
-        self.data_directory = os.path.expanduser('~/labx_master/camera_code/data')
+        self.data_output_directory = os.path.expanduser('~/labx_master/camera_code/data')
 
         # Create the data directory if it doesn't exist
-        if not os.path.exists(self.data_directory):
-            os.makedirs(self.data_directory)
+        if not os.path.exists(self.data_output_directory):
+            os.makedirs(self.data_output_directory)
 
         # Buffer for storing frames before saving
         self.frame_buffer = []
@@ -59,9 +59,9 @@ class CameraDataCollector:
         # Only initialize TimeSync if data sync is not disabled
         if not self.disable_data_sync:
             self.time_sync = TimeSync(
-                sbc_id=self.sbc_id,
+                deployed_sensor_id=self.deployed_sensor_id,
                 central_server_url=self.central_server_url,
-                polling_interval=self.polling_interval
+                sync_polling_interval=self.sync_polling_interval
             )
 
         # Camera capture thread
@@ -130,9 +130,9 @@ class CameraDataCollector:
                 print("Error reading frame from camera.")
                 break  # Error reading frame, exit loop
 
-            # Check if total duration has been reached
-            if self.duration is not None and (time.time() - start_time) >= self.duration:
-                print(f"Reached total recording duration of {self.duration} seconds.")
+            # Check if total capture_duration has been reached
+            if self.capture_duration is not None and (time.time() - start_time) >= self.capture_duration:
+                print(f"Reached total recording capture_duration of {self.capture_duration} seconds.")
                 break
 
         cap.release()
@@ -151,8 +151,8 @@ class CameraDataCollector:
 
             # Create a new video file for the batch
             timestamp = datetime.now().strftime('%Y%m%d_%H%M%S%f')[:-3]
-            video_filename = f'video_{timestamp}.avi'
-            video_path = os.path.join(self.data_directory, video_filename)
+            output_filename = f'video_{timestamp}.avi'
+            video_path = os.path.join(self.data_output_directory, output_filename)
 
             # Video writer setup
             fourcc = cv2.VideoWriter_fourcc(*'XVID')
@@ -191,32 +191,28 @@ def main():
 
     # Argument parser setup
     parser = argparse.ArgumentParser(description='Camera data collection with optional NTP chrony metadata')
-    parser.add_argument('--sbc_id', type=str, default='SBC001', help="Single Board Computer ID")
-    parser.add_argument('--duration', type=int, default=VIDEO_CAPTURE_LENGTH, help="Recording duration in seconds")
-    parser.add_argument('--video_filename', type=str, default=None, help="Filename for the video data")
+    parser.add_argument('--deployed_sensor_id', type=str, default='SBC001', help="Deployed sensor ID")
+    parser.add_argument('--capture_duration', type=int, default=VIDEO_CAPTURE_LENGTH, help="Recording capture_duration in seconds")
+    parser.add_argument('--base_filename', type=str, default='default_name_video', help="Base filename for the video data")
     parser.add_argument('--delayed_start_timestamp', type=float, default=None, help="Timestamp to delay start until")
-    parser.add_argument('--chrony_interval', type=int, default=10, help="Interval to send Chrony data (seconds)")
+    parser.add_argument('--sync_polling_interval', type=int, default=10, help="Interval to send Chrony data (seconds)")
     parser.add_argument('--camera_index', type=int, default=None, help="Camera index to use")
     parser.add_argument('--batch_duration', type=int, default=10, help="Duration of each video batch in seconds")
-    parser.add_argument('--disable_data_sync', action='store_true', help="Disable data synchronization with central server")
+    parser.add_argument('--disable_data_sync', action='store_true', help="Disable data synchronization with central server, but allow capture to occur")
     args = parser.parse_args()
 
-    # If video_filename is not provided, create one based on current time
-    if args.video_filename is None:
-        current_time = datetime.now().strftime('%Y%m%d_%H%M%S%f')[:-3]
-        video_filename = f'video_{current_time}.avi'
-    else:
-        video_filename = args.video_filename
+    if args._capture_duration <= 0:
+        raise ValueError("Duration must be greater than 0 seconds.")
 
     # Initialize Camera Data Collector with stop_event
     camera_collector = CameraDataCollector(
         stop_event=stop_event,
-        sbc_id=args.sbc_id,
+        deployed_sensor_id=args.deployed_sensor_id,
         central_server_url='http://192.168.68.130:5000/receive_data',
-        polling_interval=args.chrony_interval,
-        video_filename=video_filename,
+        sync_polling_interval=args.sync_polling_interval,
+        base_filename=args.base_filename,
         delayed_start_timestamp=args.delayed_start_timestamp,
-        duration=args.duration,
+        capture_duration=args.capture_duration,
         camera_index=args.camera_index,
         batch_duration=args.batch_duration,  # Use batch duration in seconds
         disable_data_sync=args.disable_data_sync  # Pass the flag for disabling data sync
