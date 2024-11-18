@@ -7,6 +7,19 @@ import socket
 import signal
 import sys
 import threading
+import logging
+import time
+
+LOG_DIR = "/home/dcope/labx_master/central_server_code/logs"
+os.makedirs(LOG_DIR, exist_ok=True)
+
+logging.basicConfig(
+    filename=os.path.join(LOG_DIR, f"sensor_output_{time.time()}.log"),
+    level=logging.INFO,
+    format="%(asctime)s - %(levelname)s - %(message)s"
+)
+
+logging.info("Starting Radar Data Collector script.")
 
 # Define constants
 DB_PATH = "path/to/central_server_code/data/lab_in_a_box.db"
@@ -58,6 +71,7 @@ def start_remote_capture_threaded(ip_address, sensor_type, base_filename, captur
 
 # Function to run the appropriate capture script remotely
 def start_remote_capture(ip_address, sensor_type, base_filename, capture_duration):
+    logging.info(f"Starting remote capture: {ip_address}, {sensor_type}, {base_filename}, {capture_duration}")
     ssh = paramiko.SSHClient()
     ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
     try:
