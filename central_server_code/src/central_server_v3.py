@@ -4,6 +4,7 @@ import time
 import math
 import csv
 import os
+import json
 
 app = Flask(__name__)
 
@@ -25,10 +26,8 @@ if not os.path.isfile(CSV_FILE):
 @app.route('/receive_data', methods=['POST'])
 def receive_data():
     data = request.get_json()
-    sbc_id = data.get('sbc_id')
+    sbc_id = data.get('deployed_sensor_id')
     entry = data.get('data')  # Adjusted from 'entries' to 'entry'
-
-    print(f"from {sbc_id}: {data}")
 
     if sbc_id is None or entry is None:
         return jsonify({'status': 'error', 'message': 'Invalid data'}), 400
@@ -43,10 +42,24 @@ def receive_data():
         if timestamp is None or chronyc_output is None:
             return jsonify({'status': 'error', 'message': 'Missing timestamp or chronyc_output'}), 400
 
-        # Parse metrics from chronyc_output
+            # Parse metrics from chronyc_output
         chrony_data = parse_chronyc_output(chronyc_output)
-        if chrony_data:
-            # Store the latest data
+        if not chrony_data:
+            return jsonify({'status': 'error', 'message': 'Failed to parse chronyc output'}), 400
+
+        # Print the parsed values in a structured format
+        print("\n--- Received Data ---")
+        print(f"SBC ID: {sbc_id}")
+        print(f"Timestamp: {timestamp}")
+        print(f"Reference ID: {chrony_data.get('reference_id', 'N/A')}")
+        print(f"Stratum: {chrony_data.get('stratum', 'N/A')}")
+        print(f"System Time Offset: {chrony_data.get('system_time_offset', 'N/A')} seconds")
+        print(f"Root Dispersion: {chrony_data.get('root_dispersion', 'N/A')} seconds")
+        print(f"Root Delay: {chrony_data.get('root_delay', 'N/A')} seconds")
+        print("--- End of Data ---\n")
+
+        # Store the parsed data
+        with data_lock:
             offset_data[sbc_id] = (timestamp, chrony_data)
 
     # After receiving new data, calculate synchronization metrics and save them immediately
@@ -68,6 +81,14 @@ def parse_chronyc_output(chronyc_output):
                 disp_str = line.split()[3]  # Fourth item is the value
                 disp_value = ''.join(filter(lambda c: c.isdigit() or c == '.' or c == '-' or c == '+', disp_str))
                 data['root_dispersion'] = float(disp_value)
+            elif "Root delay" in line:
+                delay_str = line.split()[3]  # Fourth item is the value
+                delay_value = ''.join(filter(lambda c: c.isdigit() or c == '.' or c == '-' or c == '+', delay_str))
+                data['root_delay'] = float(delay_value)
+            elif "Reference ID" in line:
+                data['reference_id'] = line.split(":")[1].strip()
+            elif "Stratum" in line:
+                data['stratum'] = int(line.split(":")[1].strip())
     except Exception as e:
         print(f"Error parsing chronyc output: {e}")
         return None
