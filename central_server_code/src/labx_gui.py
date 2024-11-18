@@ -6,6 +6,7 @@ import paramiko
 import socket
 import signal
 import sys
+import threading
 
 # Define constants
 DB_PATH = "path/to/central_server_code/data/lab_in_a_box.db"
@@ -46,6 +47,14 @@ def start_central_server():
         messagebox.showinfo("Server Started", f"Central server started on port {PORT}.")
     except Exception as e:
         messagebox.showerror("Error", f"Failed to start central server: {e}")
+
+
+def start_remote_capture_threaded(ip_address, sensor_type, base_filename, capture_duration):
+    threading.Thread(
+        target=start_remote_capture,
+        args=(ip_address, sensor_type, base_filename, capture_duration),
+        daemon=True
+    ).start()
 
 # Function to run the appropriate capture script remotely
 def start_remote_capture(ip_address, sensor_type, base_filename, capture_duration):
@@ -109,7 +118,8 @@ def start_capture():
     if not ping_sensor(ip_address):
         messagebox.showerror("Ping Error", f"Sensor at {ip_address} is unreachable.")
         return
-    start_remote_capture(ip_address, sensor_type, base_filename, int(capture_duration))
+    start_remote_capture_threaded(ip_address, sensor_type, base_filename, int(capture_duration))
+
 
 # Function to handle termination signals and close the GUI
 def handle_exit_signal(signum, frame):
