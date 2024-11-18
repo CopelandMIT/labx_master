@@ -10,7 +10,7 @@ import threading
 import logging
 import time
 
-LOG_DIR = "/home/dcope/labx_master/central_server_code/logs"
+LOG_DIR = "/home/daniel/labx_master/central_server_code/logs"
 os.makedirs(LOG_DIR, exist_ok=True)
 
 logging.basicConfig(
@@ -69,15 +69,20 @@ def start_remote_capture_threaded(ip_address, sensor_type, base_filename, captur
         daemon=True
     ).start()
 
-# Function to run the appropriate capture script remotely
 def start_remote_capture(ip_address, sensor_type, base_filename, capture_duration):
     logging.info(f"Starting remote capture: {ip_address}, {sensor_type}, {base_filename}, {capture_duration}")
     ssh = paramiko.SSHClient()
     ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+    private_key_path = "/home/daniel/.ssh/id_rsa"  # Path to private key
+    
     try:
-        ssh.connect(ip_address, username=PI_USERNAME, password=PI_PASSWORD)
+        # Load private key
+        private_key = paramiko.RSAKey.from_private_key_file(private_key_path)
+        
+        # Connect to the remote host
+        ssh.connect(ip_address, username=PI_USERNAME, pkey=private_key)
 
-        # Command varies based on sensor type
+        # Command based on sensor type
         if sensor_type == "camera":
             command = (
                 f"/home/pi/labx_master/camera_code/labx_env/bin/python "
@@ -95,27 +100,27 @@ def start_remote_capture(ip_address, sensor_type, base_filename, capture_duratio
             return
 
         # Execute the command
-        # print(f"Executing command: {command}")
         stdin, stdout, stderr = ssh.exec_command(command)
-        output = stdout.read().decode()
-        error = stderr.read().decode()
 
-        print("STDOUT:", output)
-        print("STDERR:", error)
+        # Read output line by line
+        for line in iter(stdout.readline, ""):
+            print(f"STDOUT: {line.strip()}")
+            logging.info(f"STDOUT: {line.strip()}")
+        
+        for line in iter(stderr.readline, ""):
+            print(f"STDERR: {line.strip()}")
+            logging.error(f"STDERR: {line.strip()}")
 
-        if error:
-            messagebox.showerror("Error", f"Failed to start capture: {error}")
-        else:
-            messagebox.showinfo("Capture Started", f"Capture started on {ip_address} for {sensor_type} with base_filename '{base_filename}' and capture_duration {capture_duration} seconds.")
+        messagebox.showinfo("Capture Started", f"Capture started on {ip_address} for {sensor_type} with base_filename '{base_filename}' and capture_duration {capture_duration} seconds.")
     except Exception as e:
         messagebox.showerror("Connection Error", f"Could not connect to {ip_address}: {e}")
     finally:
         ssh.close()
 
-# Function to ping the sensor to check connectivity
-def ping_sensor(ip_address):
-    response = os.system(f"ping -c 1 {ip_address}")
-    return response == 0
+# # Function to ping the sensor to check connectivity
+# def ping_sensor(ip_address):
+#     response = os.system(f"ping -c 1 {ip_address}")
+#     return response == 0
 
 # Start Capture logic
 def start_capture():
@@ -129,9 +134,9 @@ def start_capture():
     if not sensor_type:
         messagebox.showerror("Input Error", "Please select a sensor type.")
         return
-    if not ping_sensor(ip_address):
-        messagebox.showerror("Ping Error", f"Sensor at {ip_address} is unreachable.")
-        return
+    # if not ping_sensor(ip_address):
+    #     messagebox.showerror("Ping Error", f"Sensor at {ip_address} is unreachable.")
+    #     return
     start_remote_capture_threaded(ip_address, sensor_type, base_filename, int(capture_duration))
 
 

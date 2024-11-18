@@ -26,10 +26,10 @@ if not os.path.isfile(CSV_FILE):
 @app.route('/receive_data', methods=['POST'])
 def receive_data():
     data = request.get_json()
-    sbc_id = data.get('deployed_sensor_id')
+    deployed_sensor_id = data.get('deployed_sensor_id')
     entry = data.get('data')  # Adjusted from 'entries' to 'entry'
 
-    if sbc_id is None or entry is None:
+    if deployed_sensor_id is None or entry is None:
         return jsonify({'status': 'error', 'message': 'Invalid data'}), 400
 
     with data_lock:
@@ -49,7 +49,7 @@ def receive_data():
 
         # Print the parsed values in a structured format
         print("\n--- Received Data ---")
-        print(f"SBC ID: {sbc_id}")
+        print(f"Deployed Sensor ID: {deployed_sensor_id}")
         print(f"Timestamp: {timestamp}")
         print(f"Reference ID: {chrony_data.get('reference_id', 'N/A')}")
         print(f"Stratum: {chrony_data.get('stratum', 'N/A')}")
@@ -59,8 +59,7 @@ def receive_data():
         print("--- End of Data ---\n")
 
         # Store the parsed data
-        with data_lock:
-            offset_data[sbc_id] = (timestamp, chrony_data)
+        offset_data[deployed_sensor_id] = (timestamp, chrony_data)
 
     # After receiving new data, calculate synchronization metrics and save them immediately
     calculate_synchronization_metrics()
@@ -103,15 +102,15 @@ def calculate_synchronization_metrics():
         # Collect the latest metrics from each SBC
         metrics = {sbc_id: data for sbc_id, (timestamp, data) in offset_data.items()}
 
-        sbc_ids = list(metrics.keys())
+        deployed_sensor_ids = list(metrics.keys())
         current_time = time.time()
 
         # Calculate time offsets between SBCs
         time_offsets = []
-        for i in range(len(sbc_ids)):
-            for j in range(i + 1, len(sbc_ids)):
-                sbc_a = sbc_ids[i]
-                sbc_b = sbc_ids[j]
+        for i in range(len(deployed_sensor_ids)):
+            for j in range(i + 1, len(deployed_sensor_ids)):
+                sbc_a = deployed_sensor_ids[i]
+                sbc_b = deployed_sensor_ids[j]
                 offset_a = metrics[sbc_a]['system_time_offset']
                 offset_b = metrics[sbc_b]['system_time_offset']
                 time_offset = abs(offset_a - offset_b)
@@ -134,7 +133,7 @@ def calculate_synchronization_metrics():
             print(f"  Jitter (Std Dev of Offsets): {jitter_ms:.3f} ms")
 
             # Root Dispersion Analysis
-            root_dispersions = [metrics[sbc_id]['root_dispersion'] for sbc_id in sbc_ids]
+            root_dispersions = [metrics[deployed_sensor_id]['root_dispersion'] for deployed_sensor_id in deployed_sensor_ids]
             mean_root_dispersion = sum(root_dispersions) / len(root_dispersions)
             max_root_dispersion = max(root_dispersions)
 
