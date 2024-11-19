@@ -12,8 +12,13 @@ app = Flask(__name__)
 offset_data = {}  # {sbc_id: (timestamp, data)}
 data_lock = threading.Lock()
 
+from datetime import datetime
+
+# Generate a timestamp with microsecond accuracy
+timestamp = datetime.now().strftime('%Y%m%d_%H%M%S%f')
+
 # CSV file for storing metrics
-CSV_FILE = f'/home/daniel/labx_master/central_server_code/data/sync_metrics/test_2_camera_1_radar_{time.time()}_GPS_eth.csv'
+CSV_FILE = f'/home/daniel/labx_master/central_server_code/data/sync_metrics/test_1_camera_1_radar_{timestamp}_GPS_eth.csv'
 
 # Ensure the CSV file exists and has a header
 if not os.path.isfile(CSV_FILE):

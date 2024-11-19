@@ -43,13 +43,18 @@ class LabInABoxControlPanel:
         # Configuration setup
         tk.Label(self.root, text="Experiment Setup:").grid(row=0, column=0, columnspan=4, pady=5)
 
+        # Create StringVar instances for default values
+        self.ip_default = tk.StringVar(value="192.168.68.1")
+        base_filename_default = tk.StringVar(value="test_capture_V")
+        capture_duration_default = tk.StringVar(value="30")
+
         # Base Filename and Capture Duration
         tk.Label(self.root, text="Base Filename:").grid(row=1, column=0, padx=5, pady=5)
-        self.base_filename_entry = tk.Entry(self.root)
+        self.base_filename_entry = tk.Entry(self.root, textvariable=base_filename_default)
         self.base_filename_entry.grid(row=1, column=1, columnspan=3, pady=5)
 
         tk.Label(self.root, text="Capture Duration (seconds):").grid(row=2, column=0, padx=5, pady=5)
-        self.capture_duration_entry = tk.Entry(self.root)
+        self.capture_duration_entry = tk.Entry(self.root, textvariable=capture_duration_default)
         self.capture_duration_entry.grid(row=2, column=1, columnspan=3, pady=5)
 
         # Add Devices
@@ -57,7 +62,7 @@ class LabInABoxControlPanel:
         tk.Label(self.root, text="Username:").grid(row=3, column=1, padx=5, pady=5)
         tk.Label(self.root, text="Sensor Type:").grid(row=3, column=2, padx=5, pady=5)
 
-        self.ip_entry = tk.Entry(self.root)
+        self.ip_entry = tk.Entry(self.root, textvariable=self.ip_default)
         self.ip_entry.grid(row=4, column=0, padx=5, pady=5)
 
         self.username_entry = tk.Entry(self.root)
@@ -87,10 +92,21 @@ class LabInABoxControlPanel:
         if not ip_address or not username or not sensor_type:
             messagebox.showerror("Input Error", "Please enter a valid IP address, username, and select a sensor type.")
             return
+
+        # Add configuration to the list
         config = {"ip_address": ip_address, "username": username, "sensor_type": sensor_type}
         self.configurations.append(config)
         self.config_listbox.insert(tk.END, f"IP: {ip_address}, Username: {username}, Sensor: {sensor_type}")
-        self.ip_entry.delete(0, tk.END)
+
+        # Calculate next IP address
+        octets = ip_address.split(".")
+        if len(octets) == 4 and octets[3].isdigit():
+            next_ip = f"{octets[0]}.{octets[1]}.{octets[2]}.{int(octets[3]) + 1}"
+            self.ip_default.set(next_ip)  # Update default IP entry
+        else:
+            messagebox.showwarning("Invalid IP", "IP Address is invalid. Please enter a valid IP next time.")
+
+        # Clear the username entry
         self.username_entry.delete(0, tk.END)
 
     def start_all_captures(self):
@@ -117,9 +133,10 @@ class LabInABoxControlPanel:
 
         messagebox.showinfo("Capture Started", "All captures have been started.")
 
+
     def start_remote_capture(self, ip_address, username, sensor_type, base_filename, capture_duration):
         """Execute the remote capture command on an RPi."""
-        logging.info(f"Starting remote capture: {ip_address}, {username}, {sensor_type}, {base_filename}, {capture_duration}")
+        logging.info(f"Starting remote capture for IP: {ip_address}, Username: {username}, Sensor Type: {sensor_type}")
         ssh = paramiko.SSHClient()
         ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
         private_key_path = "/home/daniel/.ssh/id_rsa"
@@ -128,6 +145,7 @@ class LabInABoxControlPanel:
             private_key = paramiko.RSAKey.from_private_key_file(private_key_path)
             ssh.connect(ip_address, username=username, pkey=private_key)
 
+            # Map sensor type to the correct command
             if sensor_type == "camera":
                 command = (
                     f"/home/{username}/labx_master/camera_code/labx_env/bin/python "
@@ -144,6 +162,7 @@ class LabInABoxControlPanel:
                 logging.error(f"Unsupported sensor type: {sensor_type}")
                 return
 
+            logging.info(f"Executing command on {ip_address}: {command}")
             stdin, stdout, stderr = ssh.exec_command(command)
             for line in iter(stdout.readline, ""):
                 logging.info(f"STDOUT: {line.strip()}")

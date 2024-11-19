@@ -2,8 +2,8 @@ import matplotlib.pyplot as plt
 import pandas as pd
 
 # Load your data
-data_file = '/home/daniel/labx_master/central_server_code/data/sync_metrics/synchronization_metrics_600s_2_camera_1_radar_1730147938.7342548_GPS_eth.csv'
-appendix = "_2_cam_1_radar_600s_GPS_eth"
+data_file = '/home/daniel/labx_master/central_server_code/data/sync_metrics/test_1_camera_1_radar_1732029922.460368_GPS_eth.csv'
+appendix = "_1_cam_1_radar_30s_GPS_eth"
 plot_save_dir = "/home/daniel/labx_master/central_server_code/data/plots"
 
 # Assuming you have a CSV file with columns 'timestamp', 'max_offset_ms', 'mean_offset_ms', 'jitter_ms', 'mean_root_dispersion_ms'
