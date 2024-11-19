@@ -105,17 +105,19 @@ def data_saving_thread(base_filename, data_queue, stop_event, data_output_direct
     """Thread that saves data from the queue to disk."""
     while not stop_event.is_set() or not data_queue.empty():
         try:
-            buffer, frame_timestamps_list = data_queue.get(timeout=1)
+            buffer, frame_timestamps_list, buffer_duration_ms = data_queue.get(timeout=1)
             if buffer:
-                filename = f"{base_filename}_{datetime.now().strftime('%Y%m%d_%H%M%S%f')[:-3]}.npz"
+                # Use duration directly from the queue
+                batch_start_time = frame_timestamps_list[0].strftime('%Y%m%d_%H%M%S%f')[:-3]
+                filename = f"{base_filename}_{batch_start_time}_{buffer_duration_ms}ms.npz"
+
+                # Save data
                 file_path = os.path.join(data_output_directory, filename)
                 np.savez(file_path, data=np.concatenate(buffer, axis=0), frame_timestamps_list=np.array(frame_timestamps_list))
-                print(f"Saved {len(buffer)} frames to {filename}")
                 logging.info(f"Saved {len(buffer)} frames to {filename}")
-            data_queue.task_done()
+                data_queue.task_done()
         except queue.Empty:
-            continue
-
+            continue    
 
 def main():
     # Global event to signal threads to stop
@@ -221,10 +223,12 @@ def main():
         sequence = device.create_simple_sequence(config)
         device.set_acquisition_sequence(sequence)
 
-        last_frame_time = None
+        last_frame_perf = None
         total_frame_gap_duration = 0.0
         expected_frame_interval = config.frame_repetition_time_s
         frame_gap_threshold = expected_frame_interval * 1.05  # Reduced threshold for higher sensitivity
+
+        buffer_start_perf = None  # Initialize variable to track the first frame's perf_counter in a buffer
 
         try:
             while not stop_event.is_set():
@@ -232,37 +236,61 @@ def main():
                 elapsed_time = time.time() - start_time
                 if elapsed_time >= capture_duration:
                     print(f"Reached recording duration of {capture_duration} seconds.")
+                    logging.info(f"Reached recording duration of {capture_duration} seconds.")
                     break  # Exit the loop when duration is reached
 
-                frame_start_time = time.perf_counter()
+                # Use perf_counter for precise timing and datetime for human-readable timestamps
+                frame_start_perf = time.perf_counter()  # Precise start time for calculations
+                frame_start_datetime = datetime.now()  # Human-readable start time
+
                 frame_contents = device.get_next_frame()
-                frame_end_time = time.perf_counter()
-                timestamp = frame_end_time
+
+                frame_end_perf = time.perf_counter()  # Precise end time for calculations
+                frame_end_datetime = datetime.now()  # Human-readable end time
+
+                # Calculate processing duration using perf_counter
+                frame_processing_duration = frame_end_perf - frame_start_perf
+                print(f"Frame started at {frame_start_datetime}, ended at {frame_end_datetime}, "
+                    f"duration: {frame_processing_duration:.6f} seconds")
+                logging.debug(f"Frame started at {frame_start_datetime}, ended at {frame_end_datetime}, "
+                            f"duration: {frame_processing_duration:.6f} seconds")
+
+                # Use the human-readable start time as the frame's timestamp
+                timestamp = frame_start_datetime
                 buffer.append(frame_contents)
                 frame_timestamps_list.append(timestamp)
 
-                # Calculate time between frames
-                if last_frame_time is not None:
-                    time_gap_between_frames = timestamp - last_frame_time
+                # Set buffer_start_perf for the first frame in the buffer
+                if buffer_start_perf is None:
+                    buffer_start_perf = frame_start_perf
+
+                # Calculate time between frames using perf_counter for precision
+                if last_frame_perf is not None:
+                    time_gap_between_frames = frame_start_perf - last_frame_perf
                     if time_gap_between_frames > frame_gap_threshold:
                         gap_duration = time_gap_between_frames - expected_frame_interval
                         total_frame_gap_duration += gap_duration
-                        print(f"Gap detected: {gap_duration:.6f} seconds (time_gap_between_frames = {time_gap_between_frames:.6f} seconds)")
-                        logging.info(f"Gap detected: {gap_duration:.6f} seconds (time_gap_between_frames = {time_gap_between_frames:.6f} seconds)")
-                last_frame_time = timestamp
+                        print(f"Gap detected: {gap_duration:.6f} seconds "
+                            f"(time_gap_between_frames = {time_gap_between_frames:.6f} seconds)")
+                        logging.info(f"Gap detected: {gap_duration:.6f} seconds "
+                                    f"(time_gap_between_frames = {time_gap_between_frames:.6f} seconds)")
+
+                # Update last frame time for both perf_counter and datetime
+                last_frame_perf = frame_end_perf  # Assign the end time of the current frame
 
                 if len(buffer) >= MAX_BUFFER_FRAMES:
-                    # Transfer buffer to data queue for saving
-                    print(f"Buffer full with {len(buffer)} frames. Sending to saving thread.")
-                    data_queue.put((buffer.copy(), frame_timestamps_list.copy()))
+                    # Calculate the buffer duration using perf_counter
+                    batch_end_perf = time.perf_counter()  # Precise end time for the batch
+                    buffer_duration_ms = int((batch_end_perf - buffer_start_perf) * 1000)  # Duration in milliseconds
+
+                    print(f"Buffer full with {len(buffer)} frames. Duration: {buffer_duration_ms} ms.")
+                    logging.info(f"Buffer full with {len(buffer)} frames. Duration: {buffer_duration_ms} ms.")
+
+                    # Pass buffer duration and timestamps to the data queue
+                    data_queue.put((buffer.copy(), frame_timestamps_list.copy(), buffer_duration_ms))
                     buffer.clear()
                     frame_timestamps_list.clear()
-
-            # Save any remaining data
-            if buffer:
-                print(f"Saving remaining {len(buffer)} frames.")
-                logging.info(f"Saving remaining {len(buffer)} frames.")
-                data_queue.put((buffer, frame_timestamps_list))
+                    buffer_start_perf = None  # Reset buffer_start_perf for the next batch
 
         except KeyboardInterrupt:
             print("Interrupted. Cleaning up...")
@@ -272,6 +300,21 @@ def main():
             print(f"An error occurred: {e}")
             logging.error(f"An error occurred: {e}")
             stop_event.set()
+            
+        # Handle any residual buffer data
+        if buffer:
+            batch_end_perf = time.perf_counter()  # Use perf_counter for precise timing
+            buffer_duration_ms = int((batch_end_perf - buffer_start_perf) * 1000)  # Duration in milliseconds
+
+            print(f"Saving residual buffer with {len(buffer)} frames. Duration: {buffer_duration_ms} ms.")
+            logging.info(f"Saving residual buffer with {len(buffer)} frames. Duration: {buffer_duration_ms} ms.")
+
+            # Pass residual data to the data queue
+            data_queue.put((buffer.copy(), frame_timestamps_list.copy(), buffer_duration_ms))
+            buffer.clear()
+            frame_timestamps_list.clear()
+            buffer_start_perf = None  # Reset buffer_start_perf
+
 
     #Signal threads to stop
     stop_event.set()
