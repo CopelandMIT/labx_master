@@ -1,0 +1,170 @@
+import tkinter as tk
+from tkinter import messagebox
+import os
+import subprocess
+import paramiko
+import socket
+import signal
+import threading
+import logging
+import time
+
+class LabInABoxControlPanel:
+    LOG_DIR = "/home/daniel/labx_master/central_server_code/logs"
+    CENTRAL_SERVER_SCRIPT = "/home/daniel/labx_master/central_server_code/src/central_server_v3.py"
+    PORT = 5000
+    SENSOR_TYPES = ["camera", "body_tracking", "radar"]
+
+    def __init__(self):
+        # Set up logging
+        os.makedirs(self.LOG_DIR, exist_ok=True)
+        logging.basicConfig(
+            filename=os.path.join(self.LOG_DIR, f"sensor_output_{time.time()}.log"),
+            level=logging.INFO,
+            format="%(asctime)s - %(levelname)s - %(message)s"
+        )
+        logging.info("Starting Lab In A Box Control Panel.")
+
+        # Initialize Tkinter
+        self.root = tk.Tk()
+        self.root.title("Lab in a Box - Setup and Control Panel")
+
+        # Configurations list for multiple RPis
+        self.configurations = []
+
+        # Set up the GUI components
+        self.setup_gui()
+
+        # Set up signal handlers
+        signal.signal(signal.SIGINT, self.handle_exit_signal)
+        signal.signal(signal.SIGTERM, self.handle_exit_signal)
+
+    def setup_gui(self):
+        # Configuration setup
+        tk.Label(self.root, text="Experiment Setup:").grid(row=0, column=0, columnspan=4, pady=5)
+
+        # Base Filename and Capture Duration
+        tk.Label(self.root, text="Base Filename:").grid(row=1, column=0, padx=5, pady=5)
+        self.base_filename_entry = tk.Entry(self.root)
+        self.base_filename_entry.grid(row=1, column=1, columnspan=3, pady=5)
+
+        tk.Label(self.root, text="Capture Duration (seconds):").grid(row=2, column=0, padx=5, pady=5)
+        self.capture_duration_entry = tk.Entry(self.root)
+        self.capture_duration_entry.grid(row=2, column=1, columnspan=3, pady=5)
+
+        # Add Devices
+        tk.Label(self.root, text="IP Address:").grid(row=3, column=0, padx=5, pady=5)
+        tk.Label(self.root, text="Username:").grid(row=3, column=1, padx=5, pady=5)
+        tk.Label(self.root, text="Sensor Type:").grid(row=3, column=2, padx=5, pady=5)
+
+        self.ip_entry = tk.Entry(self.root)
+        self.ip_entry.grid(row=4, column=0, padx=5, pady=5)
+
+        self.username_entry = tk.Entry(self.root)
+        self.username_entry.grid(row=4, column=1, padx=5, pady=5)
+
+        self.sensor_type_var = tk.StringVar(value=self.SENSOR_TYPES[0])  # Default to first option
+        self.sensor_type_menu = tk.OptionMenu(self.root, self.sensor_type_var, *self.SENSOR_TYPES)
+        self.sensor_type_menu.grid(row=4, column=2, padx=5, pady=5)
+
+        add_device_button = tk.Button(self.root, text="Add Device", command=self.add_device)
+        add_device_button.grid(row=4, column=3, padx=5, pady=5)
+
+        # Device List
+        tk.Label(self.root, text="Configured Devices:").grid(row=5, column=0, columnspan=4, pady=5)
+        self.config_listbox = tk.Listbox(self.root, width=70, height=10)
+        self.config_listbox.grid(row=6, column=0, columnspan=4, padx=10, pady=5)
+
+        # Start All Captures Button
+        start_all_button = tk.Button(self.root, text="Start All Captures", command=self.start_all_captures)
+        start_all_button.grid(row=7, column=0, columnspan=4, pady=10)
+
+    def add_device(self):
+        """Add a device configuration to the list."""
+        ip_address = self.ip_entry.get()
+        username = self.username_entry.get()
+        sensor_type = self.sensor_type_var.get()
+        if not ip_address or not username or not sensor_type:
+            messagebox.showerror("Input Error", "Please enter a valid IP address, username, and select a sensor type.")
+            return
+        config = {"ip_address": ip_address, "username": username, "sensor_type": sensor_type}
+        self.configurations.append(config)
+        self.config_listbox.insert(tk.END, f"IP: {ip_address}, Username: {username}, Sensor: {sensor_type}")
+        self.ip_entry.delete(0, tk.END)
+        self.username_entry.delete(0, tk.END)
+
+    def start_all_captures(self):
+        """Start captures for all configured devices."""
+        base_filename = self.base_filename_entry.get()
+        capture_duration = self.capture_duration_entry.get()
+
+        if not base_filename or not capture_duration.isdigit():
+            messagebox.showerror("Input Error", "Please enter a valid base_filename and capture_duration.")
+            return
+
+        threads = []
+        for config in self.configurations:
+            thread = threading.Thread(
+                target=self.start_remote_capture,
+                args=(config["ip_address"], config["username"], config["sensor_type"], base_filename, int(capture_duration)),
+                daemon=True
+            )
+            threads.append(thread)
+            thread.start()
+
+        for thread in threads:
+            thread.join()
+
+        messagebox.showinfo("Capture Started", "All captures have been started.")
+
+    def start_remote_capture(self, ip_address, username, sensor_type, base_filename, capture_duration):
+        """Execute the remote capture command on an RPi."""
+        logging.info(f"Starting remote capture: {ip_address}, {username}, {sensor_type}, {base_filename}, {capture_duration}")
+        ssh = paramiko.SSHClient()
+        ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+        private_key_path = "/home/daniel/.ssh/id_rsa"
+
+        try:
+            private_key = paramiko.RSAKey.from_private_key_file(private_key_path)
+            ssh.connect(ip_address, username=username, pkey=private_key)
+
+            if sensor_type == "camera":
+                command = (
+                    f"/home/{username}/labx_master/camera_code/labx_env/bin/python "
+                    f"/home/{username}/labx_master/camera_code/src/CameraDataCollector.py "
+                    f"--base_filename {base_filename} --capture_duration {capture_duration}"
+                )
+            elif sensor_type == "radar":
+                command = (
+                    f"/home/{username}/labx_master/radar_code/labx_env/bin/python "
+                    f"/home/{username}/labx_master/radar_code/src/RadarDataCollector.py "
+                    f"--base_filename {base_filename} --capture_duration {capture_duration}"
+                )
+            else:
+                logging.error(f"Unsupported sensor type: {sensor_type}")
+                return
+
+            stdin, stdout, stderr = ssh.exec_command(command)
+            for line in iter(stdout.readline, ""):
+                logging.info(f"STDOUT: {line.strip()}")
+            for line in iter(stderr.readline, ""):
+                logging.error(f"STDERR: {line.strip()}")
+
+            logging.info(f"Capture started on {ip_address} for {sensor_type}")
+        except Exception as e:
+            logging.error(f"Connection Error: Could not connect to {ip_address}: {e}")
+        finally:
+            ssh.close()
+
+    def handle_exit_signal(self, signum, frame):
+        logging.info("Termination signal received. Closing GUI...")
+        self.root.quit()
+        self.root.destroy()
+
+    def run(self):
+        self.root.mainloop()
+
+
+if __name__ == "__main__":
+    app = LabInABoxControlPanel()
+    app.run()

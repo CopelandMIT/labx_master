@@ -14,6 +14,20 @@ sys.path.append(parent_dir)
 
 from shared_sensor_code.TimeSync import TimeSync
 
+import logging
+
+LOG_DIR = "/home/pi/labx_master/camera_code/logs"
+os.makedirs(LOG_DIR, exist_ok=True)
+
+logging.basicConfig(
+    filename=os.path.join(LOG_DIR, f"camera_collector_log_{time.time()}.log"),
+    level=logging.INFO,
+    format="%(asctime)s - %(levelname)s - %(message)s"
+)
+
+logging.info("Starting Camera Data Collector script.")
+
+
 # -------------------------------------------------
 # Camera Data Collector Class
 # -------------------------------------------------
@@ -27,36 +41,28 @@ class CameraDataCollector:
                  batch_duration=10, disable_data_sync=False):
         # Configuration
         self.deployed_sensor_id = deployed_sensor_id
-        print(f"CameraDataCollector initialized with SBC ID: {self.deployed_sensor_id}")
+        logging.info(f"CameraDataCollector initialized with SBC ID: {self.deployed_sensor_id}")
         self.central_server_url = central_server_url
         self.sync_polling_interval = sync_polling_interval
         self.base_filename = base_filename
         self.delayed_start_timestamp = delayed_start_timestamp
-        self.capture_duration = capture_duration  # Total duration of the entire capture
+        self.capture_duration = capture_duration
         self.camera_index = camera_index
-        self.batch_duration = batch_duration  # Duration of each batch (in seconds)
-        self.stop_event = stop_event  # Store the stop_event for graceful shutdown
-        self.disable_data_sync = disable_data_sync  # Flag to control data sync
+        self.batch_duration = batch_duration
+        self.stop_event = stop_event
+        self.disable_data_sync = disable_data_sync
 
-        # Define the absolute path to the data directory
         self.data_output_directory = os.path.expanduser('~/labx_master/camera_code/data')
-
-        # Create the data directory if it doesn't exist
-        if not os.path.exists(self.data_output_directory):
-            os.makedirs(self.data_output_directory)
-
-        # Buffer for storing frames before saving
+        os.makedirs(self.data_output_directory, exist_ok=True)
         self.frame_buffer = []
         self.buffer_lock = threading.Lock()
 
-        # Find a working camera index if none is provided
         if self.camera_index is None:
             self.camera_index = self.find_working_camera()
             if self.camera_index is None:
-                print("No camera found. Exiting initialization.")
+                logging.error("No camera found. Exiting initialization.")
                 return
 
-        # Only initialize TimeSync if data sync is not disabled
         if not self.disable_data_sync:
             self.time_sync = TimeSync(
                 deployed_sensor_id=self.deployed_sensor_id,
@@ -64,121 +70,99 @@ class CameraDataCollector:
                 sync_polling_interval=self.sync_polling_interval
             )
 
-        # Camera capture thread
         self.camera_thread = threading.Thread(target=self.collect_camera_data, daemon=True)
-        # Saving thread
         self.save_thread = threading.Thread(target=self.save_buffered_data, daemon=True)
 
     def find_working_camera(self):
-        """Tries different camera indices until it finds one that works, or returns None if none found."""
-        for idx in range(0, 38):  # Adjust the range based on your devices
+        for idx in range(0, 38):  # Adjust based on expected camera range
             cap = cv2.VideoCapture(idx)
             if cap.isOpened():
-                print(f"Camera found at index {idx}.")
+                logging.info(f"Camera found at index {idx}.")
                 cap.release()
                 return idx
             cap.release()
-        print("No camera found.")
+        logging.error("No working camera found.")
         return None
 
     def start(self):
-        """Start the camera data collection and time synchronization (if enabled)."""
         if self.camera_index is None:
-            print("No camera available to start.")
+            logging.error("No camera available to start.")
             return
 
         self.camera_thread.start()
         self.save_thread.start()
 
-        # Start time sync only if it's not disabled
         if not self.disable_data_sync:
             self.time_sync.start()
-            print("Time synchronization started.")
+            logging.info("Time synchronization started.")
 
-        print("Camera Data Collector started.")
+        logging.info("Camera Data Collector started.")
 
     def collect_camera_data(self):
-        """Collects camera video data and saves it to a buffer."""
         cap = cv2.VideoCapture(self.camera_index, cv2.CAP_V4L2)
         if not cap.isOpened():
-            print(f"Cannot open camera at index {self.camera_index}")
+            logging.error(f"Cannot open camera at index {self.camera_index}")
             return
 
-        # Wait until the specified timestamp to start data collection
         if self.delayed_start_timestamp is not None:
             while time.time() < self.delayed_start_timestamp and not self.stop_event.is_set():
                 time.sleep(0.01)
 
         start_time = time.time()
         batch_start_time = start_time
-        print(f"Camera data collection started at {start_time}")
-        
+        logging.info(f"Camera data collection started at {datetime.fromtimestamp(start_time)}")
+
         while not self.stop_event.is_set():
             ret, frame = cap.read()
             if ret:
-                # Add frame to buffer
                 with self.buffer_lock:
                     self.frame_buffer.append(frame)
-
-                # Check if the batch duration has been reached
                 current_time = time.time()
                 if (current_time - batch_start_time) >= self.batch_duration:
-                    print(f"Batch duration of {self.batch_duration} seconds reached. Saving batch.")
+                    logging.info(f"Batch duration of {self.batch_duration} seconds reached. Saving batch.")
                     self.save_buffered_data()
-                    batch_start_time = current_time  # Reset the batch timer
+                    batch_start_time = current_time
             else:
-                print("Error reading frame from camera.")
-                break  # Error reading frame, exit loop
+                logging.error("Error reading frame from camera.")
+                break
 
-            # Check if total capture_duration has been reached
-            if self.capture_duration is not None and (time.time() - start_time) >= self.capture_duration:
-                print(f"Reached total recording capture_duration of {self.capture_duration} seconds.")
+            if self.capture_duration and (time.time() - start_time) >= self.capture_duration:
+                logging.info(f"Reached total capture duration of {self.capture_duration} seconds.")
                 break
 
         cap.release()
-        print(f"Camera data collection stopped.")
-        # Save any remaining frames in the buffer
+        logging.info("Camera data collection stopped.")
         self.save_buffered_data()
-        print("Saved remaining frames.")
-
+        logging.info("Saved remaining frames.")
 
     def save_buffered_data(self):
-        """Saves the buffered frames to disk."""
         with self.buffer_lock:
             if len(self.frame_buffer) == 0:
-                # Buffer is empty, nothing to save
+                logging.info("Frame buffer is empty. Nothing to save.")
                 return
 
-            # Create a new video file for the batch
             timestamp = datetime.now().strftime('%Y%m%d_%H%M%S%f')[:-3]
             output_filename = f'video_{timestamp}.avi'
             video_path = os.path.join(self.data_output_directory, output_filename)
 
-            # Video writer setup
             fourcc = cv2.VideoWriter_fourcc(*'XVID')
             out = cv2.VideoWriter(video_path, fourcc, 20.0, (640, 480))
-
-            # Write all frames from the buffer
             for frame in self.frame_buffer:
                 out.write(frame)
-
-            # Clear the buffer after saving
             self.frame_buffer.clear()
             out.release()
-            print(f"Video batch saved to {video_path}")
+            logging.info(f"Video batch saved to {video_path}")
 
     def stop(self):
-        """Stop the camera data collection and time synchronization (if enabled)."""
         self.stop_event.set()
         self.camera_thread.join()
         self.save_thread.join()
-
-        # Ensure the remaining buffer is saved
         self.save_buffered_data()
 
         if not self.disable_data_sync:
             self.time_sync.stop()
-        print("Camera Data Collector stopped.")
+        logging.info("Camera Data Collector stopped.")
+
 
 
 # -------------------------------------------------
