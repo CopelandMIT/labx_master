@@ -45,6 +45,7 @@ class CameraDataCollector:
         self.central_server_url = central_server_url
         self.sync_polling_interval = sync_polling_interval
         self.base_filename = base_filename
+        logging.info(f"Initializing for Capture: {self.base_filename}")
         self.delayed_start_timestamp = delayed_start_timestamp
         self.capture_duration = capture_duration
         self.camera_index = camera_index
@@ -142,11 +143,11 @@ class CameraDataCollector:
                 return
 
             timestamp = datetime.now().strftime('%Y%m%d_%H%M%S%f')[:-3]
-            output_filename = f'video_{timestamp}.avi'
+            output_filename = f'{self.base_filename}_{timestamp}.avi'
             video_path = os.path.join(self.data_output_directory, output_filename)
 
             fourcc = cv2.VideoWriter_fourcc(*'XVID')
-            out = cv2.VideoWriter(video_path, fourcc, 20.0, (640, 480))
+            out = cv2.VideoWriter(video_path, fourcc, 30.0, (640, 480))
             for frame in self.frame_buffer:
                 out.write(frame)
             self.frame_buffer.clear()
