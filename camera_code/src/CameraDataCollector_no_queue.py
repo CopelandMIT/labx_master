@@ -6,8 +6,6 @@ import cv2
 import signal
 import argparse
 from datetime import datetime
-from queue import Queue, Empty
-
 
 # Add the parent directory to sys.path
 current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -34,7 +32,7 @@ logging.info("Starting Camera Data Collector script.")
 # Camera Data Collector Class
 # -------------------------------------------------
 
-VIDEO_CAPTURE_LENGTH = 30  # Default capture length for the whole session
+VIDEO_CAPTURE_LENGTH = 600  # Default capture length for the whole session
 FRAME_RATE = 30
 
 class CameraDataCollector:
@@ -48,6 +46,7 @@ class CameraDataCollector:
         self.central_server_url = central_server_url
         self.sync_polling_interval = sync_polling_interval
         self.base_filename = base_filename
+        logging.info(f"Initializing for Capture: {self.base_filename}")
         self.delayed_start_timestamp = delayed_start_timestamp
         self.capture_duration = capture_duration
         self.camera_index = camera_index
@@ -57,8 +56,8 @@ class CameraDataCollector:
 
         self.data_output_directory = os.path.expanduser('~/labx_master/camera_code/data')
         os.makedirs(self.data_output_directory, exist_ok=True)
-
-        self.data_queue = Queue()  # Queue for producer-consumer model
+        self.frame_buffer = []
+        self.buffer_lock = threading.Lock()
 
         if self.camera_index is None:
             self.camera_index = self.find_working_camera()
@@ -75,7 +74,6 @@ class CameraDataCollector:
 
         self.camera_thread = threading.Thread(target=self.collect_camera_data, daemon=True)
         self.save_thread = threading.Thread(target=self.save_buffered_data, daemon=True)
-
 
     def find_working_camera(self):
         for idx in range(0, 38):  # Adjust based on expected camera range
@@ -113,14 +111,13 @@ class CameraDataCollector:
             while time.time() < self.delayed_start_timestamp and not self.stop_event.is_set():
                 time.sleep(0.01)
 
-        capture_start_time = time.time()
-        batch_start_time = capture_start_time
-        batch_start_datetime = datetime.now()
+        capture_start_time = time.time()  # Track when capture started
+        batch_start_time = capture_start_time  # For batch duration checks
+        batch_start_datetime = datetime.now()  # Timestamp for filenames
         logging.info(f"Camera data collection started at {batch_start_datetime}")
 
-        frame_buffer = []  # Local buffer for this batch
-
         while not self.stop_event.is_set():
+            # Check if the total capture duration has been exceeded
             elapsed_capture_time = time.time() - capture_start_time
             if self.capture_duration and elapsed_capture_time >= self.capture_duration:
                 logging.info(f"Reached total capture duration of {self.capture_duration} seconds.")
@@ -128,14 +125,16 @@ class CameraDataCollector:
 
             ret, frame = cap.read()
             if ret:
-                frame_buffer.append(frame)
+                with self.buffer_lock:
+                    self.frame_buffer.append(frame)
+                
+                # Check if batch duration has been reached
                 elapsed_batch_time = time.time() - batch_start_time
                 if elapsed_batch_time >= self.batch_duration:
-                    logging.info(f"Batch duration of {self.batch_duration} seconds reached. Sending batch to queue.")
-                    self.data_queue.put((frame_buffer.copy(), batch_start_datetime))  # Add to queue
-                    frame_buffer.clear()  # Clear local buffer
-                    batch_start_time = time.time()
-                    batch_start_datetime = datetime.now()
+                    logging.info(f"Batch duration of {self.batch_duration} seconds reached. Saving batch.")
+                    self.save_buffered_data(batch_start_datetime)  # Save current batch
+                    batch_start_time = time.time()  # Reset for next batch
+                    batch_start_datetime = datetime.now()  # Timestamp for next batch
             else:
                 logging.error("Error reading frame from camera.")
                 break
@@ -143,55 +142,49 @@ class CameraDataCollector:
         cap.release()
         logging.info("Camera data collection stopped.")
 
-        # Enqueue remaining frames
-        if frame_buffer:
-            logging.info("Enqueuing remaining frames.")
-            self.data_queue.put((frame_buffer.copy(), batch_start_datetime))
+        # Save any remaining frames in the buffer
+        if self.frame_buffer:
+            logging.info("Saving remaining frames.")
+            self.save_buffered_data(batch_start_datetime)
 
-    def save_buffered_data(self):
-        while not self.stop_event.is_set() or not self.data_queue.empty():
-            try:
-                frame_buffer, batch_start_datetime = self.data_queue.get(timeout=1)
-                if frame_buffer:
-                    self._save_to_file(frame_buffer, batch_start_datetime)
-                    self.data_queue.task_done()
-            except Empty:
-                continue
 
-    def _save_to_file(self, frame_buffer, batch_start_datetime):
-        # Format batch start time and calculate duration
-        batch_start_timestamp = batch_start_datetime.strftime('%Y%m%d_%H%M%S%f')[:-3]
-        duration_ms = len(frame_buffer) * (1000 // FRAME_RATE)
 
-        # Format filename
-        output_filename = f'{self.base_filename}_{batch_start_timestamp}_{duration_ms}ms.avi'
-        video_path = os.path.join(self.data_output_directory, output_filename)
+    def save_buffered_data(self, batch_start_datetime):
+        with self.buffer_lock:
+            if len(self.frame_buffer) == 0:
+                logging.info("Frame buffer is empty. Nothing to save.")
+                return
 
-        # Save video
-        fourcc = cv2.VideoWriter_fourcc(*'XVID')
-        out = cv2.VideoWriter(video_path, fourcc, FRAME_RATE, (640, 480))
-        for frame in frame_buffer:
-            out.write(frame)
-        out.release()
+            # Format batch start time and calculate duration
+            batch_start_timestamp = batch_start_datetime.strftime('%Y%m%d_%H%M%S%f')[:-3]
+            duration_ms = len(self.frame_buffer) * (1000 // FRAME_RATE)  # Assuming constant FPS
 
-        logging.info(f"Video batch saved to {video_path}")
-        print(f"Video batch saved to {video_path}")
+            # Format filename
+            output_filename = f'{self.base_filename}_{batch_start_timestamp}_{duration_ms}ms.avi'
+            video_path = os.path.join(self.data_output_directory, output_filename)
+
+            # Save video
+            fourcc = cv2.VideoWriter_fourcc(*'XVID')
+            out = cv2.VideoWriter(video_path, fourcc, FRAME_RATE, (640, 480))
+            for frame in self.frame_buffer:
+                out.write(frame)
+            self.frame_buffer.clear()
+            out.release()
+
+            logging.info(f"Video batch saved to {video_path}")
+            print(f"Video batch saved to {video_path}")
+
 
     def stop(self):
         self.stop_event.set()
         self.camera_thread.join()
         self.save_thread.join()
-
-        # Save any remaining frames in the queue
-        while not self.data_queue.empty():
-            frame_buffer, batch_start_datetime = self.data_queue.get()
-            self._save_to_file(frame_buffer, batch_start_datetime)
-            self.data_queue.task_done()
+        self.save_buffered_data()
 
         if not self.disable_data_sync:
             self.time_sync.stop()
-
         logging.info("Camera Data Collector stopped.")
+
 
 
 # -------------------------------------------------
