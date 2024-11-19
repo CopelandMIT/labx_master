@@ -175,7 +175,7 @@ def main():
 
     # Argument parser setup
     parser = argparse.ArgumentParser(description='Camera data collection with optional NTP chrony metadata')
-    parser.add_argument('--deployed_sensor_id', type=str, default='SBC001', help="Deployed sensor ID")
+    parser.add_argument('--deployed_sensor_id', type=str, default='CAM001', help="Deployed sensor ID")
     parser.add_argument('--capture_duration', type=int, default=VIDEO_CAPTURE_LENGTH, help="Recording capture_duration in seconds")
     parser.add_argument('--base_filename', type=str, default='default_name_video', help="Base filename for the video data")
     parser.add_argument('--delayed_start_timestamp', type=float, default=None, help="Timestamp to delay start until")
@@ -185,7 +185,7 @@ def main():
     parser.add_argument('--disable_data_sync', action='store_true', help="Disable data synchronization with central server, but allow capture to occur")
     args = parser.parse_args()
 
-    if args._capture_duration <= 0:
+    if args.capture_duration <= 0:
         raise ValueError("Duration must be greater than 0 seconds.")
 
     # Initialize Camera Data Collector with stop_event
