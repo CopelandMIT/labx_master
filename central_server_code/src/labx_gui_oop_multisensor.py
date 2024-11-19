@@ -109,14 +109,54 @@ class LabInABoxControlPanel:
         # Clear the username entry
         self.username_entry.delete(0, tk.END)
 
+    def is_port_in_use(self, port):
+        """Check if a given port is in use."""
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+            return s.connect_ex(('localhost', port)) == 0
+
+    def kill_process_on_port(self, port):
+        """Kill the process using the specified port."""
+        try:
+            result = subprocess.run(["lsof", "-t", f"-i:{port}"], capture_output=True, text=True)
+            pid = result.stdout.strip()
+            if pid:
+                os.kill(int(pid), signal.SIGKILL)
+                logging.info(f"Killed process on port {port}")
+                return True
+        except Exception as e:
+            logging.error(f"Error killing process on port {port}: {e}")
+        return False
+
+    def start_central_server(self):
+        """Launch the central server, ensuring the port is available."""
+        if self.is_port_in_use(self.PORT):
+            logging.warning(f"Port {self.PORT} is in use. Attempting to free it.")
+            if not self.kill_process_on_port(self.PORT):
+                messagebox.showerror("Error", f"Failed to free up port {self.PORT}.")
+                return False
+        try:
+            logging.info("Starting the central server.")
+            subprocess.Popen(["python3", self.CENTRAL_SERVER_SCRIPT])
+            logging.info("Central server launched successfully.")
+            time.sleep(2)  # Allow time for server initialization
+            return True
+        except Exception as e:
+            logging.error(f"Failed to start central server: {e}")
+            messagebox.showerror("Error", f"Failed to start central server: {e}")
+            return False
+
     def start_all_captures(self):
-        """Start captures for all configured devices."""
+        """Start captures for all configured devices and launch the central server."""
         base_filename = self.base_filename_entry.get()
         capture_duration = self.capture_duration_entry.get()
 
         if not base_filename or not capture_duration.isdigit():
             messagebox.showerror("Input Error", "Please enter a valid base_filename and capture_duration.")
             return
+
+        # Start the central server
+        if not self.start_central_server():
+            return  # Exit if the server fails to start
 
         threads = []
         for config in self.configurations:
@@ -132,6 +172,7 @@ class LabInABoxControlPanel:
             thread.join()
 
         messagebox.showinfo("Capture Started", "All captures have been started.")
+
 
 
     def start_remote_capture(self, ip_address, username, sensor_type, base_filename, capture_duration):
