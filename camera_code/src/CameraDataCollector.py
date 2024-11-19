@@ -6,6 +6,8 @@ import cv2
 import signal
 import argparse
 from datetime import datetime
+import contextlib
+import io
 
 # Add the parent directory to sys.path
 current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -18,7 +20,7 @@ from shared_sensor_code.TimeSync import TimeSync
 # Camera Data Collector Class
 # -------------------------------------------------
 
-VIDEO_CAPTURE_LENGTH = 600  # Default capture length for the whole session
+VIDEO_CAPTURE_LENGTH = 15  # Default capture length for the whole session
 
 class CameraDataCollector:
     def __init__(self, stop_event, deployed_sensor_id="CAM001", central_server_url='http://192.168.68.130:5000/receive_data',
@@ -72,12 +74,14 @@ class CameraDataCollector:
     def find_working_camera(self):
         """Tries different camera indices until it finds one that works, or returns None if none found."""
         for idx in range(0, 38):  # Adjust the range based on your devices
-            cap = cv2.VideoCapture(idx)
-            if cap.isOpened():
-                print(f"Camera found at index {idx}.")
+            # Suppress stdout and stderr temporarily
+            with io.StringIO() as buf, contextlib.redirect_stdout(buf), contextlib.redirect_stderr(buf):
+                cap = cv2.VideoCapture(idx)
+                if cap.isOpened():
+                    print(f"Camera found at index {idx}.")
+                    cap.release()
+                    return idx
                 cap.release()
-                return idx
-            cap.release()
         print("No camera found.")
         return None
 
@@ -124,7 +128,7 @@ class CameraDataCollector:
                 current_time = time.time()
                 if (current_time - batch_start_time) >= self.batch_duration:
                     print(f"Batch duration of {self.batch_duration} seconds reached. Saving batch.")
-                    self.save_buffered_data()
+                    self.save_buffered_data(batch_start_time)
                     batch_start_time = current_time  # Reset the batch timer
             else:
                 print("Error reading frame from camera.")
@@ -138,11 +142,10 @@ class CameraDataCollector:
         cap.release()
         print(f"Camera data collection stopped.")
         # Save any remaining frames in the buffer
-        self.save_buffered_data()
+        self.save_buffered_data(batch_start_time)
         print("Saved remaining frames.")
 
-
-    def save_buffered_data(self):
+    def save_buffered_data(self, batch_start_time=None):
         """Saves the buffered frames to disk."""
         with self.buffer_lock:
             if len(self.frame_buffer) == 0:
@@ -156,7 +159,7 @@ class CameraDataCollector:
 
             # Video writer setup
             fourcc = cv2.VideoWriter_fourcc(*'XVID')
-            out = cv2.VideoWriter(video_path, fourcc, 20.0, (640, 480))
+            out = cv2.VideoWriter(video_path, fourcc, 30.0, (640, 480))  # Ensure correct FPS is used here
 
             # Write all frames from the buffer
             for frame in self.frame_buffer:
@@ -173,12 +176,14 @@ class CameraDataCollector:
         self.camera_thread.join()
         self.save_thread.join()
 
-        # Ensure the remaining buffer is saved
-        self.save_buffered_data()
+        # Save any remaining frames in the buffer with the current timestamp as the batch_start_time
+        current_time = time.time()
+        self.save_buffered_data(current_time)
 
         if not self.disable_data_sync:
             self.time_sync.stop()
         print("Camera Data Collector stopped.")
+
 
 
 # -------------------------------------------------
