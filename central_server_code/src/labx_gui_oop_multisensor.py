@@ -8,6 +8,7 @@ import signal
 import threading
 import logging
 import time
+from datetime import datetime
 
 class LabInABoxControlPanel:
     LOG_DIR = "/home/daniel/labx_master/central_server_code/logs"
@@ -16,10 +17,16 @@ class LabInABoxControlPanel:
     SENSOR_TYPES = ["camera", "body_tracking", "radar"]
 
     def __init__(self):
-        # Set up logging
+        # Ensure the log directory exists
         os.makedirs(self.LOG_DIR, exist_ok=True)
+
+        # Generate the timestamp-based log file name
+        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S%f')
+        self.log_file = os.path.join(self.LOG_DIR, f"labx_gui_log_{timestamp}.log")
+
+        # Set up logging
         logging.basicConfig(
-            filename=os.path.join(self.LOG_DIR, f"sensor_output_{time.time()}.log"),
+            filename=self.log_file,
             level=logging.INFO,
             format="%(asctime)s - %(levelname)s - %(message)s"
         )
@@ -61,6 +68,7 @@ class LabInABoxControlPanel:
         tk.Label(self.root, text="IP Address:").grid(row=3, column=0, padx=5, pady=5)
         tk.Label(self.root, text="Username:").grid(row=3, column=1, padx=5, pady=5)
         tk.Label(self.root, text="Sensor Type:").grid(row=3, column=2, padx=5, pady=5)
+        tk.Label(self.root, text="Status:").grid(row=3, column=3, padx=5, pady=5)
 
         self.ip_entry = tk.Entry(self.root, textvariable=self.ip_default)
         self.ip_entry.grid(row=4, column=0, padx=5, pady=5)
@@ -72,20 +80,35 @@ class LabInABoxControlPanel:
         self.sensor_type_menu = tk.OptionMenu(self.root, self.sensor_type_var, *self.SENSOR_TYPES)
         self.sensor_type_menu.grid(row=4, column=2, padx=5, pady=5)
 
+        self.status_canvas = tk.Canvas(self.root, width=20, height=20)
+        self.status_canvas.grid(row=4, column=3, padx=5, pady=5)
+        self.update_status_indicator("gray")  # Start with neutral (gray) status
+
         add_device_button = tk.Button(self.root, text="Add Device", command=self.add_device)
-        add_device_button.grid(row=4, column=3, padx=5, pady=5)
+        add_device_button.grid(row=4, column=4, padx=5, pady=5)
+
 
         # Device List
         tk.Label(self.root, text="Configured Devices:").grid(row=5, column=0, columnspan=4, pady=5)
-        self.config_listbox = tk.Listbox(self.root, width=70, height=10)
-        self.config_listbox.grid(row=6, column=0, columnspan=4, padx=10, pady=5)
+        self.config_listbox = tk.Listbox(self.root, width=70, height=10, selectmode=tk.SINGLE)
+        self.config_listbox.grid(row=6, column=0, columnspan=3, padx=10, pady=5)
+
+        delete_device_button = tk.Button(self.root, text="Delete Selected Device", command=self.delete_device)
+        delete_device_button.grid(row=6, column=3, padx=5, pady=5)
+
+        # Indicator for recording status
+        tk.Label(self.root, text="Recording Status:").grid(row=7, column=0, columnspan=2, pady=5)
+        self.recording_status = tk.Canvas(self.root, width=20, height=20)
+        self.recording_status.create_oval(2, 2, 18, 18, fill="grey")  # Neutral state
+        self.recording_status.grid(row=7, column=2, columnspan=2, pady=5)
 
         # Start All Captures Button
         start_all_button = tk.Button(self.root, text="Start All Captures", command=self.start_all_captures)
-        start_all_button.grid(row=7, column=0, columnspan=4, pady=10)
+        start_all_button.grid(row=8, column=0, columnspan=4, pady=10)
+
 
     def add_device(self):
-        """Add a device configuration to the list."""
+        """Add a device configuration to the list and flash status indicator."""
         ip_address = self.ip_entry.get()
         username = self.username_entry.get()
         sensor_type = self.sensor_type_var.get()
@@ -93,10 +116,17 @@ class LabInABoxControlPanel:
             messagebox.showerror("Input Error", "Please enter a valid IP address, username, and select a sensor type.")
             return
 
-        # Add configuration to the list
-        config = {"ip_address": ip_address, "username": username, "sensor_type": sensor_type}
+        # Ping the device
+        is_reachable = self.ping_device(ip_address)
+
+        # Flash the status indicator
+        self.flash_status_indicator("green" if is_reachable else "red")
+
+        # Add configuration to the list with status
+        status = "reachable" if is_reachable else "unreachable"
+        config = {"ip_address": ip_address, "username": username, "sensor_type": sensor_type, "status": status}
         self.configurations.append(config)
-        self.config_listbox.insert(tk.END, f"IP: {ip_address}, Username: {username}, Sensor: {sensor_type}")
+        self.config_listbox.insert(tk.END, f"IP: {ip_address}, Username: {username}, Sensor: {sensor_type}, Status: {status}")
 
         # Calculate next IP address
         octets = ip_address.split(".")
@@ -108,6 +138,46 @@ class LabInABoxControlPanel:
 
         # Clear the username entry
         self.username_entry.delete(0, tk.END)
+
+    def flash_status_indicator(self, color):
+        """Flash the status indicator with a given color and reset to neutral."""
+        self.update_status_indicator(color)
+        self.root.after(500, lambda: self.update_status_indicator("gray"))
+
+    def update_status_indicator(self, color):
+        """Update the status indicator with a specified color."""
+        self.status_canvas.delete("all")  # Clear the canvas
+        if color == "green":
+            self.status_canvas.create_oval(2, 2, 18, 18, fill="green")
+        elif color == "red":
+            self.status_canvas.create_oval(2, 2, 18, 18, fill="red")
+        elif color == "gray":
+            self.status_canvas.create_oval(2, 2, 18, 18, fill="gray")
+
+    def ping_device(self, ip_address):
+        """Ping the device to check if it's reachable."""
+        try:
+            response = os.system(f"ping -c 1 -W 1 {ip_address} > /dev/null 2>&1")
+            return response == 0
+        except Exception as e:
+            logging.error(f"Ping error for {ip_address}: {e}")
+            return False
+
+    def delete_device(self):
+        """Delete the selected device configuration from the list."""
+        selected_index = self.config_listbox.curselection()
+        if not selected_index:
+            messagebox.showerror("Selection Error", "Please select a device to delete.")
+            return
+
+        # Remove the selected device from the configurations list and the listbox
+        index = selected_index[0]
+        self.configurations.pop(index)
+        self.config_listbox.delete(index)
+
+        logging.info(f"Deleted device configuration at index {index}.")
+        messagebox.showinfo("Device Deleted", "Selected device has been deleted.")
+
 
     def is_port_in_use(self, port):
         """Check if a given port is in use."""
@@ -127,26 +197,12 @@ class LabInABoxControlPanel:
             logging.error(f"Error killing process on port {port}: {e}")
         return False
 
-    def start_central_server(self):
-        """Launch the central server, ensuring the port is available."""
-        if self.is_port_in_use(self.PORT):
-            logging.warning(f"Port {self.PORT} is in use. Attempting to free it.")
-            if not self.kill_process_on_port(self.PORT):
-                messagebox.showerror("Error", f"Failed to free up port {self.PORT}.")
-                return False
-        try:
-            logging.info("Starting the central server.")
-            subprocess.Popen(["python3", self.CENTRAL_SERVER_SCRIPT])
-            logging.info("Central server launched successfully.")
-            time.sleep(2)  # Allow time for server initialization
-            return True
-        except Exception as e:
-            logging.error(f"Failed to start central server: {e}")
-            messagebox.showerror("Error", f"Failed to start central server: {e}")
-            return False
+    def update_recording_status(self, color):
+        """Update the recording status indicator."""
+        self.recording_status.delete("all")
+        self.recording_status.create_oval(2, 2, 18, 18, fill=color)
 
     def start_all_captures(self):
-        """Start captures for all configured devices and launch the central server."""
         base_filename = self.base_filename_entry.get()
         capture_duration = self.capture_duration_entry.get()
 
@@ -154,11 +210,16 @@ class LabInABoxControlPanel:
             messagebox.showerror("Input Error", "Please enter a valid base_filename and capture_duration.")
             return
 
-        # Start the central server
-        if not self.start_central_server():
+        # Start the central server with the base filename and duration
+        if not self.start_central_server(base_filename, int(capture_duration)):
             return  # Exit if the server fails to start
 
+        # Update recording indicator to green
+        self.update_recording_status("green")
+
         threads = []
+
+        # Create and start a thread for each device
         for config in self.configurations:
             thread = threading.Thread(
                 target=self.start_remote_capture,
@@ -168,10 +229,49 @@ class LabInABoxControlPanel:
             threads.append(thread)
             thread.start()
 
+        # Wait for all threads to finish
+        self.root.after(int(capture_duration) * 1000, self.complete_all_captures)  # Schedule completion popup
+
+        # Ensure all threads are running asynchronously
         for thread in threads:
             thread.join()
 
-        messagebox.showinfo("Capture Started", "All captures have been started.")
+
+    def update_recording_status(self, color):
+        """Update the recording status indicator."""
+        self.recording_status.delete("all")
+        self.recording_status.create_oval(2, 2, 18, 18, fill=color)
+
+    def complete_all_captures(self):
+        """Handle the completion of all captures."""
+        # Update recording indicator to neutral
+        self.update_recording_status("grey")
+        # Show capture completed popup
+        messagebox.showinfo("Capture Completed", "All captures have finished.")
+
+    def start_central_server(self, base_filename, duration):
+        """Launch the central server with command-line arguments."""
+        if self.is_port_in_use(self.PORT):
+            logging.warning(f"Port {self.PORT} is in use. Attempting to free it.")
+            if not self.kill_process_on_port(self.PORT):
+                messagebox.showerror("Error", f"Failed to free up port {self.PORT}.")
+                return False
+        try:
+            logging.info("Starting the central server.")
+            # Pass filename and duration as arguments
+            subprocess.Popen([
+                "python3", self.CENTRAL_SERVER_SCRIPT,
+                "--base_filename", base_filename,
+                "--duration", str(duration),
+                "--log_file", self.log_file
+            ])
+            logging.info("Central server launched successfully.")
+            time.sleep(0.5)  # Allow time for server initialization
+            return True
+        except Exception as e:
+            logging.error(f"Failed to start central server: {e}")
+            messagebox.showerror("Error", f"Failed to start central server: {e}")
+            return False
 
 
 

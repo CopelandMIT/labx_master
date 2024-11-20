@@ -12,13 +12,21 @@ app = Flask(__name__)
 offset_data = {}  # {sbc_id: (timestamp, data)}
 data_lock = threading.Lock()
 
+import argparse
 from datetime import datetime
+
+# Parse command-line arguments
+parser = argparse.ArgumentParser(description="Central Server Script")
+parser.add_argument("--base_filename", type=str, required=True, help="Base filename for the CSV")
+parser.add_argument("--duration", type=int, required=True, help="Duration of the capture in ms")
+parser.add_argument("--log_file", type=str, required=True, help="Log filepath for GUI")
+args = parser.parse_args()
 
 # Generate a timestamp with microsecond accuracy
 timestamp = datetime.now().strftime('%Y%m%d_%H%M%S%f')
-
-# CSV file for storing metrics
-CSV_FILE = f'/home/daniel/labx_master/central_server_code/data/sync_metrics/test_1_camera_1_radar_{timestamp}_GPS_eth.csv'
+duration_ms = 1000 * int(args.duration)
+# Generate the CSV file path
+CSV_FILE = f'/home/daniel/labx_master/central_server_code/data/sync_metrics/{args.base_filename}_{timestamp}_{duration_ms}ms.csv'
 
 # Ensure the CSV file exists and has a header
 if not os.path.isfile(CSV_FILE):
