@@ -174,6 +174,7 @@ camera_code/logs/
 
 # Ignore Archives
 central_server_code/archives
+/home/pi/labx_master/camera_code/archives
 archives/
 
 # Ignore Python virtual environments

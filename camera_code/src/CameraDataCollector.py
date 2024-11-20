@@ -202,7 +202,7 @@ def main():
     # Global event to signal threads to stop
     stop_event = threading.Event()
 
-    # Argument parser setup
+      # Argument parser setup
     parser = argparse.ArgumentParser(description='Camera data collection with optional NTP chrony metadata')
     parser.add_argument('--deployed_sensor_id', type=str, default='CAM001', help="Deployed sensor ID")
     parser.add_argument('--capture_duration', type=int, default=VIDEO_CAPTURE_LENGTH, help="Recording capture_duration in seconds")
@@ -212,7 +212,12 @@ def main():
     parser.add_argument('--camera_index', type=int, default=None, help="Camera index to use")
     parser.add_argument('--batch_duration', type=int, default=10, help="Duration of each video batch in seconds")
     parser.add_argument('--disable_data_sync', action='store_true', help="Disable data synchronization with central server, but allow capture to occur")
+    parser.add_argument('--central_server_url', type=str, required=False , help="Central Server Url for time sync monitoring")
     args = parser.parse_args()
+
+    if args.central_server_url:
+        logging.info(f"Central server URL: {args.central_server_url}")
+        # Add logic to send data to the central server if necessary
 
     if args.capture_duration <= 0:
         raise ValueError("Duration must be greater than 0 seconds.")
@@ -221,7 +226,7 @@ def main():
     camera_collector = CameraDataCollector(
         stop_event=stop_event,
         deployed_sensor_id=args.deployed_sensor_id,
-        central_server_url='http://192.168.68.130:5000/receive_data',
+        central_server_url=args.central_server_url,
         sync_polling_interval=args.sync_polling_interval,
         base_filename=args.base_filename,
         delayed_start_timestamp=args.delayed_start_timestamp,
@@ -230,7 +235,6 @@ def main():
         batch_duration=args.batch_duration,  # Use batch duration in seconds
         disable_data_sync=args.disable_data_sync  # Pass the flag for disabling data sync
     )
-
     camera_collector.start()
 
     # Register the signal handler for SIGTERM and SIGINT
