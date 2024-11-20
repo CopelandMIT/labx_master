@@ -107,16 +107,31 @@ class LabInABoxControlPanel:
         add_device_button.grid(row=4, column=4, padx=5, pady=5)
 
         # Add live plot to the GUI
-        self.fig, self.ax = plt.subplots()
+        tk.Label(self.root, text="Live Plot:").grid(row=9, column=0, columnspan=4, pady=5)
+
+        self.fig, self.ax = plt.subplots(figsize=(6, 4))  # Increased figsize for better visibility
+        self.ax.set_title("Live Max Offset", fontsize=12)
+        self.ax.set_xlabel("Time (s)", fontsize=10)
+        self.ax.set_ylabel("Max Offset (ms)", fontsize=10)
+        self.line, = self.ax.plot([], [], label="Max Offset (ms)", lw=2)
+        self.ax.legend(fontsize=8)
+        
+        # Adjust layout to ensure labels are not clipped
+        self.fig.tight_layout(pad=3.0)
+
         self.canvas = FigureCanvasTkAgg(self.fig, master=self.root)
         self.canvas_widget = self.canvas.get_tk_widget()
-        self.canvas_widget.grid(row=9, column=0, columnspan=4, pady=10)
-
+        self.canvas_widget.grid(row=10, column=0, columnspan=4, pady=10)
 
         # Device List
         tk.Label(self.root, text="Configured Devices:").grid(row=5, column=0, columnspan=4, pady=5)
         self.config_listbox = tk.Listbox(self.root, width=70, height=10, selectmode=tk.SINGLE)
         self.config_listbox.grid(row=6, column=0, columnspan=3, padx=10, pady=5)
+
+        # Populate the device list if it already has configurations
+        for device in self.configurations:
+            self.config_listbox.insert(tk.END, f"IP: {device['ip_address']}, Username: {device['username']}, "
+                                            f"Sensor: {device['sensor_type']}, Status: {device['status']}")
 
         delete_device_button = tk.Button(self.root, text="Delete Selected Device", command=self.delete_device)
         delete_device_button.grid(row=6, column=3, padx=5, pady=5)
@@ -237,16 +252,15 @@ class LabInABoxControlPanel:
 
     def start_central_server(self, base_filename, duration):
         """Launch the central server with command-line arguments."""
-        if self.is_port_in_use(self.PORT):
-            logging.warning(f"Port {self.PORT} is in use. Attempting to free it.")
-            if not self.kill_process_on_port(self.PORT):
-                messagebox.showerror("Error", f"Failed to free up port {self.PORT}.")
+        central_server_ip_address = self.get_lan_ip()  # Use LAN IP directly
+
+        if self.is_port_in_use(central_server_ip_address, self.PORT):
+            logging.warning(f"Port {self.PORT} on {central_server_ip_address} is in use. Attempting to free it.")
+            if not self.kill_process_on_port(central_server_ip_address, self.PORT):
+                messagebox.showerror("Error", f"Failed to free up port {self.PORT} on {central_server_ip_address}.")
                 return False
         try:
             logging.info("Starting the central server.")
-
-            # Get the local IP address of the machine
-            central_server_ip_address = self.get_lan_ip()
 
             # Pass filename and duration as arguments
             subprocess.Popen([
@@ -260,13 +274,38 @@ class LabInABoxControlPanel:
             ])
             logging.info(f"Central server launched at http://{central_server_ip_address}:{self.PORT}/receive_data")
             self.central_server_url = f"http://{central_server_ip_address}:{self.PORT}/receive_data"  # Store the URL for live data fetching
-            logging.info(f"Central server url launched successfully at {self.central_server_url}.")
+            logging.info(f"Central server URL launched successfully at {self.central_server_url}.")
             time.sleep(0.5)  # Allow time for server initialization
             return True
         except Exception as e:
             logging.error(f"Failed to start central server: {e}")
             messagebox.showerror("Error", f"Failed to start central server: {e}")
             return False
+
+
+    def is_port_in_use(self, ip, port):
+        """Check if a given IP and port combination is in use."""
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+            s.settimeout(1)
+            result = s.connect_ex((ip, port))
+            return result == 0
+
+
+    def kill_process_on_port(self, ip, port):
+        """Kill the process using the specified IP and port."""
+        try:
+            # Use `lsof` to find the PID of the process using the specific IP and port
+            result = subprocess.run(["lsof", "-t", f"-i@{ip}:{port}"], capture_output=True, text=True)
+            pid = result.stdout.strip()
+            if pid:
+                os.kill(int(pid), signal.SIGKILL)
+                logging.info(f"Killed process with PID {pid} on {ip}:{port}")
+                return True
+            else:
+                logging.warning(f"No process found using {ip}:{port}.")
+        except Exception as e:
+            logging.error(f"Error killing process on {ip}:{port}: {e}")
+        return False
 
     def get_lan_ip(self):
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -277,25 +316,6 @@ class LabInABoxControlPanel:
         finally:
             s.close()
         return ip
-
-    def is_port_in_use(self, port):
-        """Check if a given port is in use."""
-        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-            return s.connect_ex(('localhost', port)) == 0
-
-    def kill_process_on_port(self, port):
-        """Kill the process using the specified port."""
-        try:
-            result = subprocess.run(["lsof", "-t", f"-i:{port}"], capture_output=True, text=True)
-            pid = result.stdout.strip()
-            if pid:
-                os.kill(int(pid), signal.SIGKILL)
-                logging.info(f"Killed process on port {port}")
-                return True
-        except Exception as e:
-            logging.error(f"Error killing process on port {port}: {e}")
-        return False
-
 
 
     # --------------------------------------
@@ -409,46 +429,52 @@ class LabInABoxControlPanel:
     # --------------------------------------
 
     def start_plot(self):
-        """Launch the live plot."""
-        threading.Thread(target=self.run_plot, daemon=True).start()
+        """Launch the live plot within the GUI."""
+        self.plot_running = True
+        self.update_plot()  # Start the update loop
 
-    def run_plot(self):
-        """Live plot the data from the latest CSV file."""
+    def update_plot(self):
+        """Update the live plot with data from the latest CSV file."""
         import pandas as pd
-        import matplotlib.pyplot as plt
-        from matplotlib.animation import FuncAnimation
 
-        fig, ax = plt.subplots()
-        times, offsets = [], []
-        line, = ax.plot(times, offsets, label="Max Offset (ms)")
-        ax.set_xlabel("Time (s)")
-        ax.set_ylabel("Max Offset (ms)")
-        ax.set_title("Live Max Offset")
-        ax.legend()
+        self.current_csv_file = self.get_latest_csv_file()
+        if not self.current_csv_file:
+            self.root.after(1000, self.update_plot)  # Retry after 1 second
+            return
 
-        def update_plot(frame):
-            self.current_csv_file = self.get_latest_csv_file()
-            if not self.current_csv_file:
-                return
+        try:
+            # Load the latest data from the CSV file
+            data = pd.read_csv(self.current_csv_file).tail(50)
+            if not data.empty:
+                # Process data for plotting
+                relative_times = (data['timestamp'] - data['timestamp'].iloc[0])  # Assuming timestamp in s
+                offsets = data['max_offset_ms']
 
-            try:
-                data = pd.read_csv(self.current_csv_file).tail(50)
-                if not data.empty:
-                    relative_times = (data['timestamp'] - data['timestamp'].iloc[0]) / 1000  # Assuming timestamp in ms
-                    times[:] = relative_times.tolist()
-                    offsets[:] = data['max_offset_ms'].tolist()
-                    line.set_data(times, offsets)
-                    ax.relim()
-                    ax.autoscale_view()
-            except Exception as e:
-                logging.error(f"Error updating plot: {e}")
+                # Update the plot
+                self.ax.clear()  # Clear the previous plot
+                self.ax.set_title("Live Max Offset")
+                self.ax.set_xlabel("Time (s)")
+                self.ax.set_ylabel("Max Offset (ms)")
+                self.ax.plot(relative_times, offsets, label="Max Offset (ms)")
+                self.ax.legend()
 
-        ani = FuncAnimation(fig, update_plot, interval=1000)
-        plt.show()
+                # Redraw the canvas
+                self.canvas.draw()
+
+        except Exception as e:
+            logging.error(f"Error updating plot: {e}")
+
+        # Schedule the next update
+        self.root.after(1000, self.update_plot)
 
     def get_latest_csv_file(self):
+        """Retrieve the most recent CSV file from the sync_metrics directory."""
         try:
-            files = [os.path.join(self.SYNC_METRICS_DIR, f) for f in os.listdir(self.SYNC_METRICS_DIR) if f.endswith(".csv")]
+            files = [
+                os.path.join(self.SYNC_METRICS_DIR, f)
+                for f in os.listdir(self.SYNC_METRICS_DIR)
+                if f.endswith(".csv")
+            ]
             if not files:
                 logging.warning("No CSV files found in the sync_metrics directory.")
                 return None
@@ -456,7 +482,6 @@ class LabInABoxControlPanel:
         except Exception as e:
             logging.error(f"Error fetching latest CSV file: {e}")
             return None
-
 
 
 
