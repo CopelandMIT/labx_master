@@ -129,9 +129,14 @@ def main():
     parser.add_argument('--deployed_sensor_id', type=str, default='RAD001', help="Single Board Computer ID")
     parser.add_argument('--base_filename', type=str, default='radar_data.json', help="File to save radar data")
     parser.add_argument('--capture_duration', type=int, default=600, help="Duration for data capture in seconds")
+    parser.add_argument('--central_server_url', type=str, default="http://192.168.68.130:5000/receive_data", help="Central Server Url for time sync monitoring")
     args = parser.parse_args()
 
     logging.info("Starting RadarDataCollector main function.")
+
+    if args.central_server_url:
+        logging.info(f"Central server URL: {args.central_server_url}")
+        # Add logic to send data to the central server if necessary
 
     # Radar configuration setup
     config = FmcwSimpleSequenceConfig(
@@ -203,7 +208,7 @@ def main():
     radar_data_collector = RadarDataCollector(
         stop_event=stop_event,
         deployed_sensor_id=args.deployed_sensor_id,
-        central_server_url='http://192.168.68.130:5000/receive_data',
+        central_server_url=args.central_server_url,
         sync_polling_interval=10
     )
 
@@ -300,7 +305,7 @@ def main():
             print(f"An error occurred: {e}")
             logging.error(f"An error occurred: {e}")
             stop_event.set()
-            
+
         # Handle any residual buffer data
         if buffer:
             batch_end_perf = time.perf_counter()  # Use perf_counter for precise timing
