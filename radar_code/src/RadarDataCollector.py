@@ -31,7 +31,7 @@ LOG_DIR = "/home/dcope/labx_master/radar_code/logs"
 os.makedirs(LOG_DIR, exist_ok=True)
 
 logging.basicConfig(
-    filename=os.path.join(LOG_DIR, f"sensor_output_{time.time()}.log"),
+    filename=os.path.join(LOG_DIR, f"sensor_output_{datetime.now().strftime('%Y%m%d_%H%M%S%f')[:-3]}.log"),
     level=logging.INFO,
     format="%(asctime)s - %(levelname)s - %(message)s"
 )

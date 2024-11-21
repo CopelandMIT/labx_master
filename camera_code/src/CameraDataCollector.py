@@ -22,7 +22,7 @@ LOG_DIR = "/home/pi/labx_master/camera_code/logs"
 os.makedirs(LOG_DIR, exist_ok=True)
 
 logging.basicConfig(
-    filename=os.path.join(LOG_DIR, f"camera_collector_log_{time.time()}.log"),
+    filename=os.path.join(LOG_DIR, f"camera_collector_log_{datetime.now().strftime('%Y%m%d_%H%M%S%f')[:-3]}.log"),
     level=logging.INFO,
     format="%(asctime)s - %(levelname)s - %(message)s"
 )
