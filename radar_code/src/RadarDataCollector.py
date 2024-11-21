@@ -162,7 +162,7 @@ def main():
     current_time = datetime.now().strftime('%Y%m%d_%H%M%S%f')[:-3]
     current_dir = os.path.dirname(os.path.abspath(__file__))
     parent_dir = os.path.abspath(os.path.join(current_dir, '..', '..'))
-    data_output_directory = f'{parent_dir}/radar_code/data/radar_{current_time}'
+    data_output_directory = f'{parent_dir}/radar_code/data/{args.base_filename}'
     print(f"Data output directory: {data_output_directory}")
     os.makedirs(data_output_directory, exist_ok=True)
 

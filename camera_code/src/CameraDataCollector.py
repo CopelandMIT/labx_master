@@ -55,7 +55,7 @@ class CameraDataCollector:
         self.stop_event = stop_event
         self.disable_data_sync = disable_data_sync
 
-        self.data_output_directory = os.path.expanduser('~/labx_master/camera_code/data')
+        self.data_output_directory = os.path.expanduser(f'~/labx_master/camera_code/data/{self.base_filename}')
         os.makedirs(self.data_output_directory, exist_ok=True)
 
         self.data_queue = Queue()  # Queue for producer-consumer model
