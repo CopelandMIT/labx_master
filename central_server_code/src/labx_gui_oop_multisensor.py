@@ -368,7 +368,7 @@ class LabInABoxControlPanel:
         messagebox.showinfo("Capture Completed", "All captures have finished.")
 
     def start_remote_capture(self, ip_address, username, sensor_type, base_filename, capture_duration):
-        """Execute the remote capture command on an RPi."""
+        """Execute the remote capture command on a remote device."""
         logging.info(f"Starting remote capture for IP: {ip_address}, Username: {username}, Sensor Type: {sensor_type}")
         ssh = paramiko.SSHClient()
         ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
@@ -390,6 +390,13 @@ class LabInABoxControlPanel:
                 command = (
                     f"/home/{username}/labx_master/radar_code/labx_env/bin/python "
                     f"/home/{username}/labx_master/radar_code/src/RadarDataCollector.py "
+                    f"--base_filename {base_filename} --capture_duration {capture_duration} "
+                    f"--central_server_url {self.central_server_url}"
+                )
+            elif sensor_type == "body_tracking":
+                command = (
+                    f"/home/{username}/labx_master/ZED2i_code/labx_env/bin/python "
+                    f"/home/{username}/labx_master/ZED2i_code/src/ZED2iDataCollector.py "
                     f"--base_filename {base_filename} --capture_duration {capture_duration} "
                     f"--central_server_url {self.central_server_url}"
                 )
