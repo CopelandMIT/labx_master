@@ -126,7 +126,33 @@ def load_data_and_config(folder_path):
 
 
 
-def save_to_mkv(frames, file_path, fps=12):
+# def save_to_mkv(frames, file_path, fps=12):
+#     """
+#     Save radar data frames to an MKV file using imageio.
+
+#     :param frames: List of numpy arrays representing frames.
+#     :param file_path: Path to save the MKV file.
+#     :param fps: Frames per second.
+#     """
+#     import numpy as np  # Ensure NumPy is imported
+#     # Normalize frames and convert to uint8 images
+#     images = []
+#     for frame in frames:
+#         frame_min = frame.min()
+#         frame_range = np.ptp(frame)
+#         if frame_range == 0:
+#             # Avoid division by zero if frame has constant values
+#             frame_normalized = np.zeros_like(frame, dtype=np.uint8)
+#         else:
+#             frame_normalized = np.uint8(255 * (frame - frame_min) / frame_range)
+#         images.append(frame_normalized)
+
+#     # Save frames as video
+#     imageio.mimwrite(file_path, images, fps=fps, codec='libx264', format='FFMPEG')
+#     print(f"Saved MKV file: {file_path}")
+
+
+def save_to_mkv(frames, file_path, fps=1.2):
     """
     Save radar data frames to an MKV file using imageio.
 
@@ -135,27 +161,82 @@ def save_to_mkv(frames, file_path, fps=12):
     :param fps: Frames per second.
     """
     import numpy as np  # Ensure NumPy is imported
+    # Calculate global min and max
+    global_min = np.min([frame.min() for frame in frames])
+    global_max = np.max([frame.max() for frame in frames])
+    global_range = global_max - global_min
+
     # Normalize frames and convert to uint8 images
     images = []
     for frame in frames:
-        frame_min = frame.min()
-        frame_range = np.ptp(frame)
-        if frame_range == 0:
-            # Avoid division by zero if frame has constant values
+        if global_range == 0:
+            # Avoid division by zero if frames have constant values
             frame_normalized = np.zeros_like(frame, dtype=np.uint8)
         else:
-            frame_normalized = np.uint8(255 * (frame - frame_min) / frame_range)
+            frame_normalized = np.uint8(255 * (frame - global_min) / global_range)
         images.append(frame_normalized)
 
     # Save frames as video
     imageio.mimwrite(file_path, images, fps=fps, codec='libx264', format='FFMPEG')
     print(f"Saved MKV file: {file_path}")
 
+def range_doppler_processing(dataCubes):
+    """
+    Processes each frame in the dataCube for each channel to generate Range-Doppler Maps.
+
+    Args:
+        dataCubes (np.ndarray): The raw data cubes to be processed.
+
+    Returns:
+        np.ndarray: Array of processed Range-Doppler Maps for each channel.
+    """
+    n_channels, n_frames, n_bins, n_doppler = dataCubes.shape
+    rdm_all_channels = []
+
+    # Define a window function for the range and Doppler dimensions
+    range_window = np.hanning(n_bins)
+    doppler_window = np.hanning(n_doppler)
+
+    for channel_idx in range(n_channels):
+        rdm_list = []
+        for frame_idx in range(n_frames):
+            # Extract current data for the frame and channel
+            current_data = dataCubes[channel_idx, frame_idx, :, :]
+
+            # Apply the Hanning window function
+            windowed_data = np.outer(range_window, doppler_window) * current_data
+
+            # Apply 2D FFT and shift
+            rdm = np.fft.fft2(windowed_data)
+            rdm = np.fft.fftshift(rdm, axes=1)  # Shift along the Doppler axis (second axis in Python)
+
+            # Take the absolute value
+            rdm = np.abs(rdm)
+            
+            # Normalize the data before logarithmic scaling
+            rdm_max = np.max(rdm)
+            rdm_min = np.min(rdm)
+            rdm = (rdm - rdm_min) / (rdm_max - rdm_min + 1e-3)  # Avoid division by zero
+            
+            # Log scaling - apply log1p for numerical stability
+            rdm = np.log1p(rdm)
+
+            # Slice the RDM to remove the mirrored part (keep only one half)
+            # Assuming the mirrored part is along the Range axis (axis 0)
+            half_index = rdm.shape[0] // 2
+            rdm = rdm[:half_index, :]
+
+            # Append to the list for the current channel
+            rdm_list.append(rdm)
+
+        # Append the result for the current channel
+        rdm_all_channels.append(rdm_list)
+
+    return np.array(rdm_all_channels)
 
 # -------------------------------------------------
 # Main Processing
 # -------------------------------------------------
-
 def main():
     GUI_on = False  # Recording was made using Radar Fusion GUI or Raspberry Pi
     Adult_on = True  # Recording was made on an adult or infant
@@ -211,40 +292,41 @@ def main():
     frames_in_window = int(window_in_sec / frame_repetition_time_s)
     num_segments = num_frames - frames_in_window
 
-    # Initialize range FFT
-    range_map = RangeAlgo(num_samples_per_chirp, frames_in_window * num_chirps_per_frame,
-                          start_frequency_Hz, end_frequency_Hz)
-
     # Time vector
     ts = chirp_repetition_time_s
     fs = 1 / ts
     time = np.arange(0, ts * frames_in_window * num_chirps_per_frame, ts)
 
     # Create directory for MKV files if not exists
-    mkv_output_dir = f"{folder_path}/radar_mkvs/"
+    mkv_output_dir = f"{folder_path}/radar_mkvs_v2/"
     os.makedirs(mkv_output_dir, exist_ok=True)
 
-    # Process data and save to MKV
-    for i_ant in range(num_rx_antennas):
-        frames = []  # List to store all frames for this antenna
+    # Reshape and prepare data for range-Doppler processing
+    # Expected data shape: (n_channels, n_frames, n_bins, n_doppler)
 
-        # Process radar data into frames for each antenna
-        for frame_number in range(num_segments):
-            frame_contents = data[frame_number:frame_number + frames_in_window, :, :, :]
-            mat = frame_contents[:, i_ant, :, :]
-            mat = mat.reshape(frames_in_window * num_chirps_per_frame, num_samples_per_chirp)
+    # Transpose and reshape data
+    # Original data shape: (num_frames, num_rx_antennas, num_chirps_per_frame, num_samples_per_chirp)
+    # We need to rearrange it to (num_rx_antennas, num_frames, num_samples_per_chirp, num_chirps_per_frame)
 
-            range_fft, distance_data, distance_peak_idx, distance_peak_m = range_map.compute_range_map(
-                mat, min_bin_index, max_bin_index)
-            frames.append(np.abs(range_fft))
+    dataCubes = np.transpose(data, (1, 0, 3, 2))  # Now shape is (num_rx_antennas, num_frames, num_samples_per_chirp, num_chirps_per_frame)
 
-            # Additional processing (if needed)
-            # For example, you can perform motion detection or signal processing here
+    # Perform range-Doppler processing
+    rdm_all_channels = range_doppler_processing(dataCubes)
+
+    # Save the Range-Doppler Maps as MKV files for each antenna
+    num_channels = rdm_all_channels.shape[0]
+    num_frames = rdm_all_channels.shape[1]
+
+    for channel_idx in range(num_channels):
+        frames = []
+        for frame_idx in range(num_frames):
+            rdm = rdm_all_channels[channel_idx, frame_idx, :, :]
+            frames.append(rdm)
 
         # Save the frames as an MKV file for this antenna
-        mkv_filename = os.path.join(mkv_output_dir, f"antenna_{i_ant}.mkv")
+        mkv_filename = os.path.join(mkv_output_dir, f"antenna_{channel_idx}.mkv")
         save_to_mkv(frames, mkv_filename)
-        print(f"Radar data saved to MKV file for antenna {i_ant} with filename {mkv_filename}.")
+        print(f"Radar data saved to MKV file for antenna {channel_idx} with filename {mkv_filename}.")
 
 if __name__ == "__main__":
     main()
