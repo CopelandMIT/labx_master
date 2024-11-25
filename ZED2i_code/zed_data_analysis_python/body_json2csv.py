@@ -2,8 +2,8 @@ import json
 import csv
 
 # Load the JSON data from a file
-input_json_file = '/usr/local/zed/samples/body tracking/export/JSON export/cpp/build/detected_bodies_18.json'
-output_csv_file = 'tracked_bodies_18.csv'
+input_json_file = '/home/daniel/labx_master/ZED2i_code/data/test_capture_V90/test_capture_V90_20241121_150932_29.999999284744263s.json'
+output_csv_file = '/home/daniel/labx_master/ZED2i_code/data/test_capture_V90/test_capture_V90_20241121_150932_30s.csv'
 
 with open(input_json_file, 'r') as f:
     data = json.load(f)
