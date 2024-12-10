@@ -70,7 +70,7 @@ class LabInABoxControlPanel:
         tk.Label(self.root, text="Experiment Setup:").grid(row=0, column=0, columnspan=4, pady=5)
 
         # Create StringVar instances for default values
-        self.ip_default = tk.StringVar(value="192.168.68.1")
+        self.ip_default = tk.StringVar(value="192.168.0.")
         base_filename_default = tk.StringVar(value="test_capture_V")
         capture_duration_default = tk.StringVar(value="30")
 

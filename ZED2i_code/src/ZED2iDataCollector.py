@@ -7,6 +7,7 @@ import time
 from datetime import datetime
 import logging
 import argparse
+import socket
 
 # Add the parent directory to sys.path
 current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -31,11 +32,29 @@ logging.basicConfig(
 
 logging.info("Starting ZED Data Collector script.")
 
+def get_local_ip():
+    """Attempt to retrieve the local machine's IP address in a reliable manner."""
+    try:
+        # This approach attempts to connect to a known public address and then retrieves the local IP used for that route.
+        with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as s:
+            s.connect(("8.8.8.8", 80))
+            return s.getsockname()[0]
+    except Exception as e:
+        logging.warning(f"Could not determine local IP using UDP method: {e}. Falling back to hostname method.")
+        # Fallback method
+        try:
+            return socket.gethostbyname(socket.gethostname())
+        except Exception as e2:
+            logging.error(f"Could not determine local IP using hostname: {e2}. Defaulting to localhost.")
+            return "127.0.0.1"
+
 def parse_arguments():
     parser = argparse.ArgumentParser(description='ZED 2i Data Collector')
+    local_ip = get_local_ip()
+    default_central_server_url = f'http://{local_ip}:5000/receive_data'
     parser.add_argument('--base_filename', type=str, default='zed_default_data', help='Base filename for the output data')
     parser.add_argument('--capture_duration', type=int, default=None, help='Total capture duration in seconds')
-    parser.add_argument('--central_server_url', type=str, default='http://192.168.68.130:5000/receive_data', help='URL of the central server to send data')
+    parser.add_argument('--central_server_url', type=str, default=default_central_server_url, help='URL of the central server to send data')
     parser.add_argument('--no-gui', default=True, action='store_true', help='Run the ZED executable in headless mode without GUI')
     parser.add_argument('--batch_duration', type=int, default=300, help='Duration of each data batch in seconds')
     return parser.parse_args()
@@ -45,7 +64,7 @@ class ZEDDataCollector:
         self, 
         stop_event, 
         deployed_sensor_id="ZED001", 
-        central_server_url='http://192.168.68.130:5000/receive_data',
+        central_server_url='http://127.0.0.1:5000/receive_data',
         sync_polling_interval=10, 
         capture_duration=None,
         base_filename='zed_default_data',

@@ -63,12 +63,88 @@ To participate in the LabX Master project:
 
 1. **Clone the Repository**:  
    ```bash
-   git clone https://github.com/yourusername/LabX-Master.git
+   git clone https://github.com/CopelandMIT/labx_master.git
    ```
-2. **Review Documentation**: Explore the component (camera, cetnral server, GPS, radar) directories for setup guides.
+2. **Review Documentation**: Explore the component (camera, central server, GPS, radar) directories for setup guides.
 3. **Set Up Hardware**: Prepare your SBCs and sensors following the hardware setup guide.
 4. **Configure Time Sync**: Set up NTP and PPS GPS synchronization as per instructions.
-5. **Run the MSI Server**: Start the server to begin managing your sensor network.
+5. **Configure SSH and Copy Permission Keys**
+
+    1. **Generate SSH Key Pair on the Central Server**:  
+       - **Purpose**: Creates a new SSH key pair if one doesn't already exist. This key pair will be used for authenticating with the Raspberry Pi.
+       - **Command**:
+         ```bash
+         ssh-keygen -t rsa -b 4096 -C "your_email@example.com"
+         ```
+       - **Notes**: Replace `"your_email@example.com"` with your actual email. You can press **Enter** to accept the default file location and choose whether to set a passphrase.
+    
+    2. **Copy SSH Public Key to the Raspberry Pi**:  
+       - **Using `ssh-copy-id`**:
+         - **Purpose**: Automates the process of copying the public key to the Raspberry Pi’s `authorized_keys` file.
+         - **Command**:
+           ```bash
+           ssh-copy-id pi@192.168.YYY.XXX
+           ```
+         - **Notes**: Replace `pi` with your Raspberry Pi’s username and `192.168.YYY.XXX` with its IP address. You’ll need to enter the Raspberry Pi user’s password once during this process.
+    
+       - **Manual Method**:
+         - **Purpose**: Provides an alternative method to transfer the public key if `ssh-copy-id` is not available.
+         - **Steps**:
+           1. **Display the Public Key** on the central server:
+              ```bash
+              cat ~/.ssh/id_rsa.pub
+              ```
+           2. **Copy the Output**.
+           3. **On the Raspberry Pi**, create the `.ssh` directory and `authorized_keys` file if they don't exist:
+              ```bash
+              mkdir -p ~/.ssh
+              nano ~/.ssh/authorized_keys
+              ```
+           4. **Paste the Public Key** into the `authorized_keys` file.
+           5. **Set Correct Permissions**:
+              ```bash
+              chmod 700 ~/.ssh
+              chmod 600 ~/.ssh/authorized_keys
+              ```
+    
+    3. **Check and Configure SSH Keys**:  
+       - **Purpose**: Ensures that the SSH keys are correctly set up and that the connection works as intended.
+       - **Steps**:
+         - **Verify SSH Key Permissions** on the Raspberry Pi:
+           ```bash
+           chmod 700 ~/.ssh
+           chmod 600 ~/.ssh/authorized_keys
+           ```
+         - **Test SSH Connection** from the Central Server:
+           ```bash
+           ssh pi@192.168.YYY.XXX
+           ```
+           - You should now connect without being prompted for a password.
+         - **Troubleshooting**:
+           - **Ensure Correct SSH Key Pair**: The private key on the central server (`~/.ssh/id_rsa`) should correspond to the public key on the Raspberry Pi (`~/.ssh/authorized_keys`).
+           - **Check SSH Configuration**: On the Raspberry Pi, ensure that `/etc/ssh/sshd_config` has the following settings:
+             ```
+             PasswordAuthentication no
+             PubkeyAuthentication yes
+             ```
+             - This enforces key-based authentication for enhanced security.
+           - **Restart SSH Service** after any changes:
+             ```bash
+             sudo systemctl restart ssh
+             ```
+    
+6. **Run the MSI Server**: Start the server to begin managing your sensor network.
+
+### Additional Recommendations:
+
+- **Replace Placeholders**: Ensure that placeholders like `"your_email@example.com"`, `pi`, and `192.168.YYY.XXX` are replaced with actual values relevant to your setup.
+  
+- **Security Considerations**:
+  - **Protect Private Keys**: Advise users to keep their private keys (`~/.ssh/id_rsa`) secure and not share them.
+  - **Use Strong Passphrases**: Encourage the use of strong passphrases for SSH keys to enhance security, especially if not using a passphrase is a security risk in your environment.
+  
+- **Verification Steps**:
+  - After setting up SSH keys, performing a test SSH connection ensures that everything is configured correctly before proceeding with further setup steps.
 
 
 ## License

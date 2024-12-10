@@ -164,4 +164,4 @@ data_folder = "/home/daniel/labx_master/ZED2i_code/data/test_capture_V91"
 json_file_path = f'{data_folder}/test_capture_V91_20241121_155631_30s.json'
 json_data = load_json_data(json_file_path)
 frames = parse_body_data(json_data)
-visualize_body_tracking(frames, output_filename=f'{data_folder}/body_tracking_v2.mp4', fps=60)
+visualize_body_tracking(frames, output_filename=f'{data_folder}/body_tracking_v3.mp4', fps=60)
