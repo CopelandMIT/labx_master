@@ -7,3 +7,13 @@ idna==3.10
 numpy==2.1.2
 requests==2.32.3
 urllib3==2.2.3
+
+# ---------------------------------------------------
+# System-Level Dependencies (Install Separately)
+# These dependencies are required for certain Python packages to function correctly.
+# Install them using your system's package manager (e.g., apt for Debian-based systems).
+
+# OpenBLAS Libraries
+# Install OpenBLAS runtime and development libraries:
+# sudo apt update
+# sudo apt install -y libopenblas0 libopenblas-dev
