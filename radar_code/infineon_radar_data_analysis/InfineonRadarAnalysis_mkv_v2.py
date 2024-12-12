@@ -159,7 +159,7 @@ def main():
     Adult_on = True  # Recording was made on an adult or infant
 
     # Folder containing radar data
-    folder_path = "/home/dcope/labx_master/radar_code/data/test_capture_V91"
+    folder_path = "/Volumes/4TBLacie2/LabXData/Squat_tests_12112024/radar_28/squat_v2_45s"
 
     # Load data and configuration
     data, timestamps, config = load_data_and_config(folder_path, GUI_on=GUI_on)
