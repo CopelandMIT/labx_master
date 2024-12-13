@@ -54,6 +54,7 @@ def parse_arguments():
     default_central_server_url = f'http://{local_ip}:5000/receive_data'
     parser.add_argument('--base_filename', type=str, default='zed_default_data', help='Base filename for the output data')
     parser.add_argument('--capture_duration', type=int, default=None, help='Total capture duration in seconds')
+    parser.add_argument('--deployed_sensor_id', type=str, default='ZED001', help="Single Board Computer ID")
     parser.add_argument('--central_server_url', type=str, default=default_central_server_url, help='URL of the central server to send data')
     parser.add_argument('--no-gui', default=True, action='store_true', help='Run the ZED executable in headless mode without GUI')
     parser.add_argument('--batch_duration', type=int, default=300, help='Duration of each data batch in seconds')

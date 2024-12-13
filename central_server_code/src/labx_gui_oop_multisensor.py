@@ -55,6 +55,14 @@ class LabInABoxControlPanel:
         self.timestamps = []
         self.plot_running = False
 
+                # Initialize sensor ID counters for consistency
+        self.sensor_counters = {
+            "radar": 1,
+            "camera": 1,
+            "body_tracking": 1
+        }
+        self.id_lock = threading.Lock()
+
         # Setup GUI with plotting
         self.setup_gui_with_plot()
 
@@ -131,7 +139,9 @@ class LabInABoxControlPanel:
         # Populate the device list if it already has configurations
         for device in self.configurations:
             self.config_listbox.insert(tk.END, f"IP: {device['ip_address']}, Username: {device['username']}, "
-                                            f"Sensor: {device['sensor_type']}, Status: {device['status']}")
+                                    f"Sensor: {device['sensor_type']}, Status: {device['status']}, "
+                                    f"ID: {device['deployed_sensor_id']}")
+
 
         delete_device_button = tk.Button(self.root, text="Delete Selected Device", command=self.delete_device)
         delete_device_button.grid(row=6, column=3, padx=5, pady=5)
@@ -186,6 +196,7 @@ class LabInABoxControlPanel:
     # Device Management
     # --------------------------------------
 
+
     def add_device(self):
         """Add a device configuration to the list and flash status indicator."""
         ip_address = self.ip_entry.get()
@@ -198,28 +209,58 @@ class LabInABoxControlPanel:
         # Ping the device
         is_reachable = self.ping_device(ip_address)
 
-        #TODO Add check on name and auth access
-
         # Flash the status indicator
         self.flash_status_indicator("green" if is_reachable else "red")
 
-        # Add configuration to the list with status
+        # Assign a unique deployed_sensor_id
+        deployed_sensor_id = self.generate_deployed_sensor_id(sensor_type)
+
+        # Add configuration to the list with status and deployed_sensor_id
         status = "reachable" if is_reachable else "unreachable"
-        config = {"ip_address": ip_address, "username": username, "sensor_type": sensor_type, "status": status}
+        config = {
+            "ip_address": ip_address,
+            "username": username,
+            "sensor_type": sensor_type,
+            "status": status,
+            "deployed_sensor_id": deployed_sensor_id  # Consistent naming
+        }
         self.configurations.append(config)
-        self.config_listbox.insert(tk.END, f"IP: {ip_address}, Username: {username}, Sensor: {sensor_type}, Status: {status}")
+        self.config_listbox.insert(tk.END, f"IP: {ip_address}, Username: {username}, Sensor: {sensor_type}, "
+                                        f"Status: {status}, ID: {deployed_sensor_id}")
 
         # Calculate next IP address
         octets = ip_address.split(".")
         if len(octets) == 4 and octets[3].isdigit():
-            next_ip = f"{octets[0]}.{octets[1]}.{octets[2]}.{int(octets[3]) + 1}"
-            self.ip_default.set(next_ip)  # Update default IP entry
+            next_octet = int(octets[3]) + 1
+            if next_octet > 254:
+                messagebox.showwarning("IP Range Exceeded", "Cannot increment IP address beyond .254.")
+            else:
+                next_ip = f"{octets[0]}.{octets[1]}.{octets[2]}.{next_octet}"
+                self.ip_default.set(next_ip)  # Update default IP entry
         else:
             messagebox.showwarning("Invalid IP", "IP Address is invalid. Please enter a valid IP next time.")
 
         # Clear the username entry
         self.username_entry.delete(0, tk.END)
 
+
+    def generate_deployed_sensor_id(self, sensor_type):
+        """Generates a unique deployed_sensor_id based on the sensor type."""
+        with self.id_lock:
+            if sensor_type not in self.sensor_counters:
+                self.sensor_counters[sensor_type] = 1
+            sensor_number = self.sensor_counters[sensor_type]
+            self.sensor_counters[sensor_type] += 1
+        prefix = ""
+        if sensor_type == "radar":
+            prefix = "RAD"
+        elif sensor_type == "camera":
+            prefix = "CAM"
+        elif sensor_type == "body_tracking":
+            prefix = "ZED"
+        else:
+            prefix = "UNK"  # Unknown sensor type
+        return f"{prefix}{sensor_number:03d}"
 
     def ping_device(self, ip_address):
         """Ping the device to check if it's reachable."""
@@ -323,12 +364,17 @@ class LabInABoxControlPanel:
     # --------------------------------------
 
     def start_all_captures(self):
+        """Start captures on all configured devices."""
         base_filename = self.base_filename_entry.get()
         capture_duration = self.capture_duration_entry.get()
 
         if not base_filename or not capture_duration.isdigit():
             messagebox.showerror("Input Error", "Please enter a valid base_filename and capture_duration.")
             return
+
+        # Assign unique sensor IDs (if not already assigned)
+        # (This step is redundant if sensor IDs are already assigned during device addition)
+        # self.assign_sensor_ids()
 
         # Update recording indicator to green immediately
         self.update_recording_status("green")
@@ -338,14 +384,21 @@ class LabInABoxControlPanel:
         if not self.start_central_server(base_filename, int(capture_duration)):
             self.update_recording_status("gray")  # Revert to gray if server fails
             return  # Exit if the server fails to start
-        
+
         threads = []
 
         # Create and start a thread for each device
         for config in self.configurations:
             thread = threading.Thread(
                 target=self.start_remote_capture,
-                args=(config["ip_address"], config["username"], config["sensor_type"], base_filename, int(capture_duration)),
+                args=(
+                    config["ip_address"],
+                    config["username"],
+                    config["sensor_type"],
+                    config["deployed_sensor_id"],  # Use consistent naming
+                    base_filename,
+                    int(capture_duration)
+                ),
                 daemon=True
             )
             threads.append(thread)
@@ -367,9 +420,10 @@ class LabInABoxControlPanel:
         # Show capture completed popup
         messagebox.showinfo("Capture Completed", "All captures have finished.")
 
-    def start_remote_capture(self, ip_address, username, sensor_type, base_filename, capture_duration):
+    def start_remote_capture(self, ip_address, username, sensor_type, deployed_sensor_id, base_filename, capture_duration):
         """Execute the remote capture command on a remote device."""
-        logging.info(f"Starting remote capture for IP: {ip_address}, Username: {username}, Sensor Type: {sensor_type}")
+        logging.info(f"Starting remote capture for IP: {ip_address}, Username: {username}, "
+                     f"Sensor Type: {sensor_type}, Sensor ID: {deployed_sensor_id}")
         ssh = paramiko.SSHClient()
         ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
         private_key_path = "/home/daniel/.ssh/id_rsa"
@@ -378,27 +432,30 @@ class LabInABoxControlPanel:
             private_key = paramiko.RSAKey.from_private_key_file(private_key_path)
             ssh.connect(ip_address, username=username, pkey=private_key)
 
-            # Map sensor type to the correct command
+            # Map sensor type to the correct command, including deployed_sensor_id
             if sensor_type == "camera":
                 command = (
                     f"/home/{username}/labx_master/camera_code/labx_env/bin/python "
                     f"/home/{username}/labx_master/camera_code/src/CameraDataCollector.py "
                     f"--base_filename {base_filename} --capture_duration {capture_duration} "
-                    f"--central_server_url {self.central_server_url}"
+                    f"--central_server_url {self.central_server_url} "
+                    f"--deployed_sensor_id {deployed_sensor_id}"
                 )
             elif sensor_type == "radar":
                 command = (
                     f"/home/{username}/labx_master/radar_code/labx_env/bin/python "
                     f"/home/{username}/labx_master/radar_code/src/RadarDataCollector.py "
                     f"--base_filename {base_filename} --capture_duration {capture_duration} "
-                    f"--central_server_url {self.central_server_url}"
+                    f"--central_server_url {self.central_server_url} "
+                    f"--deployed_sensor_id {deployed_sensor_id}"
                 )
             elif sensor_type == "body_tracking":
                 command = (
                     f"/home/{username}/labx_master/ZED2i_code/labx_env/bin/python "
                     f"/home/{username}/labx_master/ZED2i_code/src/ZED2iDataCollector.py "
                     f"--base_filename {base_filename} --capture_duration {capture_duration} "
-                    f"--central_server_url {self.central_server_url}"
+                    f"--central_server_url {self.central_server_url} "
+                    f"--deployed_sensor_id {deployed_sensor_id}"
                 )
             else:
                 logging.error(f"Unsupported sensor type: {sensor_type}")
@@ -425,11 +482,12 @@ class LabInABoxControlPanel:
             for line in iter(stderr.readline, ""):
                 logging.error(f"STDERR: {line.strip()}")
 
-            logging.info(f"Capture completed on {ip_address} for {sensor_type}")
+            logging.info(f"Capture completed on {ip_address} for {sensor_type} with Sensor ID: {deployed_sensor_id}")
         except Exception as e:
             logging.error(f"Connection Error: Could not connect to {ip_address}: {e}")
         finally:
             ssh.close()
+
 
     # --------------------------------------
     # Live Plotting
