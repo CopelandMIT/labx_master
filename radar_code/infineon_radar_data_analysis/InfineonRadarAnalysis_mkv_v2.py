@@ -150,10 +150,6 @@ def range_doppler_processing(dataCubes):
 # -------------------------------------------------
 # Main Processing
 # -------------------------------------------------
-
-# -------------------------------------------------
-# Main Processing
-# -------------------------------------------------
 def main():
     GUI_on = False  # Recording was made using Radar Fusion GUI or Raspberry Pi
     Adult_on = True  # Recording was made on an adult or infant

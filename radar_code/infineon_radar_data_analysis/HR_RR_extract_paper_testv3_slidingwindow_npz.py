@@ -61,7 +61,7 @@ def load_data_and_config(folder_path, GUI_on):
 
 if GUI_on:
     # Folder containing .npy files
-    folder_path = r'/media/daniel/4TBLacie2/LabXData/Squat_tests_12112024/radar_28/squat_v2_45s'#'C:/Users/Inbar Chityat/Dropbox (MIT)/Radar_Experimental_Data/General Lab Experiments/BGT60TR13C_record_20240528-114743_15RR_65HR/RadarIfxAvian_00/'
+    folder_path = r'/media/daniel/4TBLacie2/LabXData/actuator_tests_12112024/radar_28_data/actuator_sync_test_v1'#'C:/Users/Inbar Chityat/Dropbox (MIT)/Radar_Experimental_Data/General Lab Experiments/BGT60TR13C_record_20240528-114743_15RR_65HR/RadarIfxAvian_00/'
     # folder_path = 'C:/Users/inbarc/Dropbox (MIT)/Radar_Experimental_Data/General Lab Experiments/BGT60TR13C_record_20240618-154745/RadarIfxAvian_00/'
     # data, device_config = get_data(folder_path)
     data, timestamps, device_config = load_data_and_config(folder_path, GUI_on)
@@ -109,7 +109,7 @@ range_bins = np.linspace(0, range_resolution * num_samples_per_chirp/2, num_samp
 # Filter range bins based on min and max distance
 # Define the distance range (in meters)
 min_distance = 0.5
-max_distance = 4
+max_distance = 2.5
 min_bin_index = np.searchsorted(range_bins, min_distance)
 max_bin_index = np.searchsorted(range_bins, max_distance)
 filtered_range_bins = range_bins[min_bin_index:max_bin_index]
@@ -164,7 +164,7 @@ for i_ant in range(1,num_rx_antennas-1):
     kalman_hr_all = []
 
     print(i_ant)
-    
+
     for frame_number in range(0,num_segments):  
         frame_contents = data[frame_number:(frame_number+frames_in_window),:,:,:]
         mat = frame_contents[:,i_ant, :, :]
@@ -177,7 +177,7 @@ for i_ant in range(1,num_rx_antennas-1):
         plt.imshow(np.abs(range_fft), aspect='auto')
         plt.show()
 
-        target_range_bin = range_fft[:, 93]#distance_peak_idx]
+        target_range_bin = range_fft[:, 42]#distance_peak_idx]
         
         std_deviation = np.std(np.abs(target_range_bin))
         # print(std_deviation)
