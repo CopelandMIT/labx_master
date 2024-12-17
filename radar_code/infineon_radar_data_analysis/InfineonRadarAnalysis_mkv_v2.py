@@ -2,16 +2,14 @@ import json
 import matplotlib.pyplot as plt
 from scipy import signal, constants, fft
 from scipy.optimize import curve_fit
-from pymkv import MKVFile, MKVTrack  # Add this import for MKV handling
+#from pymkv import MKVFile, MKVTrack  # Add this import for MKV handling
 import math
 import re
 import glob
 import os
-
+from time import time
 from FFT_spectrum import *
 from RangeAlgorithmv1 import *
-
-
 import os
 import json
 import numpy as np
@@ -64,33 +62,50 @@ def load_data_and_config(folder_path, GUI_on):
     return data, timestamps, device_config
 
 
-def save_to_mkv(frames, file_path, fps=1.2*4):
+def save_to_mkv(frames, file_path, fps=1.28, min_range_bin = None, max_range_bin = None):
     """
-    Save radar data frames to an MKV file using imageio.
+    Save radar data frames to an MKV file using imageio with Jet coloring.
 
     :param frames: List of numpy arrays representing frames.
     :param file_path: Path to save the MKV file.
     :param fps: Frames per second.
     """
-    import numpy as np  # Ensure NumPy is imported
-    # Calculate global min and max
-    global_min = np.min([frame.min() for frame in frames])
-    global_max = np.max([frame.max() for frame in frames])
-    global_range = global_max - global_min
+    import numpy as np
+    import matplotlib.pyplot as plt
+    from matplotlib.cm import get_cmap
 
-    # Normalize frames and convert to uint8 images
+    if max_range_bin is not None and isinstance(max_range_bin, int): 
+        # Focus on the first 50 range bins
+        frames = [frame[:max_range_bin, :] for frame in frames]
+        
+    if min_range_bin is not None and isinstance(min_range_bin, int): 
+        # Focus on the first 50 range bins
+        frames = [frame[min_range_bin:, :] for frame in frames]
+
+    # Get the jet colormap
+    cmap = get_cmap("jet")
+
+    # Normalize frames and apply colormap
     images = []
     for frame in frames:
-        if global_range == 0:
-            # Avoid division by zero if frames have constant values
-            frame_normalized = np.zeros_like(frame, dtype=np.uint8)
+        # Normalize the frame to the range [0, 1]
+        frame_min = frame.min()
+        frame_max = frame.max()
+        frame_range = frame_max - frame_min
+        if frame_range == 0:
+            frame_normalized = np.zeros_like(frame, dtype=np.float32)
         else:
-            frame_normalized = np.uint8(255 * (frame - global_min) / global_range)
-        images.append(frame_normalized)
+            frame_normalized = (frame - frame_min) / frame_range
+
+        # Apply the colormap (jet)
+        colored_frame = cmap(frame_normalized)[:, :, :3]  # Drop the alpha channel
+        colored_frame = (colored_frame * 255).astype(np.uint8)  # Convert to uint8
+        images.append(colored_frame)
 
     # Save frames as video
-    imageio.mimwrite(file_path, images, fps=fps, codec='libx264', format='FFMPEG')
-    print(f"Saved MKV file: {file_path}")
+    imageio.mimwrite(file_path, images, fps=fps, codec="libx264", format="FFMPEG")
+    print(f"Saved MKV file with jet coloring: {file_path}")
+
 
 def range_doppler_processing(dataCubes):
     """
@@ -150,6 +165,8 @@ def range_doppler_processing(dataCubes):
 # -------------------------------------------------
 # Main Processing
 # -------------------------------------------------
+from time import time
+
 def main():
     GUI_on = False  # Recording was made using Radar Fusion GUI or Raspberry Pi
     Adult_on = True  # Recording was made on an adult or infant
@@ -159,19 +176,21 @@ def main():
 
     # Load data and configuration
     data, timestamps, config = load_data_and_config(folder_path, GUI_on=GUI_on)
+    
+    print(config)
 
     # Get data dimensions
     num_frames, num_rx_antennas, num_chirps_per_frame, num_samples_per_chirp = data.shape
     print(f"Original data shape: {data.shape}")
 
     # Total number of chirps
-    total_chirps = num_frames * num_chirps_per_frame * num_rx_antennas
-    print(f"Total chirps: {total_chirps}")
+    total_chirps = num_frames * num_chirps_per_frame     
+    print(f"Total chirps: {total_chirps} across {num_rx_antennas} antenna(s)")
 
     # Desired new number of chirps per frame
-    new_num_chirps_per_frame = 64
-    new_total_frames = total_chirps // (new_num_chirps_per_frame * num_rx_antennas)
-    remaining_chirps = total_chirps % (new_num_chirps_per_frame * num_rx_antennas)
+    new_num_chirps_per_frame = 32
+    new_total_frames = total_chirps // new_num_chirps_per_frame
+    remaining_chirps = total_chirps % new_num_chirps_per_frame
 
     if remaining_chirps != 0:
         print(f"Discarding {remaining_chirps} chirps to reshape data.")
@@ -186,10 +205,9 @@ def main():
 
     # Update the number of frames and chirps per frame
     num_frames = new_total_frames
-    num_chirps_per_frame = new_num_chirps_per_frame
 
     # Create directory for MKV files if not exists
-    mkv_output_dir = f"{folder_path}/radar_mkvs_v4/"
+    mkv_output_dir = f"{folder_path}/radar_mkvs_{int(time())}/"
     os.makedirs(mkv_output_dir, exist_ok=True)
 
     # Transpose and reshape data
@@ -204,6 +222,15 @@ def main():
     # Save the Range-Doppler Maps as MKV files for each antenna
     num_channels = rdm_all_channels.shape[0]
     num_frames = rdm_all_channels.shape[1]
+    
+    MIN_RANGE_BIN = 10
+    MAX_RANGE_BIN = 100
+    fps = ((1/config['frame_repetition_time_s']) * config['num_chirps']/new_num_chirps_per_frame)
+    print(f"Calculated FPS: {fps:.2f}")
+
+    # Calculate and print expected video duration
+    video_duration_seconds = num_frames / fps
+    print(f"Expected video duration: {video_duration_seconds:.2f} seconds")
 
     for channel_idx in range(num_channels):
         frames = []
@@ -213,9 +240,8 @@ def main():
 
         # Save the frames as an MKV file for this antenna
         mkv_filename = os.path.join(mkv_output_dir, f"antenna_{channel_idx}.mkv")
-        save_to_mkv(frames, mkv_filename)
+        save_to_mkv(frames, mkv_filename, fps=fps, min_range_bin=MIN_RANGE_BIN, max_range_bin=MAX_RANGE_BIN)
         print(f"Radar data saved to MKV file for antenna {channel_idx} with filename {mkv_filename}.")
-
-
+        
 if __name__ == "__main__":
     main()
