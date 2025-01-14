@@ -34,7 +34,7 @@ rpi_hosts = [
 ]
 
 # 2) Local root folder to which you want to copy the folder from each RPi.
-DEST_ROOT = r'/media/daniel/FourTBLaCie/LabXData/fetal_pig_test'
+DEST_ROOT = r'/media/daniel/FourTBLaCie/LabXData/actuator_sync_test_no_gps'
 
 
 # ------------------------------------------------------------------------------
