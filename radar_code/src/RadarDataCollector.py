@@ -125,11 +125,11 @@ def main():
 
     # Argument parser setup
     parser = argparse.ArgumentParser(description='Derives raw data and saves to .npz file')
+    parser.add_argument('--central_server_url', type=str, default="http://192.168.68.130:5000/receive_data", help="Central Server Url for time sync monitoring")
     parser.add_argument('-f', '--frate', type=float, default=1/1.28, help="Frame rate in Hz, default 5")
     parser.add_argument('--deployed_sensor_id', type=str, default='RAD001', help="Single Board Computer ID")
     parser.add_argument('--base_filename', type=str, default='radar_data.json', help="File to save radar data")
     parser.add_argument('--capture_duration', type=int, default=600, help="Duration for data capture in seconds")
-    parser.add_argument('--central_server_url', type=str, default="http://192.168.68.130:5000/receive_data", help="Central Server Url for time sync monitoring")
     args = parser.parse_args()
 
     logging.info("Starting RadarDataCollector main function.")
