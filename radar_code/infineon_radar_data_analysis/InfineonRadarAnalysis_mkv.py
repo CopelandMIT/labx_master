@@ -210,10 +210,10 @@ Adult_on = 1 #Recording was made on an adult or infant
 
 if GUI_on:
     # Folder containing .npy files for GUI recording
-    folder_path = "/home/dcope_rpi5_32bit/LabX/data/radar_20240925_114942882/"
+    folder_path = "/home/dcope/labx_master/radar_code/data/test_capture_V91/"
 else:
     # Folder containing .npy files for Raspberry Pi recording
-    folder_path = "/home/dcope_rpi5_32bit/LabX/data/radar_20240925_114942882/"
+    folder_path = "/home/dcope/labx_master/radar_code/data/test_capture_V91/"
 
 # Get all .npy files in the directory
 npz_abs_file_paths = [os.path.join(folder_path,file) for file in os.listdir(folder_path) if file.endswith('.npz')]
@@ -225,13 +225,14 @@ for npz_abs_file_path in npz_abs_file_paths:
     base_filename = os.path.splitext(npz_abs_file_path)[0]
 
     print(npz_abs_file_path)
-    data_and_timestamps_npz = np.load(npz_abs_file_path)
-    npy_file = data_and_timestamps_npz['data']
-    timestamps = data_and_timestamps_npz['timestamps']
+    full_npz_data = np.load(npz_abs_file_path, allow_pickle=True)
+    print("Keys in npz file:", list(full_npz_data.keys()))  # Debugging
+    npy_data = full_npz_data['data']
+    print(f"npy data shape {npy_data.shape}")
+    timestamps = full_npz_data['frame_timestamps_list']
+    print(f"timestamps shape {timestamps.shape}")
     
 
-    # Load data based on GUI_on flag
-    file_path = os.path.join(folder_path, npy_file)
     if GUI_on:
         # Load data and device configuration for GUI-based recording
         data, device_config = get_data(folder_path)
@@ -321,7 +322,7 @@ for i_ant in range(0, num_rx_antennas):
         frames.append(np.abs(range_fft))
 
     # Save the frames as an MKV file for this antenna appending the npy filename
-    mkv_filename = f"/home/dcope_rpi5_32bit/LabX/data/radar_mkvs/{base_filename}_ant{i_ant}.mkv"
+    mkv_filename = f"/home/dcope/labx_master/radar_code/data/test_capture_V91/radar_mkvs_v3/{base_filename}_ant{i_ant}.mkv"
     save_to_mkv(frames, mkv_filename)
     print(f"Radar data saved to MKV file for antenna {i_ant} with filename {mkv_filename}.")
 

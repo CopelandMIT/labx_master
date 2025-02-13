@@ -93,25 +93,37 @@ def load_data_and_config(folder_path):
     print("Data files:", npz_files)
     data_list = []
     timestamps_list = []
+    
     for npz_file in npz_files:
         file_path = os.path.join(folder_path, npz_file)
-        npz_data = np.load(file_path)
-        data_part = npz_data['data']
-        timestamps_part = npz_data['timestamps']
-        data_list.append(data_part)
-        timestamps_list.append(timestamps_part)
+        try:
+            # Enable pickle to load object arrays
+            npz_data = np.load(file_path, allow_pickle=True)
+            print("Keys in npz file:", list(npz_data.keys()))  # Debugging
+
+            # Access data and timestamps
+            data_part = npz_data['data']
+            timestamps_part = npz_data['frame_timestamps_list']  # Update key if necessary
+
+            data_list.append(data_part)
+            timestamps_list.append(timestamps_part)
+        except Exception as e:
+            print(f"Error loading file {npz_file}: {e}")
+
     data = np.concatenate(data_list, axis=0)
     timestamps = np.concatenate(timestamps_list, axis=0)
 
     # Load config.json
     config_file = os.path.join(folder_path, 'config.json')
-    print("Configuration file:", config_file)
+    if not os.path.exists(config_file):
+        raise FileNotFoundError(f"Configuration file not found: {config_file}")
     with open(config_file, 'r') as f:
         config = json.load(f)
         print("Loaded configuration:")
         print(json.dumps(config, indent=4))
 
-    return data, timestamps, config 
+    return data, timestamps, config
+
 
 
 def save_to_mkv(frames, file_path, fps=12):
@@ -149,7 +161,7 @@ def main():
     Adult_on = True  # Recording was made on an adult or infant
 
     # Folder containing radar data
-    folder_path = "/home/dcope_rpi5_32bit/LabX/data/radar_20240925_125047559"
+    folder_path = "/home/dcope/labx_master/radar_code/data/test_capture_V91"
 
     # Load data and configuration
     data, timestamps, config = load_data_and_config(folder_path)
@@ -209,7 +221,7 @@ def main():
     time = np.arange(0, ts * frames_in_window * num_chirps_per_frame, ts)
 
     # Create directory for MKV files if not exists
-    mkv_output_dir = "/home/dcope_rpi5_32bit/LabX/data/radar_mkvs/"
+    mkv_output_dir = f"{folder_path}/radar_mkvs/"
     os.makedirs(mkv_output_dir, exist_ok=True)
 
     # Process data and save to MKV

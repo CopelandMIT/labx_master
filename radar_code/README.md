@@ -22,8 +22,8 @@ This guide walks you through setting up a 32-bit Raspberry Pi OS (Debian Bookwor
 
 ### **Requirements:**
 
-- A Raspberry Pi (e.g., Pi 3, Pi 4)
-- A microSD card (minimum 32GB recommended)
+- A Raspberry Pi (e.g., Pi 4, Pi 5)
+- A microSD card (minimum 64GB recommended)
 - Raspberry Pi Imager (or another flashing tool)
 - A keyboard, mouse, and monitor (or SSH if headless)
 - Internet connection
@@ -43,6 +43,10 @@ This guide walks you through setting up a 32-bit Raspberry Pi OS (Debian Bookwor
    - Open Raspberry Pi Imager.
    - Select the **OS**: Choose **"Raspberry Pi OS (32-bit)"** (Debian Bookworm).
    - Select the **Storage**: Choose your microSD card.
+   - Click **Edit Settings** to set your wifi pass word. 
+   - **Set Hostname** as "dcope"
+   - Configure the Wifi based on your network name and password. 
+   - Click **Save**.
    - Click **Write** to flash the OS to your microSD card.
 
 4. **Boot the Raspberry Pi:**
@@ -81,7 +85,7 @@ If you're setting up the Pi without a monitor:
 
 After the initial setup, it's important to update the system to ensure all packages are up-to-date.
 
-1. **Open a Terminal:**
+1. **Open a Terminal on the Raspberry Pi:**
 
    - If you're using the desktop environment, open the terminal application.
    - If you're connected via SSH, you're already in the terminal.

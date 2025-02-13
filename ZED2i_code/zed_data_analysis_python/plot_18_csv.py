@@ -8,7 +8,7 @@ from mpl_toolkits.mplot3d import Axes3D
 plt.rcParams['animation.ffmpeg_path'] = '/usr/bin/ffmpeg'
 
 # Load the CSV data
-csv_file = "/usr/local/zed/samples/body tracking/export/JSON export/cpp/data/tracked_bodies_18.csv"
+csv_file = "/home/daniel/labx_master/ZED2i_code/data/test_capture_V90/test_capture_V90_20241121_150932_30s.csv"
 data = pd.read_csv(csv_file)
 
 print(data.head)
@@ -18,9 +18,9 @@ fig = plt.figure()
 ax = fig.add_subplot(111, projection='3d')
 
 # Set limits for the axes based on your expected keypoint coordinates
-ax.set_xlim(-2000, 2000)
-ax.set_ylim(-2000, 2000)
-ax.set_zlim(-2000, 2000)
+ax.set_xlim(-3000, 3000)
+ax.set_ylim(-3000, 3000)
+ax.set_zlim(-3000, 3000)
 
 # Function to update the plot for each frame
 def update(frame):
@@ -42,9 +42,9 @@ def update(frame):
 
     # Optionally, set titles or other plot decorations here
     ax.set_title(f"Frame {frame + 1}")
-    ax.set_xlim(-2000, 2000)
-    ax.set_ylim(-2000, 2000)
-    ax.set_zlim(-2000, 2000)
+    ax.set_xlim(-3000, 3000)
+    ax.set_ylim(-3000, 3000)
+    ax.set_zlim(-3000, 3000)
 
 # Create the animation, ending two frames earlier
 ani = animation.FuncAnimation(fig, update, frames=len(data) - 2, repeat=False)
@@ -53,6 +53,6 @@ ani = animation.FuncAnimation(fig, update, frames=len(data) - 2, repeat=False)
 writer = animation.FFMpegWriter(fps=60, codec='libx264')
 
 # Save the animation as an MP4 file
-ani.save('body_tracking_animation_3d.mp4', writer=writer)
+ani.save('/home/daniel/labx_master/ZED2i_code/data/test_capture_V90/body_tracking_animation_3d_v2.mp4', writer=writer)
 
 print('3D animation saved successfully!')
