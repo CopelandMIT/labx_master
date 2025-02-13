@@ -20,14 +20,13 @@ from ifxradarsdk.fmcw.types import FmcwSimpleSequenceConfig, FmcwSequenceChirp
 current_dir = os.path.dirname(os.path.abspath(__file__))
 parent_dir = os.path.abspath(os.path.join(current_dir, '..', '..'))
 sys.path.append(parent_dir)
-
 from shared_sensor_code.TimeSync import TimeSync
 
 # -------------------------------------------------
 # Logging Setup
 # -------------------------------------------------
 # Ensure the logs directory exists
-LOG_DIR = "/home/dcope/labx_master/radar_code/logs"
+LOG_DIR = os.path.join(os.path.expanduser("~"), "labx_master", "radar_code", "logs")
 os.makedirs(LOG_DIR, exist_ok=True)
 
 logging.basicConfig(
