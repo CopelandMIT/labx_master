@@ -138,11 +138,6 @@ Start by cloning the SDK repository from GitHub.
    git clone https://github.com/CopelandMIT/labx_master.git
    ```
 
-3. **Change into the Directory:**
-
-   ```bash
-   cd labx_master/radar_code/infineon_radar_sdk
-   ```
 
 ### **2. Setting Up Python Virtual Environment**
 
@@ -173,64 +168,41 @@ Setting up the Python virtual environment early ensures that any Python dependen
    source labx_env/bin/activate
    ```
 
+
 5. **Upgrade `pip` Inside the Virtual Environment:**
 
    ```bash
    pip install --upgrade pip
    ```
 
-6. **Install Required Python Packages:**
+6. **Install OpenBLAS Development Libraries:**
+
+Before installing the Infineon Radar SDK wheel file, install the OpenBLAS development libraries:
+
+   ```bash
+   sudo apt-get install -y libopenblas-dev
+   ```
+
+7. **Install Required Python Packages:**
 
    ```bash
    pip install -r requirements.txt
    ```
 
-7. **Ensure Necessary Build Tools Are Installed:**
+8. **Ensure Necessary Build Tools Are Installed:**
 
    ```bash
    pip install wheel setuptools
    ```
 
-8. **Install System Packages Required for Building:**
+9. **Install System Packages Required for Building:**
 
    ```bash
    sudo apt update
    sudo apt install -y cmake python3-dev build-essential
    ```
 
-### **3. Installing the Python SDK**
-
-With the virtual environment set up and dependencies installed, you can now install the Infineon Radar SDK Python package.
-
-1. **Ensure Virtual Environment is Activated:**
-
-   ```bash
-   source ~/labx_master/radar_code/labx_env/bin/activate
-   ```
-
-2. **Install OpenBLAS Development Libraries:**
-
-   Before installing the Infineon Radar SDK wheel file, install the OpenBLAS development libraries:
-
-   ```bash
-   sudo apt-get install -y libopenblas-dev
-   ```
-
-3. **Locate the Python Wheel:**
-
-   ```bash
-   find ~/labx_master/radar_code/infineon_radar_sdk -name "*.whl"
-   ```
-
-4. **Install the Correct Wheel for Your Architecture:**
-
-   ```bash
-   pip install ~/labx_master/radar_code/infineon_radar_sdk/python_wheels/ifxradarsdk-3.5.0+8c595dbb-py3-none-linux_armv7l.whl
-   ```
-
-   - Ensure you adjust the version number if it's different in your directory.
-
-5. **Verify Installation:**
+10. **Verify Installation:**
 
    ```bash
    pip list | grep ifxradarsdk
@@ -242,7 +214,7 @@ With the virtual environment set up and dependencies installed, you can now inst
      ifxradarsdk       3.5.0+8c595dbb
      ```
 
-6. **Test the SDK Import:**
+11. **Test the SDK Import:**
 
    ```bash
    python -c "import ifxradarsdk; print('SDK version:', ifxradarsdk.get_version_full())"
