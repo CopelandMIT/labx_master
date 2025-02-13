@@ -66,7 +66,7 @@ To participate in the LabX Master project:
    git clone https://github.com/CopelandMIT/labx_master.git
    ```
 2. **Review Documentation**: Explore the component (camera, central server, GPS, radar) directories for setup guides.
-3. **Set Up Hardware**: Prepare your SBCs and sensors following the hardware setup guide.
+3. **Set Up Hardware**: Prepare your SBCs and sensors following the hardware setup guide. Example: Radar set up instructions are in radar_code's README.md
 4. **Configure Time Sync**: Set up NTP and PPS GPS synchronization as per instructions.
 5. **Configure SSH and Copy Permission Keys**
 

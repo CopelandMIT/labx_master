@@ -247,6 +247,7 @@ We need to configure Chrony to use the GPS PPS SBC over LAN as the preferred tim
 
 1. **Determine the IP Address of Your GPS PPS SBC:**
 
+   - Connect to the WIFI LAN that you will be running your GPS on.
    - The GPS PPS SBC should be connected to your LAN.
    - Find its IP address by checking your router's connected devices or using network scanning tools.
    - For example, let's assume the IP address is `192.168.1.100`.
@@ -255,7 +256,7 @@ We need to configure Chrony to use the GPS PPS SBC over LAN as the preferred tim
 
 2. **Configure Chrony:**
 
-   - Edit Chrony's configuration file:
+   - Edit Chrony's configuration file: NOTE "nano" UI is KEYBOARD ONLY!
 
      ```bash
      sudo nano /etc/chrony/chrony.conf
@@ -268,15 +269,15 @@ We need to configure Chrony to use the GPS PPS SBC over LAN as the preferred tim
      #pool 2.debian.pool.ntp.org iburst
      ```
 
-   - **Add** the GPS PPS SBC as the preferred time source:
+   - **Add** the GPS PPS SBC as the preferred time source: NOTE: UPDATE IP Address with YOUR GPS server's IP address. 
 
      ```bash
-     # GPS PPS SBC over LAN
-     server 192.168.1.100 iburst prefer
+     # GPS PPS SBC over LAN 
+     server 192.168.1.100 iburst prefer minpoll 4 maxpoll 4
      ```
 
      - **Explanation:**
-       - `server 192.168.1.100`: Specifies the IP address of your GPS time server.
+       - `server 192.168.1.100`: Specifies the IP address of your GPS time server. Must be changed to YOUR GPS server's IP address. 
        - `iburst`: Allows faster initial synchronization.
        - `prefer`: Marks this server as the preferred time source.
 
@@ -292,7 +293,7 @@ We need to configure Chrony to use the GPS PPS SBC over LAN as the preferred tim
 
 3. **Save and Close the File:**
 
-   - Press `Ctrl+O` to save and `Ctrl+X` to exit the editor.
+   - Press `Ctrl+O` to save, then `Enter`, and `Ctrl+X` to exit the editor.
 
 4. **Restart Chrony:**
 
@@ -342,6 +343,10 @@ We need to configure Chrony to use the GPS PPS SBC over LAN as the preferred tim
 
      - This will update the output every 10 seconds.
 
+
+---
+
+## CONGRATS! Your radar is ready to pair with the central server. Go back to the main page start on "Step 5. Configure SSH and Copy Permission Keys" to send authentication keys from your central server to this device. 
 ---
 
 ## **Troubleshooting**
