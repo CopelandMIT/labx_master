@@ -1,3 +1,108 @@
+Lab in a Box - ZED2i Markerless Motion Capture Setup
+
+This README provides step-by-step instructions to set up the ZED2i camera with the ZED SDK for markerless motion capture as part of the Lab in a Box system.
+
+✅ System Requirements:
+	•	A computer with a compatible NVIDIA GPU (check ZED SDK requirements).
+	•	Installed Linux (Ubuntu 20.04 or 22.04) or Windows OS.
+	•	PPS GPS Clock available on the same network for time synchronization.
+	•	Chrony installed for time sync.
+	•	Lab in a Box Central Server with GUI running.
+
+⚡ Setup Instructions:
+
+1. Install the Correct NVIDIA Driver
+	1.	Identify your GPU model:
+
+nvidia-smi
+
+
+	2.	Download and install the appropriate NVIDIA driver from the NVIDIA Driver Downloads.
+	3.	Reboot after installation.
+
+2. Download and Install the ZED SDK
+	1.	Download the latest ZED SDK from StereoLabs ZED SDK.
+	2.	Follow installation instructions from the website for your OS.
+	3.	Verify installation:
+
+zed_info
+
+3. Configure Time Synchronization with PPS GPS Clock
+	1.	Install Chrony:
+
+sudo apt update
+sudo apt install chrony
+
+
+	2.	Edit your Chrony configuration:
+
+sudo nano /etc/chrony/chrony.conf
+
+
+	3.	Add your PPS GPS clock’s IP address (replace <GPS_IP>):
+
+server <GPS_IP> prefer iburst
+
+
+	4.	Restart Chrony:
+
+sudo systemctl restart chrony
+
+
+	5.	Verify synchronization:
+
+chronyc tracking
+
+4. Share SSH Keys
+
+Ensure passwordless SSH access between the ZED2i computer and the Central Server.
+
+On the ZED2i computer:
+
+ssh-keygen
+ssh-copy-id <username>@<central_server_ip>
+
+On the Central Server:
+
+ssh-copy-id <username>@<zed2i_computer_ip>
+
+🖥️ Running the Markerless Motion Capture
+	1.	Open the Lab in a Box GUI on the Central Server.
+	2.	In the GUI:
+	•	Enter the IP address of the ZED2i computer.
+	•	Enter the username for SSH login.
+	•	Select Sensor Type: Motion Capture.
+	3.	Press Run.
+
+✅ Confirm Successful Operation:
+	•	The GUI will indicate a successful connection.
+	•	ZED2i data will stream and record synchronized with the rest of the Lab in a Box system.
+	•	Logs and data will be saved locally and/or uploaded to your designated storage (e.g., S3).
+
+🚀 Troubleshooting:
+	•	Verify GPU compatibility and driver installation using nvidia-smi.
+	•	Check ZED SDK installation using zed_info.
+	•	Confirm time sync status with chronyc tracking.
+	•	Test SSH connectivity with:
+
+ssh <username>@<zed2i_computer_ip>
+
+
+	•	Ensure the PPS GPS clock is online and serving NTP.
+
+📂 Folder Structure Example:
+
+labx_master/
+├── zed2i/
+│   ├── data/
+│   ├── src/
+│   └── README.md
+
+📧 Contact
+
+For support, please contact Dan Copeland at dcope@mit.edu.
+
+
 # JSON Bodies export sample
 
 This sample shows how to export bodies detected with the SDK in a JSON format.
