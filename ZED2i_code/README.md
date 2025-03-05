@@ -79,21 +79,21 @@ ssh-copy-id <username>@<zed2i_computer_ip>
 🖥️ Running the Markerless Motion Capture
 	1.	Open the Lab in a Box GUI on the Central Server.
 	2.	In the GUI:
-	•	Enter the IP address of the ZED2i computer.
-	•	Enter the username.
-	•	Select Sensor Type: Motion Capture.
+	-Enter the IP address of the ZED2i computer.
+	-Enter the username.
+	-Select Sensor Type: Motion Capture.
 	3.	Press Start Capture.
 
 ✅ Confirm Successful Operation:
-	•	The GUI will indicate a successful connection.
-	•	ZED2i data will stream and record synchronized with the rest of the Lab in a Box system.
-	•	Logs and data will be saved locally and/or uploaded to your designated storage (e.g., S3).
+	-The GUI will indicate a successful connection.
+	-ZED2i data will stream and record synchronized with the rest of the Lab in a Box system.
+	-Logs and data will be saved locally .
 
 🚀 Troubleshooting:
-	•	Verify GPU compatibility and driver installation using nvidia-smi.
-	•	Check ZED SDK installation using zed_info.
-	•	Confirm time sync status with chronyc tracking.
-	•	Test SSH connectivity with:
+	-Verify GPU compatibility and driver installation using nvidia-smi.
+	-Check ZED SDK installation using zed_info.
+	-Confirm time sync status with chronyc tracking.
+	-Test SSH connectivity with:
 
 ssh <username>@<zed2i_computer_ip>
 
