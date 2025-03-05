@@ -1,21 +1,27 @@
-Lab in a Box - ZED2i Markerless Motion Capture Setup
+# Lab in a Box - ZED2i Markerless Motion Capture Setup
 
-This README provides step-by-step instructions to set up the ZED2i camera with the ZED SDK for markerless motion capture as part of the Lab in a Box system.
+This guide explains how to set up the **ZED2i camera** with the **ZED SDK** for markerless motion capture as part of the **Lab in a Box** system.
 
-✅ System Requirements:
-	•	A computer with a compatible NVIDIA GPU (check ZED SDK requirements).
-	•	Installed Linux (Ubuntu 20.04 or 22.04) or Windows OS.
-	•	PPS GPS Clock available on the same network for time synchronization.
-	•	Chrony installed for time sync.
-	•	Lab in a Box Central Server with GUI running.
+---
 
-⚡ Setup Instructions:
+## ✅ System Requirements
 
-1. Install the Correct NVIDIA Driver
-	1.	Identify your GPU model:
+- Computer with a compatible **NVIDIA GPU** ([check compatibility](https://www.stereolabs.com/docs/requirements/))
+- **Ubuntu 20.04/22.04** or **Windows**
+- **PPS GPS Clock** on the same network
+- **Chrony** installed
+- **Lab in a Box Central Server** with GUI running
 
-nvidia-smi
+---
 
+## ⚡ Setup Instructions
+
+### 1. Install the Correct NVIDIA Driver
+
+1. Identify your GPU:
+   ```bash
+   nvidia-smi
+   ```
 
 	2.	Download and install the appropriate NVIDIA driver from the NVIDIA Driver Downloads.
 	3.	Reboot after installation.
