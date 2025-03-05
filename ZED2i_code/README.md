@@ -100,14 +100,6 @@ ssh <username>@<zed2i_computer_ip>
 
 	•	Ensure the PPS GPS clock is online and serving NTP.
 
-📂 Folder Structure Example:
-
-labx_master/
-├── zed2i/
-│   ├── data/
-│   ├── src/
-│   └── README.md
-
 📧 Contact
 
 For support, please contact Dan Copeland at dcope@mit.edu.
