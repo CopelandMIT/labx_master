@@ -33,53 +33,56 @@ This guide explains how to set up the **ZED2i camera** with the **ZED SDK** for 
  ```bash
    zed_info
    ```
-
 3. Configure Time Synchronization with PPS GPS Clock
 	1.	Install Chrony:
 
+ ```bash
 sudo apt update
 sudo apt install chrony
+   ```
 
-
-	2.	Edit your Chrony configuration:
-
+ 2.	Edit your Chrony configuration:
+ ```bash
 sudo nano /etc/chrony/chrony.conf
+   ```
 
-
-	3.	Add your PPS GPS clock’s IP address (replace <GPS_IP>):
+3.	Add your PPS GPS clock’s IP address (replace <GPS_IP>):
 
 server <GPS_IP> prefer iburst
 
 
-	4.	Restart Chrony:
-
+4.	Restart Chrony:
+ ```bash
 sudo systemctl restart chrony
-
+```
 
 	5.	Verify synchronization:
-
+```bash
 chronyc tracking
-
+```
 4. Share SSH Keys
 
 Ensure passwordless SSH access between the ZED2i computer and the Central Server.
 
 On the ZED2i computer:
 
+```bash
 ssh-keygen
 ssh-copy-id <username>@<central_server_ip>
-
+```
 On the Central Server:
 
+```bash
 ssh-copy-id <username>@<zed2i_computer_ip>
+```
 
 🖥️ Running the Markerless Motion Capture
 	1.	Open the Lab in a Box GUI on the Central Server.
 	2.	In the GUI:
 	•	Enter the IP address of the ZED2i computer.
-	•	Enter the username for SSH login.
+	•	Enter the username.
 	•	Select Sensor Type: Motion Capture.
-	3.	Press Run.
+	3.	Press Start Capture.
 
 ✅ Confirm Successful Operation:
 	•	The GUI will indicate a successful connection.
