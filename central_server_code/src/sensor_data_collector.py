@@ -40,7 +40,7 @@ rpi_hosts = [
 ]
 
 # 2) Local root folder to which you want to copy the folder from each RPi.
-DEST_ROOT = r'/media/daniel/FourTBLaCie/LabXData/pig_heart_test_v12'
+DEST_ROOT = input("Enter the Local Root Destination Folder path: ").strip()
 
 
 # ------------------------------------------------------------------------------
