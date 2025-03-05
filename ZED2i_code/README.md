@@ -27,9 +27,9 @@ This guide explains how to set up the **ZED2i camera** with the **ZED SDK** for 
 	3.	Reboot after installation.
 
 ### 2. Download and Install the ZED SDK
-	1.	Download the latest ZED SDK from StereoLabs ZED SDK.
-	2.	Follow installation instructions from the website for your OS.
-	3.	Verify installation:
+1.	Download the latest ZED SDK from StereoLabs ZED SDK.
+2.	Follow installation instructions from the website for your OS.
+3.	Verify installation:
  ```bash
    zed_info
    ```
@@ -56,7 +56,7 @@ server <GPS_IP> prefer iburst
 sudo systemctl restart chrony
 ```
 
-	5.	Verify synchronization:
+5.	Verify synchronization:
 ```bash
 chronyc tracking
 ```
