@@ -47,9 +47,9 @@ sudo nano /etc/chrony/chrony.conf
    ```
 
 3.	Add your PPS GPS clock’s IP address (replace <GPS_IP>):
-
-server <GPS_IP> prefer iburst
-
+ ```bash
+server <GPS_IP> prefer iburst minpoll 4 maxpoll 4
+```
 
 4.	Restart Chrony:
  ```bash
