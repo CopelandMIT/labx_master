@@ -26,15 +26,15 @@ This guide explains how to set up the **ZED2i camera** with the **ZED SDK** for 
 	2.	Download and install the appropriate NVIDIA driver from the NVIDIA Driver Downloads.
 	3.	Reboot after installation.
 
-2. Download and Install the ZED SDK
+### 2. Download and Install the ZED SDK
 	1.	Download the latest ZED SDK from StereoLabs ZED SDK.
 	2.	Follow installation instructions from the website for your OS.
 	3.	Verify installation:
  ```bash
    zed_info
    ```
-3. Configure Time Synchronization with PPS GPS Clock
-	1.	Install Chrony:
+### 3. Configure Time Synchronization with PPS GPS Clock
+1.	Install Chrony:
 
  ```bash
 sudo apt update
@@ -60,7 +60,7 @@ sudo systemctl restart chrony
 ```bash
 chronyc tracking
 ```
-4. Share SSH Keys
+### 4. Share SSH Keys
 
 Ensure passwordless SSH access between the ZED2i computer and the Central Server.
 
