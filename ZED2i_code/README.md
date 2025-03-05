@@ -83,6 +83,7 @@ ssh-copy-id <username>@<zed2i_computer_ip>
 - Enter the IP address of the ZED2i computer.
 - Enter the username.
 - Select Sensor Type: Motion Capture.
+- Select Add Device (Green light flash confirms connection with device)
 3.	Press Start Capture.
 
 ✅ Confirm Successful Operation:
