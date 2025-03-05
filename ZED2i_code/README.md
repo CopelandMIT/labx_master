@@ -30,8 +30,9 @@ This guide explains how to set up the **ZED2i camera** with the **ZED SDK** for 
 	1.	Download the latest ZED SDK from StereoLabs ZED SDK.
 	2.	Follow installation instructions from the website for your OS.
 	3.	Verify installation:
-
-zed_info
+ ```bash
+   zed_info
+   ```
 
 3. Configure Time Synchronization with PPS GPS Clock
 	1.	Install Chrony:
