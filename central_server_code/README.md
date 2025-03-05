@@ -5,7 +5,7 @@ This repository contains the central server code for the "Lab in a Box" system. 
 
 ## Prerequisites
 Before running the central server, ensure that:
-1. All sensors are correctly configured and connected to the network.
+1. All sensors are correctly configured and connected to the network. (Go to sensor subfolder if you need to set up a given sensor)
 2. Each sensor has an assigned IP address and username for SSH access.
 3. The necessary dependencies are installed using `requirements.txt`.
 
