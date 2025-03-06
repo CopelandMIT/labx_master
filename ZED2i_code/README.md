@@ -130,6 +130,8 @@ cd ..
 
 Ensure passwordless SSH access between the ZED2i computer and the Central Server.
 
+CONNECT to the same wifi as your central server. 
+
 On the ZED2i computer:
 
 ```bash
