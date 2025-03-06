@@ -120,6 +120,9 @@ cd ..
    ```bash
    chronyc tracking
    ```
+     ```bash
+   chronyc sources
+   ```
 
 ---
 
