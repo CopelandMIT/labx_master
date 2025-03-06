@@ -28,39 +28,102 @@ This guide explains how to set up the **ZED2i camera** with the **ZED SDK** for 
 
 ### 2. Download and Install the ZED SDK
 1.	Download the latest ZED SDK from StereoLabs ZED SDK.
-2.	Follow installation instructions from the website for your OS.
+2.	Follow installation instructions from the website for your OS. (Optimization may take a few hours)
 3.	Verify installation:
  ```bash
    zed_info
    ```
-### 3. Configure Time Synchronization with PPS GPS Clock
-1.	Install Chrony:
+4. 	Check for zed folder in /usr/local/zed after completion. 
 
- ```bash
-sudo apt update
-sudo apt install chrony
-   ```
+# LabX Setup Instructions
 
- 2.	Edit your Chrony configuration:
- ```bash
-sudo nano /etc/chrony/chrony.conf
-   ```
+## ✅ Full Setup Instructions
 
-3.	Add your PPS GPS clock’s IP address (replace <GPS_IP>):
- ```bash
-server <GPS_IP> prefer iburst minpoll 4 maxpoll 4
-```
+### 1. Clone the repository
 
-4.	Restart Chrony:
- ```bash
-sudo systemctl restart chrony
-```
-
-5.	Verify synchronization:
 ```bash
-chronyc tracking
+git clone https://github.com/CopelandMIT/labx_master.git
+cd labx_master/ZED2i_code
 ```
-### 4. Share SSH Keys
+
+---
+
+### 2. Create a new virtual environment in the `ZED2i_code` folder
+
+```bash
+python3 -m venv labx_env
+```
+
+---
+
+### 3. Activate the virtual environment
+
+```bash
+source labx_env/bin/activate
+```
+
+---
+
+### 4. Install Python requirements from `requirements.txt`
+
+Make sure you're still in the `ZED2i_code` directory:
+
+```bash
+pip install -r requirements.txt
+```
+
+---
+
+### 5. Build C++ code with CMake
+
+If your C++ code requires building:
+
+```bash
+mkdir -p build
+cd build
+cmake ..
+make -j4
+cd ..
+```
+
+---
+
+### 6. Configure Time Synchronization with PPS GPS Clock
+
+1. **Install Chrony:**
+
+   ```bash
+   sudo apt update
+   sudo apt install chrony
+   ```
+
+2. **Edit your Chrony configuration:**
+
+   ```bash
+   sudo nano /etc/chrony/chrony.conf
+   ```
+
+3. **Add your PPS GPS clock’s IP address (replace `<GPS_IP>`):**
+
+   ```bash
+   server <GPS_IP> prefer iburst minpoll 4 maxpoll 4
+   ```
+
+4. **Restart Chrony:**
+
+   ```bash
+   sudo systemctl restart chrony
+   ```
+
+5. **Verify synchronization:**
+
+   ```bash
+   chronyc tracking
+   ```
+
+---
+
+### 7. Share SSH Keys
 
 Ensure passwordless SSH access between the ZED2i computer and the Central Server.
 
@@ -75,6 +138,16 @@ On the Central Server:
 ```bash
 ssh-copy-id <username>@<zed2i_computer_ip>
 ```
+
+## ✅ Quick check after setup:
+- Confirm your environment is active:  
+  ```bash
+  which python
+  ```
+  Should return:  
+  `/home/user/labx_master/ZED2i_code/labx_env/bin/python`
+
+- Confirm your C++ binaries are in the `build` folder.
 
 🖥️ Running the Markerless Motion Capture
 
