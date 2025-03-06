@@ -86,6 +86,16 @@ make -j4
 cd ..
 ```
 
+## ✅ Quick check after setup:
+- Confirm your environment is active:  
+  ```bash
+  which python
+  ```
+  Should return:  
+  `/home/user/labx_master/ZED2i_code/labx_env/bin/python`
+
+- Confirm your C++ binaries are in the `build` folder.
+
 ---
 
 ### 6. Configure Time Synchronization with PPS GPS Clock
@@ -140,16 +150,6 @@ On the Central Server:
 ```bash
 ssh-copy-id <username>@<zed2i_computer_ip>
 ```
-
-## ✅ Quick check after setup:
-- Confirm your environment is active:  
-  ```bash
-  which python
-  ```
-  Should return:  
-  `/home/user/labx_master/ZED2i_code/labx_env/bin/python`
-
-- Confirm your C++ binaries are in the `build` folder.
 
 🖥️ Running the Markerless Motion Capture
 
