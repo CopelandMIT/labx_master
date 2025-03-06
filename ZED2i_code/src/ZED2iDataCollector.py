@@ -17,12 +17,14 @@ sys.path.append(parent_dir)
 from shared_sensor_code.TimeSync import TimeSync
 
 # Constants
-ZED_EXECUTABLE_PATH = "/home/daniel/labx_master/ZED2i_code/build/ZED_Bodies_JSON_Export"
-SAVE_DIR = "/home/daniel/labx_master/ZED2i_code/data"
+HOME_DIR = os.path.expanduser("~")
 
-# Set up logging
-LOG_DIR = "/home/daniel/labx_master/ZED2i_code/logs"
+ZED_EXECUTABLE_PATH = f"{HOME_DIR}/labx_master/ZED2i_code/build/ZED_Bodies_JSON_Export"
+SAVE_DIR = f"{HOME_DIR}/labx_master/ZED2i_code/data"
+LOG_DIR = f"{HOME_DIR}/labx_master/ZED2i_code/logs"
+
 os.makedirs(LOG_DIR, exist_ok=True)
+
 
 logging.basicConfig(
     filename=os.path.join(LOG_DIR, f"zed_collector_log_{datetime.now().strftime('%Y%m%d_%H%M%S%f')[:-3]}.log"),
