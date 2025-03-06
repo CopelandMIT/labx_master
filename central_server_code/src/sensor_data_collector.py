@@ -36,6 +36,12 @@ rpi_hosts = [
         'password': '',
         'base_remote_path': '/home/dcope/labx_master/camera_code/data'
     },
+    {
+        'host': '192.168.0.47',
+        'username': 'user',
+        'password': 'admin',  # or None if using keys
+        'base_remote_path': '/home/user/labx_master/ZED2i_code/data'
+    },
     # ... add more as needed
 ]
 
