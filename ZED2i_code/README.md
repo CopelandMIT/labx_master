@@ -115,11 +115,8 @@ cd ..
    sudo systemctl restart chrony
    ```
 
-5. **Verify synchronization:**
+5. **Verify synchronization:** After 20 seconds, check to see if your GPS's ip address is listed in chrony sources, even if it is not yet connected to the same wifi. 
 
-   ```bash
-   chronyc tracking
-   ```
      ```bash
    chronyc sources
    ```
