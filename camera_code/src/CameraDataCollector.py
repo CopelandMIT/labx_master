@@ -6,13 +6,10 @@ import cv2
 import signal
 import argparse
 from datetime import datetime
-<<<<<<< HEAD
 import contextlib
 import io
-=======
 from queue import Queue, Empty
 
->>>>>>> ce71d0ec0c200600112511453f63419c031910dd
 
 # Add the parent directory to sys.path
 current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -39,12 +36,8 @@ logging.info("Starting Camera Data Collector script.")
 # Camera Data Collector Class
 # -------------------------------------------------
 
-<<<<<<< HEAD
-VIDEO_CAPTURE_LENGTH = 15  # Default capture length for the whole session
-=======
 VIDEO_CAPTURE_LENGTH = 30  # Default capture length for the whole session
 FRAME_RATE = 30
->>>>>>> ce71d0ec0c200600112511453f63419c031910dd
 
 class CameraDataCollector:
     def __init__(self, stop_event, deployed_sensor_id="CAM001", central_server_url='http://192.168.68.130:5000/receive_data',
