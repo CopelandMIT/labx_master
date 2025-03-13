@@ -169,11 +169,13 @@ class CameraDataCollector:
             try:
                 frame_buffer, batch_start_datetime = self.data_queue.get(timeout=1)
                 if frame_buffer:
+                    
                     self._save_to_file(frame_buffer, batch_start_datetime)
                     self.data_queue.task_done()
+                    
             except Empty:
                 continue
->>>>>>> ce71d0ec0c200600112511453f63419c031910dd
+
 
     def _save_to_file(self, frame_buffer, batch_start_datetime):
         # Format batch start time and calculate duration
