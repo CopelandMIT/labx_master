@@ -129,30 +129,16 @@ class CameraDataCollector:
             if self.capture_duration and elapsed_capture_time >= self.capture_duration:
                 logging.info(f"Reached total capture duration of {self.capture_duration} seconds.")
                 break
-
             ret, frame = cap.read()
             if ret:
-<<<<<<< HEAD
-                # Add frame to buffer
-                with self.buffer_lock:
-                    self.frame_buffer.append(frame)
-
-                # Check if the batch duration has been reached
-                current_time = time.time()
-                if (current_time - batch_start_time) >= self.batch_duration:
-                    print(f"Batch duration of {self.batch_duration} seconds reached. Saving batch.")
-                    self.save_buffered_data(batch_start_time)
-                    batch_start_time = current_time  # Reset the batch timer
-=======
                 frame_buffer.append(frame)
                 elapsed_batch_time = time.time() - batch_start_time
                 if elapsed_batch_time >= self.batch_duration:
                     logging.info(f"Batch duration of {self.batch_duration} seconds reached. Sending batch to queue.")
-                    self.data_queue.put((frame_buffer.copy(), batch_start_datetime))  # Add to queue
-                    frame_buffer.clear()  # Clear local buffer
+                    self.data_queue.put((frame_buffer.copy(), batch_start_datetime))
+                    frame_buffer.clear()
                     batch_start_time = time.time()
                     batch_start_datetime = datetime.now()
->>>>>>> ce71d0ec0c200600112511453f63419c031910dd
             else:
                 logging.error("Error reading frame from camera.")
                 break
