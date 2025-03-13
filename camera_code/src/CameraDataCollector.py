@@ -80,28 +80,16 @@ class CameraDataCollector:
 
 
     def find_working_camera(self):
-<<<<<<< HEAD
-        """Tries different camera indices until it finds one that works, or returns None if none found."""
-        for idx in range(0, 38):  # Adjust the range based on your devices
-            # Suppress stdout and stderr temporarily
+        for idx in range(0, 38):
+            # Suppress stdout/stderr to prevent clutter
             with io.StringIO() as buf, contextlib.redirect_stdout(buf), contextlib.redirect_stderr(buf):
                 cap = cv2.VideoCapture(idx)
                 if cap.isOpened():
-                    print(f"Camera found at index {idx}.")
+                    logging.info(f"Camera found at index {idx}.")
                     cap.release()
                     return idx
                 cap.release()
-        print("No camera found.")
-=======
-        for idx in range(0, 38):  # Adjust based on expected camera range
-            cap = cv2.VideoCapture(idx)
-            if cap.isOpened():
-                logging.info(f"Camera found at index {idx}.")
-                cap.release()
-                return idx
-            cap.release()
         logging.error("No working camera found.")
->>>>>>> ce71d0ec0c200600112511453f63419c031910dd
         return None
 
     def start(self):
