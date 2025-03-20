@@ -131,6 +131,7 @@ venv/
 ENV/
 env.bak/
 venv.bak/
+central_server_code/src/labx_master_env/
 
 # Spyder project settings
 .spyderproject

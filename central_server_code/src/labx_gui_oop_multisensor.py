@@ -159,7 +159,7 @@ class LabInABoxControlPanel:
         start_all_button.grid(row=8, column=0, columnspan=4, pady=10)
 
         # NEW: "Collect Data" Button
-        collect_data_button = tk.Button(self.root, text="Collect Data", command=self.collect_data)
+        collect_data_button = tk.Button(self.root, text="Pull Collected Data", command=self.pull_collected_data)
         collect_data_button.grid(row=9, column=0, columnspan=4, pady=10)
 
 
@@ -292,7 +292,8 @@ class LabInABoxControlPanel:
         logging.info(f"Deleted device configuration at index {index}.")
         messagebox.showinfo("Device Deleted", "Selected device has been deleted.")
 
-    def collect_data(self):
+    def pull_collected_data(self):
+        self.plot_running = False
         if not self.configurations:
             tk.messagebox.showwarning("No Devices", "No devices are configured to collect data from.")
             return
