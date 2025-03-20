@@ -13,11 +13,13 @@ import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import pandas as pd
 import requests
+from auto_data_collector import AutoDataCollector
+
 
 class LabInABoxControlPanel:
-    LOG_DIR = "/home/daniel/labx_master/central_server_code/logs"
-    CENTRAL_SERVER_SCRIPT = "/home/daniel/labx_master/central_server_code/src/central_server_v3.py"
-    SYNC_METRICS_DIR = "/home/daniel/labx_master/central_server_code/data/sync_metrics"
+    LOG_DIR = "/home/linton_central/labx_master/central_server_code/logs"
+    CENTRAL_SERVER_SCRIPT = "/home/linton_central/labx_master/central_server_code/src/central_server_v3.py"
+    SYNC_METRICS_DIR = "/home/linton_central/labx_master/central_server_code/data/sync_metrics"
     PORT = 5000
     SENSOR_TYPES = ["camera", "body_tracking", "radar"]
 
@@ -152,9 +154,13 @@ class LabInABoxControlPanel:
         self.recording_status.create_oval(2, 2, 18, 18, fill="grey")  # Neutral state
         self.recording_status.grid(row=7, column=2, columnspan=2, pady=5)
 
-        # Start All Captures Button
+        # Existing "Start All Captures" Button
         start_all_button = tk.Button(self.root, text="Start All Captures", command=self.start_all_captures)
         start_all_button.grid(row=8, column=0, columnspan=4, pady=10)
+
+        # NEW: "Collect Data" Button
+        collect_data_button = tk.Button(self.root, text="Collect Data", command=self.collect_data)
+        collect_data_button.grid(row=9, column=0, columnspan=4, pady=10)
 
 
     def run(self):
@@ -286,6 +292,25 @@ class LabInABoxControlPanel:
         logging.info(f"Deleted device configuration at index {index}.")
         messagebox.showinfo("Device Deleted", "Selected device has been deleted.")
 
+    def collect_data(self):
+        if not self.configurations:
+            tk.messagebox.showwarning("No Devices", "No devices are configured to collect data from.")
+            return
+
+        default_folder = self.base_filename_entry.get().strip() or "previous_capture"
+        folder_name = tk.simpledialog.askstring(
+            title="Folder Name",
+            prompt="Enter the folder name of the previous capture:",
+            initialvalue=default_folder
+        )
+
+        if not folder_name:
+            tk.messagebox.showinfo("Cancelled", "Data collection cancelled.")
+            return
+
+        collector = AutoDataCollector()
+        collector.pull_previous_data(self.configurations, folder_name=folder_name)
+        tk.messagebox.showinfo("Collection Complete", f"Pulled data from '{folder_name}' on all devices.")
 
     # --------------------------------------
     # Central Server Management
@@ -426,7 +451,7 @@ class LabInABoxControlPanel:
                      f"Sensor Type: {sensor_type}, Sensor ID: {deployed_sensor_id}")
         ssh = paramiko.SSHClient()
         ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-        private_key_path = "/home/daniel/.ssh/id_rsa"
+        private_key_path = "/home/linton_central/.ssh/id_rsa"
 
         try:
             private_key = paramiko.RSAKey.from_private_key_file(private_key_path)
@@ -500,7 +525,6 @@ class LabInABoxControlPanel:
 
     def update_plot(self):
         """Update the live plot with data from the latest CSV file."""
-        import pandas as pd
 
         self.current_csv_file = self.get_latest_csv_file()
         if not self.current_csv_file:
@@ -529,8 +553,9 @@ class LabInABoxControlPanel:
         except Exception as e:
             logging.error(f"Error updating plot: {e}")
 
-        # Schedule the next update
-        self.root.after(1000, self.update_plot)
+            # Schedule the next update only if we're still running
+        if self.plot_running:
+            self.root.after(1000, self.update_plot)
 
     def get_latest_csv_file(self):
         """Retrieve the most recent CSV file from the sync_metrics directory."""

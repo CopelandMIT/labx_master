@@ -1,0 +1,12 @@
+																				2025-02-25 16:12:46,082 - INFO - Starting Lab In A Box Control Panel.
+2025-02-25 16:13:11,760 - INFO - Starting the central server.
+2025-02-25 16:13:11,760 - INFO - Central server launched at http://192.168.0.216:5000/receive_data
+2025-02-25 16:13:11,761 - INFO - Central server URL launched successfully at http://192.168.0.216:5000/receive_data.
+2025-02-25 16:13:11,933 - INFO - Starting Central Server.
+2025-02-25 16:13:11,934 - INFO - Initialized CSV file: //home/linton_central/labx_master/central_server_code/data/sync_metrics/test_capture_pi_cc_20250225_161311933836_30000ms.csv
+2025-02-25 16:13:11,934 - INFO - Starting server at http://192.168.0.216:5000/receive_data
+2025-02-25 16:13:11,944 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://192.168.0.216:5000
+2025-02-25 16:13:11,944 - INFO - [33mPress CTRL+C to quit[0m
+2025-02-25 16:13:12,261 - INFO - Starting remote capture for IP: 192.168.0.70, Username: dcope, Sensor Type: radar, Sensor ID: RAD001
+2025-02-25 16:13:12,261 - ERROR - Connection Error: Could not connect to 192.168.0.70: [Errno 2] No such file or directory: '/home/daniel/.ssh/id_rsa'

@@ -31,10 +31,10 @@ rpi_hosts = [
         'base_remote_path': '/home/pi/labx_master/camera_code/data'
     },
     {
-        'host': '192.168.0.5',
-        'username': 'dcope',
-        'password': '',
-        'base_remote_path': '/home/dcope/labx_master/camera_code/data'
+        'host': '192.168.0.47',
+        'username': 'user',
+        'password': 'admin',
+        'base_remote_path': '/home/user/labx_master/ZED2i_code/data'
     },
     {
         'host': '192.168.0.47',
@@ -46,8 +46,13 @@ rpi_hosts = [
 ]
 
 # 2) Local root folder to which you want to copy the folder from each RPi.
+<<<<<<< Updated upstream
 DEST_ROOT = input("Enter the Local Root Destination Folder path: ").strip()
 
+=======
+#DEST_ROOT = r'/media/daniel/FourTBLaCie/LabXData/pig_heart_test_v12'
+DEST_ROOT = r'/home/linton_central/test_data_022825'
+>>>>>>> Stashed changes
 
 # ------------------------------------------------------------------------------
 # HELPER FUNCTION: Recursively copy a remote directory via SFTP
