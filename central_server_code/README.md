@@ -30,7 +30,7 @@ python3 labx_gui_oop_multisensor.py
 - Monitor the **Live Max Offset** plot to track time synchronization accuracy.
 
 ### 4. Collect Data After Capture
-Once the capture process is complete, run the `sensor_data_collector.py` script to collect the recorded data from each sensor:
+Once the capture process is complete, click the 'Collect Data' Button or run the `sensor_data_collector.py` script to collect the recorded data from each sensor:
 ```bash
 python3 sensor_data_collector.py
 ```
