@@ -167,6 +167,7 @@ cython_debug/
 radar_code/data/
 camera_code/data/
 data/
+pulled_data/
 
 # Ignore logs directories
 radar_code/logs/
