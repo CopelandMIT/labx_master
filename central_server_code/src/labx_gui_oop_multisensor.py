@@ -15,11 +15,14 @@ import pandas as pd
 import requests
 from auto_data_collector import AutoDataCollector
 
+CENTRAL_SERVER_USERNAME = os.getlogin()
 
 class LabInABoxControlPanel:
-    LOG_DIR = "/home/linton_central/labx_master/central_server_code/logs"
-    CENTRAL_SERVER_SCRIPT = "/home/linton_central/labx_master/central_server_code/src/central_server_v3.py"
-    SYNC_METRICS_DIR = "/home/linton_central/labx_master/central_server_code/data/sync_metrics"
+    LABX_HOME = os.path.expanduser("~/labx_master")
+    print(LABX_HOME)  
+    LOG_DIR = os.path.join(LABX_HOME, "central_server_code", "logs")
+    SYNC_METRICS_DIR = os.path.join(LABX_HOME, "central_server_code", "data", "sync_metrics")
+    CENTRAL_SERVER_SCRIPT = os.path.join(LABX_HOME, "central_server_code", "src", "central_server_v3.py")
     PORT = 5000
     SENSOR_TYPES = ["camera", "body_tracking", "radar"]
 
@@ -452,7 +455,7 @@ class LabInABoxControlPanel:
                      f"Sensor Type: {sensor_type}, Sensor ID: {deployed_sensor_id}")
         ssh = paramiko.SSHClient()
         ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-        private_key_path = "/home/linton_central/.ssh/id_rsa"
+        private_key_path = f"/home/{CENTRAL_SERVER_USERNAME}/.ssh/id_rsa"
 
         try:
             private_key = paramiko.RSAKey.from_private_key_file(private_key_path)
