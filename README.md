@@ -61,10 +61,7 @@ The distributed multimodal monitoring capabilities of the LabX Master project en
 
 To participate in the LabX Master project:
 
-1. **Clone the Repository**:  
-   ```bash
-   git clone https://github.com/CopelandMIT/labx_master.git
-   ```
+1. **Create a Central Server**: Follow the steps on the central server guide page. 
 2. **Review Documentation**: Explore the component/sensor (camera, central server, GPS, radar) directories for hardware requirements and setup guides.
 3. **Set Up Hardware**: Prepare your SBCs and sensors following the hardware setup guide. Example: Radar set up instructions are in radar_code's README.md
 4. **Configure Time Sync**: Set up NTP and PPS GPS synchronization as per instructions.
