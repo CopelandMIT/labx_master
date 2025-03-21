@@ -124,17 +124,14 @@ wait a few minutes for the time sync to stabilize.
    ```
 2. Start the data collector with desired settings:
    ```bash
-   python3 CameraDataCollector.py --duration 300 --data_directory_name "data"
+   python3 CameraDataCollector.py --capture duration 300 --data_directory_name "data"
    ```
    This command starts recording for 300 seconds (or your specified duration).
 
 ### Optional Arguments
 
-- `--sbc_id`: Unique ID for your single board computer (default: `SBC001`)
-- `--duration`: Total recording duration in seconds 
-- `--data_directory`: Directory to store recorded video files
-- `--batch_duration`: Duration in seconds for each batch segment (default: 10 seconds)
-- `--disable_data_sync`: Add this flag to disable timestamp synchronization with the central server.
+- `--deployed_sensor_id`: Unique ID for your single board computer (default: `CAM001`)
+- `--capture duration`: Total recording duration in seconds 
 
 ## Troubleshooting
 
