@@ -3,12 +3,6 @@
 ## Overview
 This repository contains the central server code for the "Lab in a Box" system. It is responsible for coordinating data collection from multiple sensors, monitoring time synchronization, and collecting recorded data after the capture process.
 
-## Prerequisites
-Before running the central server, ensure that:
-1. All sensors are correctly configured and connected to the network. (Go to sensor subfolder if you need to set up a given sensor)
-2. Each sensor has an assigned IP address and username for SSH access.
-3. The necessary dependencies are installed using `requirements.txt`.
-
 ## Setup and Execution
 
 **LabX Master Setup Guide**
@@ -180,6 +174,11 @@ pip install -r requirements.txt
 ```
 
 4\. **Run the GUI Control Panel:**
+
+## Prerequisites
+Before running the central server, ensure that:
+1. All sensors are correctly configured and connected to the network. (Go to sensor subfolder if you need to set up a given sensor)
+2. Each sensor has an assigned IP address and username for SSH access and key sharing.
 
 ```bash
 python3 labx_gui_oop_multisensor.py
