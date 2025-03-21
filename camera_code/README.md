@@ -131,7 +131,7 @@ wait a few minutes for the time sync to stabilize.
 ### Optional Arguments
 
 - `--sbc_id`: Unique ID for your single board computer (default: `SBC001`)
-- `--duration`: Total recording duration in seconds
+- `--duration`: Total recording duration in seconds 
 - `--data_directory`: Directory to store recorded video files
 - `--batch_duration`: Duration in seconds for each batch segment (default: 10 seconds)
 - `--disable_data_sync`: Add this flag to disable timestamp synchronization with the central server.
