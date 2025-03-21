@@ -18,7 +18,9 @@ This document provides step-by-step instructions to set up the LabXMaster projec
 **1\. Clone the Repository**
 
 Clone the repository using the command below:
-```git clone https://github.com/CopelandMIT/labx_master.git```
+```bash
+git clone https://github.com/CopelandMIT/labx_master.git
+```
 
 **2\. Configure SSH and Copy Permission Keys**
 
@@ -30,7 +32,9 @@ Create a new SSH key pair if one doesn’t already exist. This keypair is used f
 
 **Command:**
 
- ```ssh-keygen -t rsa -b 4096 -C "your_email@example.com"```
+ ```bash
+ ssh-keygen -t rsa -b 4096 -C "your_email@example.com"
+```
 
 **Notes:**
 
@@ -50,7 +54,9 @@ This automates copying the public key to the Raspberry Pi’s authorized\_keys f
 
 **Command:**
 
- ```ssh-copy-id pi@192.168.YYY.XXX ```
+ ```bash 
+ ssh-copy-id pi@192.168.YYY.XXX 
+ ```
 
 **Notes:**
 
@@ -64,7 +70,9 @@ This automates copying the public key to the Raspberry Pi’s authorized\_keys f
 
 1\. **Displaythe Public Key on the Central Server:**
 
-```cat ~/.ssh/id_rsa.pub ```
+```bash
+cat ~/.ssh/id_rsa.pub
+```
 
 2\. **Copythe output.**
 
@@ -72,18 +80,26 @@ This automates copying the public key to the Raspberry Pi’s authorized\_keys f
 
 • Create the .sshdirectory if it does not exist:
 
-``` mkdir -p ~/.ssh ```
+```bash 
+mkdir -p ~/.ssh
+```
 
 • Create or edit the authorized\_keys file:
 
-```  nano ~/.ssh/authorized_keys   ```
+```bash
+nano ~/.ssh/authorized_keys
+```
 
 • Paste the copied public keyinto the file and save your changes.
 
 4\. **SetCorrect Permissions on the Raspberry Pi:**
 
-```  chmod 700 ~/.ssh   ```
-```chmod 600 ~/.ssh/authorized_keys   ```
+```bash  
+chmod 700 ~/.ssh
+```
+```bash
+chmod 600 ~/.ssh/authorized_keys
+```
 
 **2.3 Check and Configure SSH Keys**
 
@@ -91,13 +107,19 @@ Verify that the SSH keys are set up correctly and that you canconnect without a 
 
 1\. **VerifySSH Key Permissions on the Raspberry Pi:**
 
-``` chmod 700 ~/.ssh   ```
+```bash
+chmod 700 ~/.ssh
+```
 
-``` chmod 600 ~/.ssh/authorized_keys   ```
+```bash 
+chmod 600 ~/.ssh/authorized_keys
+```
 
 2\. **Testthe SSH Connection from the Central Server:**
 
-```  ssh pi@192.168.YYY.XXX   ```
+```bash
+ssh pi@192.168.YYY.XXX
+```
 
 You should now connect without being prompted for a password.
 
@@ -111,15 +133,21 @@ Verify that the private key on the central server (~/.ssh/id\_rsa)matches the pu
 
 Open /etc/ssh/sshd\_config and ensure thesesettings are enabled:
 
-```  PasswordAuthentication no   ```
+```bash
+PasswordAuthentication no
+```
 
-```  PubkeyAuthentication yes   ```
+```bash
+PubkeyAuthentication yes
+```
 
 These enforce key-based authentication.
 
 • **Restartthe SSH Service:**
 
-```  sudo systemctl restart ssh   ```
+```bash
+sudo systemctl restart ssh
+```
 
 **3\. Start the GUI Control Panel**
 
@@ -127,25 +155,35 @@ Follow these steps to configure and launch the GUI for datacollection.
 
 1\. **ChangeDirectory to the Central Server Source Code:**
 
-```  cd labx_master/central_server_code/src   ```
+```bash
+cd labx_master/central_server_code/src  
+```
 
 2\. **Createand Activate a Python Virtual Environment:**
 
 • Create the environment:
 
-```  python3 -m venv env   ```
+```bash
+python3 -m venv env
+```
 
 • Activate the environment:
 
-```  source env/bin/activate   ```
+```bash
+source env/bin/activate
+```
 
 3\. **InstallRequired Dependencies:**
 
-```  pip install -r requirements.txt   ```
+```bash
+pip install -r requirements.txt
+```
 
 4\. **Runthe GUI Control Panel:**
 
-```  python3 labx_gui_oop_multisensor.py   ```
+```bash
+python3 labx_gui_oop_multisensor.py
+```
 
 You should now be ready to configure and start data collectionusing the LabX Master GUI control panel. If you encounter any issues, referback to the troubleshooting steps or consult the project documentation.
 
