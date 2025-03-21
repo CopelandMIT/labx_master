@@ -115,7 +115,7 @@ wait a few minutes for the time sync to stabilize.
 
 --- 
 
-### Step 4: Running the Data Collector
+### Step 4: Running the Data Collector locally
 
 1. Make sure you’re in the virtual environment:
    ```bash
@@ -127,6 +127,10 @@ wait a few minutes for the time sync to stabilize.
    python3 CameraDataCollector.py --capture duration 300
    ```
    This command starts recording for 300 seconds (or your specified duration).
+
+### Step 5: Running the Data Collector on the central server GUI
+
+1. Make sure you follow the central server steps on how to connect this sensor and share keys with the sensors raspberry pi. 
 
 ### Optional Arguments
 
