@@ -11,11 +11,145 @@ Before running the central server, ensure that:
 
 ## Setup and Execution
 
-### 1. Start the GUI Control Panel
-Run the GUI to configure and start data collection:
-```bash
-python3 labx_gui_oop_multisensor.py
-```
+**LabX Master Setup Guide**
+
+This document provides step-by-step instructions to set up the LabXMaster project. Follow these instructions to clone the repository, configureSSH key-based authentication with all sensors (e.g., Raspberry Pi), and launchthe GUI control panel for data collection.
+
+**1\. Clone the Repository**
+
+Clone the repository using the command below:
+```git clone https://github.com/CopelandMIT/labx_master.git```
+
+**2\. Configure SSH and Copy Permission Keys**
+
+Before running the project, ensure that you have exchanged SSH keyswith all of your sensors. This section explains how to generate an SSH key pairon the central server, copy your public key to a Raspberry Pi, and verify thesetup.
+
+**2.1 Generate SSH Key Pair on the Central Server**
+
+Create a new SSH key pair if one doesn’t already exist. This keypair is used for authenticating with the Raspberry Pi.
+
+**Command:**
+
+ ```ssh-keygen -t rsa -b 4096 -C "your_email@example.com"```
+
+**Notes:**
+
+• Replace "your\_email@example.com"with your actual email.
+
+• Press Enter to accept thedefault file location.
+
+• Choose whether to set apassphrase or leave it empty.
+
+**2.2 Copy SSH Public Key to the Raspberry Pi**
+
+You can copy your public key using one of the following methods:
+
+**Using ssh-copy-id**
+
+This automates copying the public key to the Raspberry Pi’s authorized\_keys file.
+
+**Command:**
+
+ ```ssh-copy-id pi@192.168.YYY.XXX ```
+
+**Notes:**
+
+• Replace piwith your Raspberry Pi’s username.
+
+• Replace 192.168.YYY.XXXwith the IP address of your Raspberry Pi.
+
+• You will be prompted for theRaspberry Pi user’s password once.
+
+**Manual Method**
+
+1\. **Displaythe Public Key on the Central Server:**
+
+```cat ~/.ssh/id_rsa.pub ```
+
+2\. **Copythe output.**
+
+3\. **Onthe Raspberry Pi:**
+
+• Create the .sshdirectory if it does not exist:
+
+``` mkdir -p ~/.ssh ```
+
+• Create or edit the authorized\_keys file:
+
+```  nano ~/.ssh/authorized_keys   ```
+
+• Paste the copied public keyinto the file and save your changes.
+
+4\. **SetCorrect Permissions on the Raspberry Pi:**
+
+```  chmod 700 ~/.ssh   ```
+```chmod 600 ~/.ssh/authorized_keys   ```
+
+**2.3 Check and Configure SSH Keys**
+
+Verify that the SSH keys are set up correctly and that you canconnect without a password.
+
+1\. **VerifySSH Key Permissions on the Raspberry Pi:**
+
+``` chmod 700 ~/.ssh   ```
+
+``` chmod 600 ~/.ssh/authorized_keys   ```
+
+2\. **Testthe SSH Connection from the Central Server:**
+
+```  ssh pi@192.168.YYY.XXX   ```
+
+You should now connect without being prompted for a password.
+
+3\. **Troubleshooting:**
+
+• **Ensurethe Correct SSH Key Pair:**
+
+Verify that the private key on the central server (~/.ssh/id\_rsa)matches the public key on the Raspberry Pi (~/.ssh/authorized\_keys).
+
+• **CheckSSH Configuration on the Raspberry Pi:**
+
+Open /etc/ssh/sshd\_config and ensure thesesettings are enabled:
+
+```  PasswordAuthentication no   ```
+
+```  PubkeyAuthentication yes   ```
+
+These enforce key-based authentication.
+
+• **Restartthe SSH Service:**
+
+```  sudo systemctl restart ssh   ```
+
+**3\. Start the GUI Control Panel**
+
+Follow these steps to configure and launch the GUI for datacollection.
+
+1\. **ChangeDirectory to the Central Server Source Code:**
+
+```  cd labx_master/central_server_code/src   ```
+
+2\. **Createand Activate a Python Virtual Environment:**
+
+• Create the environment:
+
+```  python3 -m venv env   ```
+
+• Activate the environment:
+
+```  source env/bin/activate   ```
+
+3\. **InstallRequired Dependencies:**
+
+```  pip install -r requirements.txt   ```
+
+4\. **Runthe GUI Control Panel:**
+
+```  python3 labx_gui_oop_multisensor.py   ```
+
+You should now be ready to configure and start data collectionusing the LabX Master GUI control panel. If you encounter any issues, referback to the troubleshooting steps or consult the project documentation.
+
+Make sure you copy the entire content above into your file toretain all markdown formatting.
 
 ### 2. Configure Devices and Capture Settings
 - Enter the **Base Filename** for captured data.
