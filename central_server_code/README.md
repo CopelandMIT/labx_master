@@ -202,20 +202,18 @@ Make sure you copy the entire content above into your file to retain all markdow
 - Monitor the **Live Max Offset** plot to track time synchronization accuracy.
 
 ### 4. Collect Data After Capture
-Once the capture process is complete, click the 'Collect Data' Button or run the `sensor_data_collector.py` script to collect the recorded data from each sensor:
-```bash
-python3 sensor_data_collector.py
-```
-This script will:
+Once the capture process is complete, click the 'Collect Data'.
+
+This will:
 - Connect to each sensor via SSH.
-- Retrieve the recorded data.
-- Store the data in the designated local directory (`DEST_ROOT`).
+- Retrieve the recorded data from the last or specified capture.
+- Store the data in the designated local directory (`pulled_data`).
 
 ## File Structure
 ```
 central_server_code/
 │── archives/                   # Archived logs and previous runs
-│── data/                       # Local storage for collected data
+│── pulled_data/                # Local storage for collected data
 │── labx_env/                   # Virtual environment (if applicable)
 │── logs/                       # Log files for debugging
 │── src/                        # Source code
