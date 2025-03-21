@@ -14,8 +14,9 @@ This project is a Python-based camera data collection tool designed for a Raspbe
 
 1. Download the latest **64-bit Raspberry Pi OS** (desktop version) from the [official website](https://www.raspberrypi.com/software/operating-systems/).
 2. Use a tool like **Raspberry Pi Imager** to flash the OS onto a microSD card with at least 256 GB of storage.
-3. Boot up the Raspberry Pi with the newly flashed OS.
-4. If using VNC/SSH, run:
+3. Edit Settinsg with username, password and wifi info. Remeber these!
+4. Boot up the Raspberry Pi with the newly flashed OS.
+5. If using VNC/SSH, run:
    ```bash
    sudo raspi-config
    ```
