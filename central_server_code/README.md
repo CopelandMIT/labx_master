@@ -186,8 +186,6 @@ python3 labx_gui_oop_multisensor.py
 
 You should now be ready to configure and start data collection using the LabX Master GUI control panel. If you encounter any issues, refer back to the troubleshooting steps or consult the project documentation.
 
-Make sure you copy the entire content above into your file to retain all markdown formatting.
-
 ### 2. Configure Devices and Capture Settings
 - Enter the **Base Filename** for captured data.
 - Set the **Capture Duration** (in seconds).
