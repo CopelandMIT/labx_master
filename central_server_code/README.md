@@ -28,7 +28,7 @@ Before running the project, ensure that you have exchanged SSH keyswith all of y
 
 **2.1 Generate SSH Key Pair on the Central Server**
 
-Create a new SSH key pair if one doesn’t already exist. This keypair is used for authenticating with the Raspberry Pi.
+Create a new SSH key pair if one doesn’t already exist. This key pair is used for authenticating with the Raspberry Pi.
 
 **Command:**
 
@@ -38,11 +38,11 @@ Create a new SSH key pair if one doesn’t already exist. This keypair is used f
 
 **Notes:**
 
-• Replace "your\_email@example.com"with your actual email.
+• Replace "your\_email@example.com" with your actual email.
 
-• Press Enter to accept thedefault file location.
+• Press Enter to accept the default file location.
 
-• Choose whether to set apassphrase or leave it empty.
+• Choose whether to set a passphrase or leave it empty.
 
 **2.2 Copy SSH Public Key to the Raspberry Pi**
 
@@ -50,7 +50,7 @@ You can copy your public key using one of the following methods:
 
 **Using ssh-copy-id**
 
-This automates copying the public key to the Raspberry Pi’s authorized\_keys file.
+This automates copying the public key to the Raspberry Pi’s authorized keys file.
 
 **Command:**
 
@@ -60,11 +60,11 @@ This automates copying the public key to the Raspberry Pi’s authorized\_keys f
 
 **Notes:**
 
-• Replace piwith your Raspberry Pi’s username.
+• Replace pi with your Raspberry Pi’s username.
 
-• Replace 192.168.YYY.XXXwith the IP address of your Raspberry Pi.
+• Replace 192.168.YYY.XXX with the IP address of your Raspberry Pi.
 
-• You will be prompted for theRaspberry Pi user’s password once.
+• You will be prompted for the Raspberry Pi user’s password once.
 
 **Manual Method**
 
@@ -74,9 +74,9 @@ This automates copying the public key to the Raspberry Pi’s authorized\_keys f
 cat ~/.ssh/id_rsa.pub
 ```
 
-2\. **Copythe output.**
+2\. **Copy the output.**
 
-3\. **Onthe Raspberry Pi:**
+3\. **On the Raspberry Pi:**
 
 • Create the .sshdirectory if it does not exist:
 
@@ -90,9 +90,9 @@ mkdir -p ~/.ssh
 nano ~/.ssh/authorized_keys
 ```
 
-• Paste the copied public keyinto the file and save your changes.
+• Paste the copied public key into the file and save your changes.
 
-4\. **SetCorrect Permissions on the Raspberry Pi:**
+4\. **Set Correct Permissions on the Raspberry Pi:**
 
 ```bash  
 chmod 700 ~/.ssh
@@ -103,7 +103,7 @@ chmod 600 ~/.ssh/authorized_keys
 
 **2.3 Check and Configure SSH Keys**
 
-Verify that the SSH keys are set up correctly and that you canconnect without a password.
+Verify that the SSH keys are set up correctly and that you can connect without a password.
 
 1\. **VerifySSH Key Permissions on the Raspberry Pi:**
 
@@ -115,7 +115,7 @@ chmod 700 ~/.ssh
 chmod 600 ~/.ssh/authorized_keys
 ```
 
-2\. **Testthe SSH Connection from the Central Server:**
+2\. **Test the SSH Connection from the Central Server:**
 
 ```bash
 ssh pi@192.168.YYY.XXX
@@ -125,13 +125,13 @@ You should now connect without being prompted for a password.
 
 3\. **Troubleshooting:**
 
-• **Ensurethe Correct SSH Key Pair:**
+• **Ensure the Correct SSH Key Pair:**
 
 Verify that the private key on the central server (~/.ssh/id\_rsa)matches the public key on the Raspberry Pi (~/.ssh/authorized\_keys).
 
 • **CheckSSH Configuration on the Raspberry Pi:**
 
-Open /etc/ssh/sshd\_config and ensure thesesettings are enabled:
+Open /etc/ssh/sshd\_config and ensure these settings are enabled:
 
 ```bash
 PasswordAuthentication no
@@ -143,7 +143,7 @@ PubkeyAuthentication yes
 
 These enforce key-based authentication.
 
-• **Restartthe SSH Service:**
+• **Restart the SSH Service:**
 
 ```bash
 sudo systemctl restart ssh
@@ -151,7 +151,7 @@ sudo systemctl restart ssh
 
 **3\. Start the GUI Control Panel**
 
-Follow these steps to configure and launch the GUI for datacollection.
+Follow these steps to configure and launch the GUI for data collection.
 
 1\. **ChangeDirectory to the Central Server Source Code:**
 
@@ -159,7 +159,7 @@ Follow these steps to configure and launch the GUI for datacollection.
 cd labx_master/central_server_code/src  
 ```
 
-2\. **Createand Activate a Python Virtual Environment:**
+2\. **Create and Activate a Python Virtual Environment:**
 
 • Create the environment:
 
@@ -173,21 +173,21 @@ python3 -m venv env
 source env/bin/activate
 ```
 
-3\. **InstallRequired Dependencies:**
+3\. **Install Required Dependencies:**
 
 ```bash
 pip install -r requirements.txt
 ```
 
-4\. **Runthe GUI Control Panel:**
+4\. **Run the GUI Control Panel:**
 
 ```bash
 python3 labx_gui_oop_multisensor.py
 ```
 
-You should now be ready to configure and start data collectionusing the LabX Master GUI control panel. If you encounter any issues, referback to the troubleshooting steps or consult the project documentation.
+You should now be ready to configure and start data collection using the LabX Master GUI control panel. If you encounter any issues, refer back to the troubleshooting steps or consult the project documentation.
 
-Make sure you copy the entire content above into your file toretain all markdown formatting.
+Make sure you copy the entire content above into your file to retain all markdown formatting.
 
 ### 2. Configure Devices and Capture Settings
 - Enter the **Base Filename** for captured data.
