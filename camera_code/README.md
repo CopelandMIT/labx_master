@@ -8,7 +8,7 @@ This project is a Python-based camera data collection tool designed for a Raspbe
 - **Storage**: 256+ GB storage recommended for local storage and extended recording sessions
 - **Software**: Raspberry Pi OS (64-bit) and OpenCV installed
 
-## Installation
+## Raspberry Pi Setup
 
 ### Step 1: Flash the Raspberry Pi OS
 
@@ -19,26 +19,48 @@ This project is a Python-based camera data collection tool designed for a Raspbe
    ```bash
    sudo raspi-config
    ```
-   Navigate to "Interface" to enable SSH and VNC.
+   Navigate to "Interface Options" to enable SSH and VNC.
 
-### Step 2: Set Up the Environment
+### Step 1.1: Edit Settings on the Raspberry Pi
+
+After booting up, it's important to configure your Raspberry Pi before setting up the environment:
+
+- **Connect to WiFi:**  
+  Click on the network icon in the top-right corner of the desktop environment, then select your WiFi network. Enter your WiFi username and password when prompted.
+  
+- **Change Default Username/Password:**  
+  It is recommended to change the default login credentials. Open a terminal and run:
+  ```bash
+  sudo raspi-config
+  ```
+  Navigate to "System Options" > "Password" (or the equivalent option) and set a new password. (Note: Changing the default username may require additional steps or using a custom image.)
+  
+- **Enable SSH and VNC:**  
+  Within the same `raspi-config` utility, navigate to "Interface Options" and enable both SSH and VNC if you plan to access the Raspberry Pi remotely.
+
+### Step 2: Set Up the Environment on the Raspberry Pi
 
 1. **Clone this repository**:
-   ```bash
-   git clone https://github.com/CopelandMIT/labx_master.git
-   ```
-2. **Create and activate a virtual environment** called `labx_env`:
-   ```bash
-   cd labx_master/camera_code
-   python3 -m venv labx_env
-   source labx_env/bin/activate
-   ```
-3. **Install the dependencies** from `requirements.txt`:
-   ```bash
-   pip install -r requirements.txt
-   ```
 
-4. **Configure settings** in the `camera_code.py` file if needed (e.g., `central_server_url`, `batch_duration`).
+    ```bash
+    git clone https://github.com/CopelandMIT/labx_master.git
+    ```
+
+2. **Create and Activate a Virtual Environment** called `labx_env`:
+
+    ```bash
+    cd labx_master/camera_code
+    python3 -m venv labx_env
+    source labx_env/bin/activate
+    ```
+
+3. **Install the Dependencies** from `requirements.txt`:
+
+    ```bash
+    pip install -r requirements.txt
+    ```
+
+4. **Configure Settings** in the `src/CameraDataCollector.py` file if needed (e.g., `central_server_url`, `batch_duration`).
 
 ---
 
