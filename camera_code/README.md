@@ -130,7 +130,7 @@ wait a few minutes for the time sync to stabilize.
 
 ### Step 5: Running the Data Collector on the central server GUI
 
-1. Make sure you follow the central server steps on how to connect this sensor and share keys with the sensors raspberry pi. 
+1. Make sure you follow the central server steps on how to connect this sensor and share keys with this camera sensor's raspberry pi. 
 
 ### Optional Arguments
 
