@@ -25,16 +25,6 @@ This project is a Python-based camera data collection tool designed for a Raspbe
 ### Step 1.1: Edit Settings on the Raspberry Pi
 
 After booting up, it's important to configure your Raspberry Pi before setting up the environment:
-
-- **Connect to WiFi:**  
-  Click on the network icon in the top-right corner of the desktop environment, then select your WiFi network. Enter your WiFi username and password when prompted.
-  
-- **Change Default Username/Password:**  
-  It is recommended to change the default login credentials. Open a terminal and run:
-  ```bash
-  sudo raspi-config
-  ```
-  Navigate to "System Options" > "Password" (or the equivalent option) and set a new password. (Note: Changing the default username may require additional steps or using a custom image.)
   
 - **Enable SSH and VNC:**  
   Within the same `raspi-config` utility, navigate to "Interface Options" and enable both SSH and VNC if you plan to access the Raspberry Pi remotely.
