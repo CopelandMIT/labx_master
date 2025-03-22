@@ -124,7 +124,7 @@ wait a few minutes for the time sync to stabilize.
    ```
 2. Start the data collector with desired settings:
    ```bash
-   python3 CameraDataCollector.py --capture duration 300
+   python3 CameraDataCollector.py --capture_duration 300
    ```
    This command starts recording for 300 seconds (or your specified duration).
 
@@ -135,7 +135,7 @@ wait a few minutes for the time sync to stabilize.
 ### Optional Arguments
 
 - `--deployed_sensor_id`: Unique ID for your single board computer (default: `CAM001`)
-- `--capture duration`: Total recording duration in seconds 
+- `--capture_duration`: Total recording duration in seconds 
 
 ## Troubleshooting
 
